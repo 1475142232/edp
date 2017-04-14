@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>EDP</title>
+	<link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+	<link href="./src/bootstrapvalidator/dist/css/bootstrapValidator.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="./src/actionlist-module/css/index.css" />
+</head>
+<body>
+	<!-- 项目列表内容部分 -->
+    <div class="content-box-zhu" id="actionList">
+       
+		<div class="task-dateil-task">
+   			<div class="task-deteil-list">
+   				<i class="back"></i>
+   				<h3 class="task-deteil-list-h3" style="margin:0;text-align:left;">
+   					<span class="listName"></span>功能
+   				</h3>
+   				<div class="task-deteil-no">
+   					<div class="task-list-top">
+   						<span class="top-span">输入参数</span>
+   						<hr class="top-heng"/>
+   					</div>
+   					<div class="task-list-center" id="noList">
+   						
+   					</div>
+   				</div>
+   				<div class="task-deteil-approve">
+   					<div class="task-list-top">
+   						<span class="top-span">输出参数</span>
+   						<hr class="top-heng"/>
+   					</div>
+   					<div class="task-list-center" id="approveList">
+   					</div>
+   				</div>
+   				<div class="task-deteil-yes">
+   					<div class="task-list-top">
+   						<span class="top-span">url地址</span>
+   						<hr class="top-heng"/>
+   					</div>
+   					<div class="task-list-center" id="yesList">
+   					
+   					</div>
+   				</div>
+   			</div>
+   		</div>
+    </div>
+    
+	<!-- 模态框（Modal） --> 
+    <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+	    <div class="modal-dialog"> 
+	        <div class="modal-content"> 
+	            <div class="modal-header"> 
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+	                <h4 class="modal-title" id="myModalLabel">提示信息</h4> 
+	            </div> 
+	            <div class="modal-body">
+	                	您确定删除此功能？
+	            </div> 
+	            <div class="modal-footer"> 
+	                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	                <button type="button" class="btn btn-primary" data-dismiss="modal" id="del_Data">确定</button>
+	            </div> 
+	        </div><!-- /.modal-content --> 
+	    </div><!-- /.modal --> 
+	</div>
+   	
+	<!-- 模态框（Modal） --> 
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+	    <div class="modal-dialog"> 
+	        <div class="modal-content"> 
+	            <div class="modal-header"> 
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+	                <h4 class="modal-title" id="myModalLabel">提示信息</h4> 
+	            </div> 
+	            <div class="modal-body" id="modelInfo"></div> 
+	            <div class="modal-footer"> 
+	                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+	            </div> 
+	        </div><!-- /.modal-content --> 
+	    </div><!-- /.modal --> 
+	</div>
+	
+	<script src="./src/jquery/jquery.min.js"></script>
+	<script src="./src/kissy/jquery.form.js"></script>
+	<script src="./src/kissy/seed-min.js"></script>
+	<script src="./src/kissy/import-style-min.js"></script>
+	<script src="./src/kissy/kissy/bui/adapter-min.js"></script>
+	<script src="./src/bootstrapvalidator/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./src/bootstrapvalidator/dist/js/bootstrapValidator.js"></script>
+	<script src="./src/module-config.js"></script>
+	<script src="./src/actionlist-module/action-entry.js"></script>
+</body>
+</html>

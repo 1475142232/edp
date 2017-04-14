@@ -1,0 +1,21 @@
+package com.edp.serviceI.product;
+
+
+import java.util.List;
+
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.UserInfoDto;
+
+public interface ProductServiceI {
+	
+	List<ProductDto> getAllProduct(Integer teamId, Integer id);
+
+	Integer addProduct(ProductDto productDto);
+
+	String addUTPId(Integer teamId, Integer id, ProductDto productDto,Integer role_type);
+
+	Integer editProductById(ProductDto productDto);
+
+	ProductDto findProductById(String productId);
+
+}

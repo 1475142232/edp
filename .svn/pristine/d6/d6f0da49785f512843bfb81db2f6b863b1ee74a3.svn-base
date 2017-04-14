@@ -1,0 +1,50 @@
+﻿@charset "utf-8";
+/*=========================Reset_start==========================*/
+body,h1,h2,h3,h4,h5,h6,div,p,dl,dt,dd,ol,ul,li,form,table,th,td,a,
+img,span,strong,var,em,input,textarea,select,option{margin: 0; padding: 0;}
+html,body{font-family:"微软雅黑","黑体",Arail,Tabhoma;
+	text-align: left;}
+ul,ol{list-style: none;}
+img{border: 0;}
+input,select,textarea{outline:0;}
+table{border-collapse: collapse; border-spacing: 0;}
+th,strong,var,em{font-weight: normal; font-style: normal;}
+a{text-decoration: none;}
+a:link,a:visited,a:hover,a:active{text-decoration:none;}
+/*==========================Reset_End===========================*/
+body{background:url(../img/bg.jpg) repeat;}
+.dropdown-toggle{font-size:20px;color:#CC9966 !important;font-weight: bold;color:#996666 !important}
+.nav-color-zhu{font-size:16px;color:#CC9966 !important;font-weight: bold;}
+.content-box-zhu{width:100%;min-height:500px;padding:40px 40px;border-radius:8px;background:#fff;margin:0 auto;-webkit-box-shadow:3px 3px 3px #CCCCCC;  -moz-box-shadow:3px 3px 3px #CCCCCC;box-shadow:3px 3px 3px #CCCCCC; }
+/*项目统计*/
+.x_tongji{overflow: hidden;}
+.x_tit{font-size: 22px;}
+.x_statistic_tit{float: left;}
+.x_return{float: right;}
+.x_tongjiCon{margin:50px 0;overflow: hidden;}
+.x_tongjiCon li{border-right: 1px solid #AEAEAE;text-align: center;}
+.x_top{color: #868686;font-size:20px;padding: 10px 0;}
+.x_con{font-size: 20px;padding: 10px 0;font-weight: bold;letter-spacing: 1px;}
+.x_tongjiCon .x_borderRight{border-right: 0;}
+/*项目经理统计*/
+.x_line{border-bottom: 1px solid #00FF66;padding-bottom: 10px;}
+.x_manaS{margin: 60px 0;}
+.x_waitComp{background: url(../img/bg0.png) 0px 0px no-repeat;height: 37px;line-height: 37px;padding-left:50px;font-size: 30px;color: #D7D7D9;float: left;}
+.x_lineCenter{border-top:1px solid #D7D7D9;margin-top: 19px;}
+.x_manCon{margin: 25px 0;}
+.x_maTit{font-size: 18px;}
+.x_maTit2{font-size: 14px;margin-left: 40px;}
+.x_require{margin: 10px 0;color:#D7D7D9 ;}
+.x_right{font-size: 25px;color: red;}
+.x_comp{background: url(../img/bg1.png) 0px 0px no-repeat;height: 37px;line-height: 37px;padding-left:50px;font-size: 30px;color: #D7D7D9;float: left;}
+.x_distribute{background: url(../img/bg3.png) 0px 0px no-repeat;height: 37px;line-height: 37px;padding-left:50px;font-size: 30px;color: #D7D7D9;float: left;}
+.x_right3{font-size: 25px;color:#00FF33;}
+/*忘记密码*/
+.x_findCon{width: 720px;margin: 70px auto 0;}
+.x_findT{color: #999999;font-size: 50px;text-align: center;}
+.x_findC{width: 528px;background: #fff;margin: 30px auto 0;border: 1px solid #D9D9D9;border-radius:8px;padding: 40px 0;overflow: hidden;}
+.x_find_title{font-size: 25px;color: #C0C0C0;}
+.x_margin{width: 85%;margin: 0 auto;}
+.x_inputT{margin-top: 30px;}
+.x_find_input{padding-left: 10px;height: 40px;line-height: 40px;}
+.x_findSub{margin: 30px auto 0px;width: 300px;height: 47px;font-size: 18px;}

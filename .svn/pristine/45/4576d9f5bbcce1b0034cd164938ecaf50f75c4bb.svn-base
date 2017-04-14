@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+<link href='./src/fullcalendar-module/css/fullcalendar.css' rel='stylesheet' />
+<link href='./src/fullcalendar-module/css/fullcalendar.print.css' rel='stylesheet' media='print' />
+	<script src="./src/jquery/jquery.min.js"></script>
+<script src='./src/jquery/jquery-ui.custom.min.js'></script>
+<script src='./src/fullcalendar-module/src/fullcalendar.min.js'></script>
+<!--<script src='../../src/fullcalendar-module/src/calendar.js'></script>  -->
+<style>
+
+	body {
+		margin-top: 40px;
+		text-align: center;
+		font-size: 14px;
+		font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+		}
+
+
+</style>
+</head>
+<body>
+  <!-- 我的任务 -->
+<div class="row content-box-zhu">
+     <div id='calendar'></div>
+</div>
+</body>
+</html>

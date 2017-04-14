@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>团队选择+团队创建</title>
+	<link rel="stylesheet" href="./../src/teamcreat-module/css/teamcreat.css" />
+	<link rel="stylesheet" href="./../src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+</head>
+<body>
+	<div class="container">
+	   <div class="row row-box-zhu">
+	        <!-- 列表 -->
+			<div class="addNav">
+				<div class="navList">
+					<a href="javascript:;">EDP ></a>
+				</div>
+				<a href="javascript:;" class="addNavBtn">＋</a>
+			</div>
+	   </div>
+   		<!-- 弹窗 -->
+		<div class="addNavAlert">
+			<h1>新建团队</h1>
+			<span>名称 ：</span><input type="text" class="addNavName" placeholder="新建团队名称"/>
+			<!--<span>地址:</span><input type="text" class="addNavUrl" />-->
+			<a class="addNavOk btnA blue" href="javascript:;">创建团队</a>
+			<a class="addNavNo btnA" href="javascript:;">取消</a>
+		</div>
+	</div>
+	<script src="./../src/jquery/jquery.min.js"></script>
+	<script src="./../src/kissy/jquery.form.js"></script>
+	<script src="./../src/kissy/seed-min.js"></script>
+	<script src="./../src/kissy/import-style-min.js"></script>
+	<script src="./../src/kissy/kissy/bui/adapter-min.js"></script>
+	<script src="./../src/module-config.js"></script>
+	<script src="./../src/systemlogin-module/teamCreat.js"></script>
+</body>
+</html>
+

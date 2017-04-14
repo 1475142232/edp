@@ -1,0 +1,193 @@
+.back{
+	background: url(../img/bg.jpg) repeat;
+	height: 100%;
+	width: 100%;
+	font-family: "΢���ź�";
+}
+
+/**
+ * 登陆 样式 wangtian
+ */
+.back-login{
+	top: -50%;
+	position:relative;
+	width: 720px;
+	height: 300px;
+	text-align: center;
+}
+
+.back-login-title{
+	color: #999999;
+	font-size: 40px !important;
+}
+
+.back-login-type{
+	margin-left: 115px;
+	margin-right: 115px;
+	margin-top: 20px;
+	background-color: white;
+	border: 1px solid #D9D9D9;
+	border-radius: 15px;
+	box-shadow: 4px 4px 10px #D9D9D9;
+	height: 420px;
+}
+
+.tab-transition{
+	margin-left: 30px;
+	margin-right: 30px;
+	line-height: 40px;
+}
+
+.tab-login-tabs{
+	margin-left: 133px !important;
+	font-size: 16px;
+	width: 260px;
+}
+
+.tab-login-form{
+	margin-top: 50px;
+}
+
+.tab-login-group0{
+	text-align: left;
+	color: red;
+	padding-left: 55px;
+	margin-bottom: 0px !important;
+	height: 20px;
+}
+
+.tab-login-group1{
+	margin-top: 25px;
+}
+
+.tab-login-group2{
+	margin-top: 40px;
+} 
+
+.tab-login-input{
+	width: 80% !important;
+	height: 40px !important;
+	line-height: 40px !important;
+	margin: auto;
+	font-size: 18px !important;
+}
+
+.tab-login-rememberpwd{
+	text-align: left;
+	line-height: 30px;
+}
+
+.tab-login-rememberpwd input{
+	margin-left: 56px !important;
+}
+
+.tab-login-forgetpwd{
+	text-align: right;
+	line-height: 30px;
+}
+
+.tab-login-forgetpwd a{
+	margin-right: 55px !important;
+}
+
+.tab-login-checkbox {
+	margin-right: 5px !important;
+	width: 15px;
+	height: 15px;
+}
+
+.tab-login-button{
+	margin-top: 40px;
+	width: 300px;
+	height: 47px;
+	font-weight: 100 !important;
+    font-style: normal;
+    font-size: 18px !important;
+    font-family: "微软雅黑";
+    background-color: #66BD78 !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+}
+
+.tab-login-button:hover{
+	margin-top: 40px;
+	width: 300px;
+	height: 47px;
+	font-weight: 100 !important;
+    font-style: normal;
+    font-size: 18px !important;
+    font-family: "微软雅黑";
+    background-color: #66BD78 !important;
+    border-radius: 8px !important;
+}
+
+.tab-login-button:active{
+	margin-top: 40px;
+	width: 300px;
+	height: 47px;
+	font-weight: 100 !important;
+    font-style: normal;
+    font-size: 18px !important;
+    font-family: "微软雅黑";
+    background-color: #66BD78 !important;
+    border-radius: 8px !important;
+}
+
+.tab-login-register{
+	text-align: right;
+	line-height: 30px;
+	padding-top: 10px;
+}
+
+.tab-login-register a{
+	margin-right: 110px;
+}
+
+
+/**
+ * 注册 样式 wangtian
+ */
+.back-register-type{
+	margin-left: 95px;
+	margin-right: 95px;
+	margin-top: 20px;
+	background-color: white;
+	border: 1px solid #D9D9D9;
+	border-radius: 15px;
+	box-shadow: 4px 4px 10px #D9D9D9;
+	height: 480px;
+}
+
+.tab-register-form{
+	margin-top: 10px;
+	padding-top: 30px;
+}
+
+.tab-register-group{
+	margin-bottom: 30px !important;
+}
+
+.tab-register-button{
+	margin-top: 10px;
+	width: 300px;
+	height: 47px;
+	font-weight: 700 !important;
+    font-style: normal;
+    font-size: 18px !important;
+    font-family: "微软雅黑";
+    background-color: #66BD78 !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+}
+
+.tab-register-checkbox{
+	margin-right: 15px;
+}
+
+.has-error{
+	margin-bottom: 10px !important;
+}
+
+.has-success{
+	margin-bottom: 30px !important;
+}

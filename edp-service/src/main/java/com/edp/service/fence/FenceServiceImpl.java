@@ -1,0 +1,111 @@
+package com.edp.service.fence;
+
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.dao.domain.FenceInfoPo;
+import com.edp.dao.domain.TaskInfoPo;
+import com.edp.dao.domain.TaskInfoPoCriteria;
+import com.edp.dao.domain.UserInfoPo;
+import com.edp.dao.mapper.FenceInfoPoMapper;
+import com.edp.dao.mapper.TaskInfoPoMapper;
+import com.edp.dao.mapper.UserInfoPoMapper;
+import com.edp.serviceI.dto.FenceInfoDto;
+import com.edp.serviceI.dto.TaskInfoDto;
+import com.edp.serviceI.fence.FenceInfoServiceI;
+
+
+
+
+@Service(value = "FenceInfoServiceI")
+public class FenceServiceImpl implements FenceInfoServiceI{
+	
+	private static final Logger log = LoggerFactory.getLogger(FenceServiceImpl.class);
+	@Autowired
+	private FenceInfoPoMapper fenceMapper;
+	@Autowired
+	private TaskInfoPoMapper taskMapper;
+	@Autowired
+	private UserInfoPoMapper userMapper;
+
+	@Override
+	public Integer addFencBase(String productId) {
+		String[] name=new String[]{"立项准备","需求任务","设计任务","开发任务","测试任务","项目疑问"};
+		for(int i=0;i<name.length;i++){
+			FenceInfoPo fence=new FenceInfoPo();
+			String id=SequenceManage.getSequence("");
+			fence.setId(id);
+			fence.setFenceName(name[i]);
+			fence.setFenceType("0"+(i+1));
+			fence.setFenceState("01");
+			fenceMapper.insert(fence);
+			fenceMapper.insertProduct(id,productId);
+		}
+		return name.length;
+	};
+
+	@Override
+	public List<FenceInfoDto> getAllFence(String productId,String state,String taskState) {
+        List<FenceInfoPo> po=fenceMapper.getAllFence(productId,state);
+        List<FenceInfoDto> dto = BeanCopyUtils.populateTListbyDListBySpring(po, FenceInfoDto.class);
+        for(int i=0;i<dto.size();i++){
+        	TaskInfoPoCriteria example = new TaskInfoPoCriteria();
+        	TaskInfoPoCriteria.Criteria taskCrteria = example.createCriteria();
+        	taskCrteria.andFenceIdEqualTo(dto.get(i).getId());
+//        	taskCrteria.andTaskStateNotEqualTo("00");
+        	if(!"".equals(taskState) && taskState!=null){
+        		String[] states=taskState.split(",");
+        		List<String> s=new ArrayList<String>();
+        		for(int j=0;j<states.length;j++){
+        			s.add(states[j]);
+        		}
+        		taskCrteria.andTaskStateIn(s);
+        	}else{
+        		dto.get(i).setChildren(new ArrayList<TaskInfoDto>());
+        		return dto;
+        	}
+        	List<TaskInfoPo> taskPo=taskMapper.selectByExample(example);
+        	List<TaskInfoDto> taskDto=BeanCopyUtils.populateTListbyDListBySpring(taskPo,TaskInfoDto.class);
+        	for(int j=0 ; j<taskDto.size() ;j++){
+        		if(!"".equals(taskDto.get(j).getTaskOwner()) && taskDto.get(j).getTaskOwner()!=null){
+        		  UserInfoPo userPo = userMapper.selectByPrimaryKey(Integer.parseInt(taskDto.get(j).getTaskOwner()));
+        		  taskDto.get(j).setUserName(userPo.getUserName());
+        		}
+        	}
+        	dto.get(i).setChildren(taskDto);
+        }
+		return dto;
+	}
+
+	@Override
+	public Integer addFence(FenceInfoDto fence) {
+		FenceInfoPo po=BeanCopyUtils.populateTbyDBySpring(fence, FenceInfoPo.class);
+		return fenceMapper.insert(po);
+	}
+
+	@Override
+	public Integer editFence(FenceInfoDto fence) {
+		FenceInfoPo po=BeanCopyUtils.populateTbyDBySpring(fence, FenceInfoPo.class);
+		return fenceMapper.updateByPrimaryKeySelective(po);
+	}
+
+	@Override
+	public Integer addFencProductId(String id, String productId) {
+		return fenceMapper.insertProduct(id, productId);
+	}
+
+	@Override
+	public String findFenceIdByType(String treeId, String string) {
+		return fenceMapper.findFenceIdByType(treeId,string);
+	}
+
+}

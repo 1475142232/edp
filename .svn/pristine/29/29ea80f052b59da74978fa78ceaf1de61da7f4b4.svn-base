@@ -1,0 +1,72 @@
+KISSY.add("fullcalendar-module/src/agenda-day", function(S,IO ,Calendar){
+	function AgendaDay(){
+		var _this = this;
+		this.init=function(){
+			var selectdate=localStorage.getItem("selectdate");
+			_this.goAgendaDay(selectdate);
+			_this.goFullcalendar();
+		}
+		/**
+		 * 获取当日的信息
+		 */
+		this.goAgendaDay=function(selectdate){
+			$.ajax({
+				 type: "post",
+	             url: "TaskInfoController/findTaskInfoByDate.action",
+	             dataType: "json",  
+	             data:{
+	            	 date : selectdate
+	             },
+	             success: function(data){
+	            	 for(var i=0 ; i<data.length ; i++){
+            			 var html='';
+	            		 for(var j=0; j<data[i].length ; j++){
+	            				 html+='<div class="task-list-info">'+
+	     						           '<div class="task-list-info-name">'+
+								                '<span class="info-taskname">'+data[i][j].taskName+'</span>'+
+								                '<span class="info-tasktime">预计交付时间：</span>'+
+								                '<span class="info-tasktime">'+data[i][j].taskDoneTime+'</span>'+
+								                '<span class="info-tasktime">状态：</span>'+
+								                '<span class="info-tasktime">'+data[i][j].StateString+'</span>'+
+							               '</div>'+
+							               '<div class="task-list-info-desc">'+
+							                    data[i][j].taskSpec+
+							               '</div>'+
+						               '</div>';
+	            		 }
+	            		 if(i==0){
+	            			 if(data[i].length!=0){
+	            				 $("#myYesList").html(html);
+	            			 }else{
+	            				 $("#myYesList").html('<div class="task-list-info">暂无相关任务。</div>');
+	            			 }
+	            		 }else{
+	            			 if(data[i].length!=0){
+	            				 $("#myNoList").html(html);
+	            			 }else{
+	            				 $("#myNoList").html('<div class="task-list-info">暂无相关任务。</div>');
+	            			 }
+	            		 }
+	            	 }
+	             }
+			})
+		}
+		/**
+		 * 跳转日历
+		 */
+		this.goFullcalendar = function(){
+			$("#problem_back").on("click",function(){
+				IO.get("views/fullcalendar/agenda-views.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+                    var calendar = new Calendar();
+                    calendar.init();
+	         	});
+			});
+		}
+	}
+	
+	return AgendaDay;
+},{
+	requires : ['io',
+	            'fullcalendar-module/src/calendar']
+});

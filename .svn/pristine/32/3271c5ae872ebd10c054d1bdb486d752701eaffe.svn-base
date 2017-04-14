@@ -1,0 +1,36 @@
+package com.edp.dao.mapper;
+
+import com.edp.dao.domain.TaskTracePo;
+import com.edp.dao.domain.TaskTracePoCriteria;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+public interface TaskTracePoMapper {
+    int countByExample(TaskTracePoCriteria example);
+
+    int deleteByExample(TaskTracePoCriteria example);
+
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(TaskTracePo record);
+
+    int insertSelective(TaskTracePo record);
+
+    List<TaskTracePo> selectByExampleWithBLOBs(TaskTracePoCriteria example);
+
+    List<TaskTracePo> selectByExample(TaskTracePoCriteria example);
+
+    TaskTracePo selectByPrimaryKey(Integer id);
+
+    int updateByExampleSelective(@Param("record") TaskTracePo record, @Param("example") TaskTracePoCriteria example);
+
+    int updateByExampleWithBLOBs(@Param("record") TaskTracePo record, @Param("example") TaskTracePoCriteria example);
+
+    int updateByExample(@Param("record") TaskTracePo record, @Param("example") TaskTracePoCriteria example);
+
+    int updateByPrimaryKeySelective(TaskTracePo record);
+
+    int updateByPrimaryKeyWithBLOBs(TaskTracePo record);
+
+    int updateByPrimaryKey(TaskTracePo record);
+}

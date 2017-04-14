@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+	<display-name>edp-admin</display-name>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath:META-INF/spring/spring-config.xml
+			classpath:META-INF/spring/biz-datasource.xml
+			classpath:META-INF/spring/biz-service.xml
+			classpath:META-INF/spring/spring-activiti.xml
+		</param-value>
+	</context-param>
+	<!-- 解决同一个jboss部署多个war包 -->
+	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>edp-admin</param-value>
+	</context-param>
+
+	<!-- UTF-8 config -->
+	<filter>
+		<filter-name>Character Encoding</filter-name>
+		<filter-class>com.edp.admin.common.CharacterEncodingFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>Character Encoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>Set Character Encoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<async-supported>true</async-supported>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>Set Character Encoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- ETag support -->
+	<filter>
+		<filter-name>Etag</filter-name>
+		<filter-class>org.springframework.web.filter.ShallowEtagHeaderFilter</filter-class>
+		<async-supported>true</async-supported>
+	</filter>
+	<filter-mapping>
+		<filter-name>Etag</filter-name>
+		<servlet-name>edp-servlet</servlet-name>
+	</filter-mapping>
+
+	<!-- Log Filter -->
+	<filter>
+		<filter-name>Log Filter</filter-name>
+		<filter-class>com.edp.common.filter.LogFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>Log Filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>SessionFilter</filter-name>
+		<filter-class>com.edp.admin.filter.SessionFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>SessionFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- 设置Spring的监听，项目启动时候初始化 -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+
+	<!-- SpringMVC config -->
+	<servlet>
+		<servlet-name>edp-servlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:META-INF/spring/spring-mvc.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+		<async-supported>true</async-supported>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>edp-servlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	<!-- servlet配置 -->
+
+	<session-config>
+		<cookie-config>
+			<http-only>true</http-only>
+			<secure>false</secure>
+		</cookie-config>
+
+		<session-timeout>20</session-timeout>
+	</session-config>
+
+
+	
+
+
+	<servlet>
+		<servlet-name>JSONPFilter</servlet-name>
+		<servlet-class>com.edp.admin.filter.JsonpCallbackFilter</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>JSONPFilter</servlet-name>
+		<url-pattern>/service/*</url-pattern>
+	</servlet-mapping>
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+</web-app>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 配置文件 -->
+    <property resource="dubbo.properties"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{"yyyy/MM/dd HH:mm:ss,SSS"}[%X{product}|%X{module}|%X{node}|%X{process}|%X{uuid}][%p]%c{0}-%m%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logback.file}/cyws-dao.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logback.file}/cyws-dao-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{"yyyy/MM/dd HH:mm:ss,SSS"}[%X{product}|%X{module}|%X{node}|%X{process}|%X{uuid}][%p]%c{0}-%m%n</pattern>
+        </encoder>
+    </appender>
+
+    <if condition='property("logback.mode").equals("dev")'>
+        <then>
+            <logger name="com.bocsoft" level="DEBUG"/>
+            <root>
+                <level value="INFO"/>
+                <appender-ref ref="STDOUT"/>
+            </root>
+        </then>
+        <else>
+            <logger name="com.bocsoft" level="INFO"/>
+            <root>
+                <level value="WARN"/>
+                <appender-ref ref="FILE"/>
+            </root>
+        </else>
+    </if>
+</configuration>

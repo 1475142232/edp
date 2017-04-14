@@ -1,0 +1,30 @@
+package com.edp.dao.mapper;
+
+import com.edp.dao.domain.FenceInfoPo;
+import com.edp.dao.domain.FenceInfoPoCriteria;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+public interface FenceInfoPoMapper {
+    int countByExample(FenceInfoPoCriteria example);
+
+    int deleteByExample(FenceInfoPoCriteria example);
+
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(FenceInfoPo record);
+
+    int insertSelective(FenceInfoPo record);
+
+    List<FenceInfoPo> selectByExample(FenceInfoPoCriteria example);
+
+    FenceInfoPo selectByPrimaryKey(Integer id);
+
+    int updateByExampleSelective(@Param("record") FenceInfoPo record, @Param("example") FenceInfoPoCriteria example);
+
+    int updateByExample(@Param("record") FenceInfoPo record, @Param("example") FenceInfoPoCriteria example);
+
+    int updateByPrimaryKeySelective(FenceInfoPo record);
+
+    int updateByPrimaryKey(FenceInfoPo record);
+}

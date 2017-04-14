@@ -1,0 +1,293 @@
+package com.edp.admin.table;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import com.edp.common.constant.Constants;
+import com.edp.common.jedis.JedisUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.edp.admin.common.BaseController;
+import com.edp.admin.login.UserInfoBean;
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.serviceI.columnInfo.ColumnInfoServiceI;
+import com.edp.serviceI.dto.ColumnInfoDto;
+import com.edp.serviceI.dto.FunColumnDto;
+import com.edp.serviceI.dto.MasterDto;
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.dto.TableInfoDto;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import com.edp.serviceI.tableinfo.TableInfoServiceI;
+import com.edp.serviceI.tree.TreeServiceI;
+import com.google.gson.Gson;
+
+import redis.clients.jedis.Jedis;
+@Controller
+@RequestMapping("tableController")
+public class TableController extends BaseController{
+	@Autowired
+	private TableInfoServiceI tableInfoService;
+	@Autowired
+	private TreeServiceI treeServiceI;
+	@Autowired
+	private ColumnInfoServiceI columnInfoServiceI;
+	@Autowired
+	private FunctionInfoServiceI functionInfoServiceI;
+	
+	
+private static final Logger LOGGER = LoggerFactory.getLogger(TableController.class);
+
+	private Gson gson = new Gson();
+	
+	@RequestMapping(value = "/tablelist.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String tablelist(TableInfoDto dto,String product_id){
+		RequestmentDto reqDto=new RequestmentDto();
+		reqDto.setTreeNodeId(product_id);
+		reqDto.setTreeNodeType("9");
+		List<RequestmentDto> reqDtos=treeServiceI.findAllTree(reqDto);
+		String id="";
+		for(int i=0;i<reqDtos.size();i++){
+			if(i!=reqDtos.size()-1){
+				id+=reqDtos.get(i).getId()+",";
+			}else{
+				id+=reqDtos.get(i).getId();
+			}
+			
+		}
+		dto.setId(id);
+		TableInfoDto allTables = tableInfoService.getAllTables(dto);
+		return gson.toJson(allTables);
+	}
+	//根据id查询商品
+	@RequestMapping(value = "/gettableById.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String selectTableById(String Id){
+		TableInfoDto tableById = tableInfoService.getTableById(Id);
+		return gson.toJson(tableById);
+	}
+	
+	//添加商品
+	@RequestMapping(value = "/addtable.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String addtable(String tableCnName,String ParentId, String columnCnName,String opType,HttpSession session){
+		ParentId=(String)session.getAttribute("productId");
+		String[] names=columnCnName.split("\r\n");//根据回车截取字符串("\n")
+		TableInfoDto dto = new TableInfoDto();
+		ColumnInfoDto coldto=new ColumnInfoDto();
+		MasterDto tDto=new MasterDto();//创建表的节点承载类
+		//获取系统时间
+		Date today = new Date();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		//根据opType 赋值treeNodeState]
+		String treeNodeState = Constants.TreeStates.NORMAL_ADD;//默认所有的新增都是正常新增
+		if("2".equals(opType)){
+			treeNodeState = Constants.TreeStates.CHANGE_ADD;
+		}
+		//获取session中的用户信息
+		UserInfoBean userInfoBean=(UserInfoBean)session.getAttribute("userInfoBean");
+		String tableId=SequenceManage.getSequence("");
+        dto.setId(tableId);
+		dto.setTableCnName(tableCnName);
+		dto.setTableCreater(userInfoBean.getUsername());
+		dto.setTableCreateTime(sdf.format(today));
+		tableInfoService.addTable(dto);
+		tDto.setId(tableId);
+		tDto.setTreeNodeType("9");
+		tDto.setTreeNodeName(tableCnName);
+		tDto.setTreeNodeState(treeNodeState);
+		tDto.setTreeNodeId(ParentId);
+		tDto.setText(tableCnName);
+		treeServiceI.addTreeNode(tDto);
+		List<MasterDto> masteres=new ArrayList<MasterDto>();
+    		for(String name:names){
+			if(name.trim().equals("")){
+				continue;
+			}
+			MasterDto cDto=new MasterDto();//创建字段的节点的承载类
+			String id=SequenceManage.getSequence("");
+			coldto.setId(id);
+			coldto.setColumnCnName(name.trim());
+			coldto.setColumnCreater(userInfoBean.getUsername());
+			coldto.setColumnCreateTime(sdf.format(today)); 
+			coldto.setColumnType("04");
+			columnInfoServiceI.addColumnInfo(coldto);
+			cDto.setId(id);
+			cDto.setTreeNodeType("10");
+			cDto.setTreeNodeName(name.trim());
+			cDto.setTreeNodeState(treeNodeState);
+			cDto.setText(name.trim());
+			cDto.setTreeNodeId(ParentId);
+			cDto.setTreeNodeParent(tableId);
+			treeServiceI.addTreeNode(cDto);
+			masteres.add(cDto);
+		}
+		List<MasterDto> tDtos=new ArrayList<MasterDto>();
+		tDto.setChildren(masteres);
+		Jedis client = JedisUtils.getJedis();
+		if("2".equals(opType)){
+			String change=client.get("CHANGE_NODE");
+			Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			Constants.CHANGE_NODE.get(ParentId).add(tDto);
+			Map<String,List<Object>> JsonChange=Constants.CHANGE_NODE;
+			client.set("CHANGE_NODE", gson.toJson(JsonChange));
+		}else{
+			String change=client.get("NORMAL_NODE");
+			Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			Constants.NORMAL_NODE.get(ParentId).add(tDto);
+			Map<String,List<Object>> JsonNormal=Constants.NORMAL_NODE;
+			client.set("NORMAL_NODE", gson.toJson(JsonNormal));
+		}
+		JedisUtils.returnResource(client);
+		String tree=treeServiceI.findJsonTreeById(ParentId,treeNodeState);
+		JSONObject a = JSON.parseObject(tree); 
+		JSONArray jsonArr = (JSONArray) a.get("children");
+		JSONObject b= (JSONObject)jsonArr.get(3);
+		if(b.containsKey("children") == false){
+			b.put("children", new JSONArray());
+		}
+		JSONArray jsonArrs= (JSONArray)b.get("children");
+		jsonArrs.add(JSON.parseObject(gson.toJson(tDto)));		
+		treeServiceI.editTreeByProductId(ParentId,a.toString(),treeNodeState);
+		tDtos.add(tDto);
+		return gson.toJson(tDtos);
+	}
+	//修改商品
+	@RequestMapping(value = "/updatetable.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String updateTable(TableInfoDto dto, String type,HttpSession session){
+		//获取系统时间
+	    Date today = new Date();
+	    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		//获取session中的用户信息
+		UserInfoBean userInfoBean=(UserInfoBean)session.getAttribute("userInfoBean");
+		RequestmentDto requestmentDto=treeServiceI.findTreeNodeById(dto.getId());
+	    String state="";
+	    String table=dto.getId();
+	    MasterDto po = new MasterDto();
+		if(requestmentDto.getTreeNodeState().equals("66")){
+			String oldId=dto.getId();
+			String id=SequenceManage.getSequence("");
+			dto.setId(id);
+			dto.setTableCreater(userInfoBean.getUsername());
+			dto.setTableCreateTime(sdf.format(today));
+			tableInfoService.addTable(dto);
+			requestmentDto.setTreeId(requestmentDto.getId());
+		    requestmentDto.setId(id);
+			requestmentDto.setTreeNodeCreateperson(userInfoBean.getUsername());
+			requestmentDto.setTreeNodeCreatetime(sdf.format(today));
+			requestmentDto.setTreeNodeName(dto.getTableCnName());
+			requestmentDto.setTreeNodeDesc(dto.getTableSpec());
+			po = BeanCopyUtils.populateTbyDBySpring(requestmentDto, MasterDto.class);
+			Jedis client = JedisUtils.getJedis();
+			if("2".equals(type)){		
+			   String change=client.get("CHANGE_NODE");
+			   Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			   requestmentDto.setTreeNodeState(Constants.TreeStates.CHANGE_ADD);
+			   state=Constants.TreeStates.CHANGE_ADD;
+			   Constants.CHANGE_NODE.get((String)session.getAttribute("productId")).add(po);
+			   Map<String,List<Object>> JsonChange=Constants.CHANGE_NODE;
+			   client.set("CHANGE_NODE", gson.toJson(JsonChange));
+		    }else{
+			   String change=client.get("NORMAL_NODE");
+			   Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			   requestmentDto.setTreeNodeState(Constants.TreeStates.NORMAL_ADD);
+			   state=Constants.TreeStates.NORMAL_ADD;
+			   Constants.NORMAL_NODE.get((String)session.getAttribute("productId")).add(po);
+			   Map<String,List<Object>> JsonNormal=Constants.NORMAL_NODE;
+			   client.set("NORMAL_NODE", gson.toJson(JsonNormal));
+			}
+			JedisUtils.returnResource(client);
+		    treeServiceI.addTreeNode(requestmentDto, (String)session.getAttribute("productId"));	
+			FunColumnDto funcol=new FunColumnDto();
+			funcol.setTableId(oldId);
+			List<FunColumnDto> funcolumn=functionInfoServiceI.selectFunColumn(funcol);
+		    for(int i=0;i<funcolumn.size();i++){
+		    	funcolumn.get(i).setId(null);
+		    	funcolumn.get(i).setTableId(id);
+		    	functionInfoServiceI.insertFunColumn(funcolumn.get(i));
+		    }	   
+		}else{
+			dto.setTableCreater(userInfoBean.getUsername());
+			dto.setTableCreateTime(sdf.format(today));
+			tableInfoService.updateTable(dto);
+			requestmentDto.setTreeNodeName(dto.getTableCnName());
+			requestmentDto.setTreeNodeModifiedtime(sdf.format(today));
+			requestmentDto.setTreeId(dto.getId());
+			treeServiceI.editTreeNode(requestmentDto);
+			state=requestmentDto.getTreeNodeState();
+			List<Object> object;
+			Jedis client = JedisUtils.getJedis();
+			if("2".equals(type)){
+				String change=client.get("CHANGE_NODE");
+				Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+				object=Constants.CHANGE_NODE.get((String)session.getAttribute("productId"));
+			}else{
+				String change=client.get("NORMAL_NODE");
+				Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+				object=Constants.NORMAL_NODE.get((String)session.getAttribute("productId"));
+			}	
+			for(int i=0;i<object.size();i++){
+            	MasterDto masterDto=JSON.parseObject(object.get(i).toString(),MasterDto.class);
+            	if(masterDto.getId().equals(requestmentDto.getId())){
+            		po = BeanCopyUtils.populateTbyDBySpring(requestmentDto, MasterDto.class);
+            		object.set(i, po);
+            		break;
+            	}
+            }	
+			if("2".equals(type)){
+				String change=client.get("CHANGE_NODE");
+				Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			}else{
+				String change=client.get("NORMAL_NODE");
+				Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			}
+			JedisUtils.returnResource(client);
+		}
+		//预存
+		MasterDto master=BeanCopyUtils.populateTbyDBySpring(requestmentDto,MasterDto.class);
+		List<MasterDto> masterDto = new ArrayList<MasterDto>();
+		String tree=treeServiceI.findJsonTreeById((String)session.getAttribute("productId"),state);
+		JSONObject a = JSON.parseObject(tree); 
+		JSONArray jsonArr = (JSONArray) a.get("children");
+		JSONObject b= (JSONObject)jsonArr.get(3);
+		JSONArray jsonArrs= (JSONArray)b.get("children");
+		for(int i=0;i<jsonArrs.size();i++){
+			JSONObject json=(JSONObject)jsonArrs.get(i);
+			if(json.get("id").equals(table)){
+				JSONObject JsonMaster=JSON.parseObject(gson.toJson(master));
+				JsonMaster.put("children", json.get("children"));
+				masterDto=JSONArray.parseArray(gson.toJson(json.get("children")), MasterDto.class);
+			    jsonArrs.set(i, JsonMaster);
+			    break;
+			}
+		}
+		po.setChildren(masterDto);
+		treeServiceI.editTreeByProductId((String)session.getAttribute("productId"),a.toString(),state);
+		//预存
+		return gson.toJson(master);
+	}
+	//删除商品
+	@RequestMapping(value = "/deltable.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	public String delTable(String Id){
+		tableInfoService.delTable(Id);
+		return null;
+	}
+}

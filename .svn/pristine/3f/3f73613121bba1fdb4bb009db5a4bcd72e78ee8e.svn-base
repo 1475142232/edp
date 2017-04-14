@@ -1,0 +1,137 @@
+package com.edp.service.user;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SqlFormatUtil;
+import com.edp.dao.domain.UserInfoPo;
+import com.edp.dao.domain.UserInfoPoCriteria;
+import com.edp.dao.mapper.UserInfoPoMapper;
+import com.edp.dao.mapper.UserRoleMapper;
+import com.edp.serviceI.dto.UserDto;
+import com.edp.serviceI.user.UserServiceI;
+
+
+@Service(value ="UserService")
+public class UserServiceImpl implements UserServiceI{
+	
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+	@Autowired
+	UserInfoPoMapper userInfoPoMapper;
+	@Autowired
+	UserRoleMapper userRoleMapper;
+
+	@Override
+	public UserDto findAllUser(UserDto dto) {
+	    UserDto userDto=new UserDto();
+		UserInfoPoCriteria example = new UserInfoPoCriteria();
+		UserInfoPoCriteria.Criteria userInfoPoCriteria =  example.createCriteria();
+		if(null != dto.getUserName() && !"".equals(dto.getUserName())){
+			userInfoPoCriteria.andUserNameLike("%"+dto.getUserName()+"%");
+		}
+		if(null != dto.getUserDept() && !"".equals(dto.getUserDept())){
+			userInfoPoCriteria.andUserDeptEqualTo(dto.getUserDept());
+		}
+		if(null != dto.getUserPassword() && !"".equals(dto.getUserPassword())){
+			userInfoPoCriteria.andUserPasswordEqualTo(dto.getUserPassword());
+		}
+		String pagingStr = SqlFormatUtil.makeupOrderByAndLimit("id", SqlFormatUtil.ORDER_BY_DIRECTION_DESC, dto.getPageIndex(), dto.getLimit());
+		example.setOrderByClause(pagingStr);
+		try{
+		    int count = userInfoPoMapper.countByExample(example);
+		    List<UserInfoPo> uiPo = userInfoPoMapper.selectByExample(example);
+		    List<UserDto> uiDto = BeanCopyUtils.populateTListbyDListBySpring(uiPo,UserDto.class);
+		    userDto.setRows(uiDto);
+		    userDto.setResults(count);
+		}catch(Exception e){
+			LOGGER.error("查询错误",e);
+		}
+		return userDto;
+	}
+
+	@Override
+	public UserDto findUserById(Integer id) {
+		UserInfoPo po = userInfoPoMapper.selectByPrimaryKey(id);
+		UserDto dto = BeanCopyUtils.populateTbyDBySpring(po,UserDto.class);
+		return dto;
+	}
+
+	@Override
+	public Integer editUserById(UserDto dto) {
+		UserInfoPo po = BeanCopyUtils.populateTbyDBySpring(dto,UserInfoPo.class);
+		Integer edit=userInfoPoMapper.updateByPrimaryKey(po);
+		return edit;
+	}
+
+	@Override
+	public void delUserInfoById(Integer id) {
+		userInfoPoMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public void addUserInfo(UserDto dto) {
+		UserInfoPo po = BeanCopyUtils.populateTbyDBySpring(dto,UserInfoPo.class);
+		userInfoPoMapper.insert(po);
+		
+	}
+
+	@Override
+	public List<UserDto> findUserByRoleId(Integer roleId) {
+		List<Integer> userNames=userRoleMapper.findUserByRoleId(roleId);
+		List<UserDto> user = new ArrayList<UserDto>();
+		for(int i=0;i<userNames.size();i++){
+			UserInfoPo po=userInfoPoMapper.selectByPrimaryKey(userNames.get(i));
+			UserDto dto = BeanCopyUtils.populateTbyDBySpring(po,UserDto.class);
+			user.add(dto);
+		}
+		return user;
+	}
+
+	@Override
+	public Integer delUserInfo(Integer userId,Integer parent) {
+		return userInfoPoMapper.delUserInfo(userId,parent);
+	}
+
+	@Override
+	public Integer selectUserByRole(String id, Integer userId) {
+		return userInfoPoMapper.selectUserByRole(id,userId);
+	}
+
+	@Override
+	public Integer selectUserByProductId(String id, Integer userId) {
+		return userInfoPoMapper.selectUserByProductId(id,userId);
+	}
+
+	@Override
+	public Integer findUserByName(String userName) {
+		UserInfoPoCriteria example = new UserInfoPoCriteria();
+		UserInfoPoCriteria.Criteria userInfoPoCriteria =  example.createCriteria();
+		userInfoPoCriteria.andUserNameEqualTo(userName);
+		return userInfoPoMapper.countByExample(example);
+
+	}
+
+	@Override
+	public List<UserDto> getUserByProductId(String productId) {
+		List<UserInfoPo> po=userInfoPoMapper.getUserByProductId(productId);
+		return BeanCopyUtils.populateTListbyDListBySpring(po,UserDto.class);
+	}
+
+	@Override
+	public List<String> SelectRoleById(String username) {
+		return userRoleMapper.SelectRoleById(username);
+	}
+
+	@Override
+	public String getTypeById(String productId, Integer id) {
+		return userRoleMapper.getTypeById(productId,id);
+	}
+
+}

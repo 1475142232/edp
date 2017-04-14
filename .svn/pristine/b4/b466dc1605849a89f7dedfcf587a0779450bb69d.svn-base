@@ -1,0 +1,75 @@
+KISSY.add("fullcalendar-module/src/calendar",function(S,IO){
+	
+	function Calendar(){
+		var _this = this;
+		var date = new Date();
+		var d = date.getDate();
+		var m = date.getMonth();
+		var y = date.getFullYear();
+		this.init=function(){
+			_this.goCalendar();
+		}
+		
+		this.goCalendar = function(){
+			var event = [];
+			$.ajax({
+				 type: "post",
+	             url: "TaskInfoController/findTaskInfoByTime.action",
+	             dataType: "json",      
+	             success: function(data){
+	            	 for(var i=0;i<data.length;i++){
+	            		 var state = '0';
+	            		 var date1=new Date(data[i].taskDoneYear, data[i].taskDoneMonth, data[i].taskDoneDay);
+	            		 var date2=new Date(data[i].taskRealYear, data[i].taskRealMonth, data[i].taskRealDay);
+	            		 if(date2>date1){
+	            			 state = '1';
+	            		 }
+	            		 event.push({
+	            			 "id": data[i].id,
+	            			 "title": data[i].taskName+"            状态："+data[i].StateString,
+	            			 "start": new Date(data[i].taskStarteYear, data[i].taskStarteMonth, data[i].taskStarteDay),
+	            			 "end": new Date(data[i].taskDoneYear, data[i].taskDoneMonth, data[i].taskDoneDay),
+	            			 "state" : state
+	            		 })
+	            	 }
+	            	 $('#calendar').fullCalendar({
+	     				header: {
+	     					left: 'prev,next today',
+	     					center: 'title',
+	     					right: 'month,agendaWeek,agendaDay'
+	     				},
+	     				editable: false,
+	     				events: event,
+	     				monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+	     				monthNamesShort: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+	     				dayNames: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+	     				dayNamesShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+	     				today: ["今天"],
+                        firstDay: 1,
+                        buttonText: {
+                                      today: '本月',
+                                      month: '月',
+	     		                      week: '周',
+	     			                  day: '日',
+	     			                  prev: '上一月',
+	     		                      next: '下一月'
+	                    },
+	     				dayClick: function(date, allDay, jsEvent, view) { 
+	     					var selectdate = $.fullCalendar.formatDate(date, "MM/dd/yyyy");//选择当前日期的时间转换
+	     					localStorage.setItem("selectdate",selectdate);
+	     					IO.get("views/fullcalendar/agenda-day.html",null,function(){
+	        	     			$("#mainpage").html(arguments[0], true);   	     			
+	        	         	});
+                            
+	     				}
+	     			});
+	            	 
+	             }
+			})
+		}
+		
+	}	
+	return Calendar;
+},{
+	requires : ['io']
+});

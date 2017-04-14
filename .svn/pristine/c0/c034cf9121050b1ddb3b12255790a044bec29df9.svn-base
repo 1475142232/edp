@@ -1,0 +1,22 @@
+@charset "utf-8";
+/*=========================Reset_start==========================*/
+body,h1,h2,h3,h4,h5,h6,div,p,dl,dt,dd,ol,ul,li,form,table,th,td,a,
+img,span,strong,var,em,input,textarea,select,option{margin: 0; padding: 0;}
+html,body{font-family:"宋体","微软雅黑",Arail,Tabhoma; font-size: 12px;
+	text-align: left;}
+ul,ol{list-style: none;}
+img{border: 0;}
+input,select,textarea{outline:0;}
+table{border-collapse: collapse; border-spacing: 0;}
+th,strong,var,em{font-weight: normal; font-style: normal;}
+a{text-decoration: none;}
+a:link,a:visited,a:hover,a:active{text-decoration:none;}
+a:hover {text-decoration: none;}
+/*==========================Reset_End===========================*/
+body{background:url(../img/bg.jpg) repeat;}
+.dropdown-toggle{font-size:20px;color:#CC9966 !important;font-weight: bold;color:#996666 !important}
+.nav-color-zhu{font-size:16px;color:#CC9966 !important;font-weight: bold;}
+.content-box-zhu{width:100%;min-height:500px;padding:40px 40px;border-radius:8px;background:#fff;margin:0 auto;-webkit-box-shadow:3px 3px 3px #CCCCCC;  -moz-box-shadow:3px 3px 3px #CCCCCC;box-shadow:3px 3px 3px #CCCCCC; }
+#navUl .active a{
+	color: #333 !important;
+}

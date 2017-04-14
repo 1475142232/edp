@@ -1,0 +1,48 @@
+@charset "utf-8";
+/* CSS Document */
+.logon{
+	background:-moz-linear-gradient(left,#5783a0,#339fe7);/*Mozilla*/
+	background:-webkit-gradient(linear,0 50%,100% 50%,from(#5783a0),to(#339fe7));/*Old gradient for webkit*/
+	background:-webkit-linear-gradient(left,#5783a0,#339fe7);/*new gradient for Webkit*/
+	background:-o-linear-gradient(left,#5783a0,#339fe7); /*Opera11*/	
+}
+.logon-con{
+	width:600px;
+	height:370px;
+	background:#dce8ef;
+	margin:100px auto 0 auto;
+	-webkit-border-radius:2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+	-moz-box-shadow:2px 2px 5px #dadada;; 
+	-webkit-box-shadow:2px 2px 5px #dadada;; 
+	box-shadow: 2px 2px 5px #dadada;
+	border: 1px solid #dadada;
+}
+.logon-con ul{margin-top:100px;text-algin:centent}
+.logon-con ul li {float:left;width:500px;margin-bottom:10px;}
+.logon-con ul li lable,.logon-con ul li input{float:left;}
+.logon-con ul li lable{width:120px;text-align:right;display:block;line-height:44px;}
+.logon-con ul li input{width:310px;height:44px;border: 1px solid #ededed;}
+.logon-con ul li input.verification{width:140px;}
+.verificationimg{padding-left:15px;float:left;cursor:pointer}
+.logon-con button{margin:5% 0 0 35%;width:120px;height:40px;font-size:16px;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,87 @@
+package com.edp.service.user;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.dao.domain.TeamInfoPo;
+import com.edp.dao.domain.UserInfoPo;
+import com.edp.dao.domain.UserInfoPoCriteria;
+import com.edp.dao.mapper.TeamInfoPoMapper;
+import com.edp.dao.mapper.UserInfoPoMapper;
+import com.edp.serviceI.dto.TableInfoDto;
+import com.edp.serviceI.dto.UserInfoDto;
+import com.edp.serviceI.user.UserServiceI;
+
+@Service(value = "UserServiceI")
+public class UserServiceImpl implements UserServiceI{
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+	
+	@Autowired
+	private UserInfoPoMapper userMapper;
+	@Autowired
+	private TeamInfoPoMapper  teamMapper;
+     
+	/**
+	 * 登录验证
+	 */
+	@Override
+	public List<UserInfoDto> LoginUser(UserInfoDto dto,Integer teamId) {
+		UserInfoPoCriteria example = new UserInfoPoCriteria();
+		UserInfoPoCriteria.Criteria userCrteria = example.createCriteria();
+		if(null != dto.getUserMail() && !"".equals(dto.getUserMail())){
+			userCrteria.andUserMailEqualTo(dto.getUserMail());
+		}else{
+			return new ArrayList<UserInfoDto>();
+		}
+		if(null != dto.getUserPassword() && !"".equals(dto.getUserPassword())){
+			userCrteria.andUserPasswordEqualTo(dto.getUserPassword());
+		}else{
+			return new ArrayList<UserInfoDto>();
+		}
+		List<UserInfoPo> result = userMapper.selectByExample(example);
+		if(result.size()==0){
+			return new ArrayList<UserInfoDto>();
+		}
+		if(null != teamId){
+			teamMapper.insertUser(result.get(0).getId(),teamId,3);
+		}
+		return BeanCopyUtils.populateTListbyDListBySpring(result, UserInfoDto.class);
+	}
+
+	/**
+	 * 注册
+	 */
+	@Override
+	public Integer registerUser(UserInfoDto dto, String teamId) {
+		dto.setUserCreate(dto.getUserName());
+		UserInfoPo po=BeanCopyUtils.populateTbyDBySpring(dto, UserInfoPo.class);
+		if(teamId!=null && !"".equals(teamId)){
+			TeamInfoPo teamPo=teamMapper.selectByPrimaryKey(Integer.parseInt(teamId));
+			dto.setUserCreate(teamPo.getTeamCreat());
+			teamMapper.insertUser(po.getId(),Integer.parseInt(teamId),3);
+		}
+		return userMapper.insert(po);
+	}
+	
+	/**
+	 * 查询用户
+	 */
+	public List<UserInfoDto> findAllUser(UserInfoDto dto) {
+		UserInfoPoCriteria example = new UserInfoPoCriteria();
+		UserInfoPoCriteria.Criteria userCrteria = example.createCriteria();
+		if(null != dto.getUserMail() && !"".equals(dto.getUserMail())){
+			userCrteria.andUserMailEqualTo(dto.getUserMail());
+		}
+		List<UserInfoPo> result = userMapper.selectByExample(example);
+		return BeanCopyUtils.populateTListbyDListBySpring(result, UserInfoDto.class);
+	}
+
+}

@@ -1,0 +1,42 @@
+.back{
+	width: 100px;
+    height: 100px;
+    position: absolute;
+    z-index: 10;
+    right: 15px;
+    top: 15px;
+    font-size: 16px;
+    background: url(../img/u211.png) no-repeat;
+    cursor: pointer;
+    background-position: center;
+}
+.task-content{
+	width:98%;
+	min-height:200px;
+	border:1px solid #ddd;
+	border-radius: 5px;
+	margin: 20px auto;
+}
+.task-content ul li{
+	margin: 15px auto;
+	padding: 0 5px;
+	cursor: pointer;
+}
+.footer{
+	width:98%;
+	text-align: right;
+}
+.myScene{
+	width: 47%;
+	display: inline-block;
+	margin-top: 20px;
+	margin-left: 20px;
+	padding: 5px 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	cursor: pointer;
+}
+.wode{
+	display: inline-block;
+	margin: 5px;	
+}

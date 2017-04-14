@@ -1,0 +1,27 @@
+
+<div class="modal" ng-controller="KisBelongFunctionPropertiesPopupCtrl">
+    <div class="modal-dialog modal-wide" style="width: 500px;">
+        <div class="modal-content">
+			<div class="modal-header">
+			    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
+			    <h2>{{'PROPERTY.PROPERTY.EDIT.TITLE' | translate:property}}</h2>
+			</div>
+			<div class="modal-body" style="height: 400px;">
+			
+			    <div class="row row-no-gutter">
+			    	<input id="treeCheckId" style="display:none" ng-model="property.value.id"/>
+	        		<input id="treeCheckName" style="display:none" ng-model="property.value.belongFunction"/>
+	        		<input id="treeCheckType" style="display:none" ng-model="property.value.type"/>
+			        <div class="col-xs-12">
+						<iframe src="activititree.html" width="100%" height="395px;"></iframe>
+			    	</div>
+	        	</div>
+			</div>
+			<div class="modal-footer">
+			    <button ng-click="cancel()" class="btn btn-primary" translate>ACTION.CANCEL</button>
+			    <button ng-click="save()" class="btn btn-primary" translate>ACTION.SAVE</button>
+			</div>
+		</div>
+	</div>
+	
+</div>

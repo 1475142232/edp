@@ -1,0 +1,229 @@
+package com.edp.service.tree;
+
+import com.alibaba.dubbo.common.utils.StringUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.edp.common.constant.Constants;
+import com.edp.common.constant.EDPCodeConstants;
+import com.edp.common.jedis.JedisUtils;
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.dao.domain.FunctionInfoPo;
+import com.edp.dao.domain.FunctionInfoPoCriteria;
+import com.edp.dao.domain.ModuleInfoPo;
+import com.edp.dao.domain.RequestmentTreePo;
+import com.edp.dao.domain.RequestmentTreePoCriteria;
+import com.edp.dao.domain.TaskInfoPo;
+import com.edp.dao.mapper.FunctionInfoPoMapper;
+import com.edp.dao.mapper.ModuleInfoPoMapper;
+import com.edp.dao.mapper.RequestmentTreePoMapper;
+import com.edp.dao.mapper.TaskInfoPoMapper;
+import com.edp.serviceI.dto.MasterDto;
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.dto.TreeDto;
+import com.edp.serviceI.product.ProductServiceI;
+import com.edp.serviceI.tree.TreeServiceI;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import redis.clients.jedis.Jedis;
+
+import org.activiti.editor.constants.ModelDataJsonConstants;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+@Service(value = "TreeService")
+public class TreeServiceImpl implements TreeServiceI {
+
+	@Override
+	public List<TreeDto> findTreeById(List<String> treeId, String state) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer addTreeNode(RequestmentDto reqDto, String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RequestmentDto findTreeNodeById(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer editTreeNode(RequestmentDto reqDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer delTreeNode(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer findCNodeByPid(String reqDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String addTreeNodeByProductId(String pId, String userName, String name, String type, String productId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String addTreeNodeByModuleId(String pId, String userName, String name, String type, String productId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer findCountTreeById(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> findNodeByLevel(String treeNodeId, Integer treeNodeLevels, String state) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RequestmentDto findTreeNodeId(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<RequestmentDto> findTreeNodesById(String treeNodeParent) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer delTreeNodesByNodeId(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RequestmentDto getDOCbyProductId(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RequestmentDto normalRequestmentComfirm(String productId, Integer version) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RequestmentDto changeRequestmentComfirm(String productId, Integer version) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String findModuleIdByName(String module_name, String id, String user, String time) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Object> findRequestById(String tree01, String tree11, String tree66) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<RequestmentDto> findTreeNodepId(String pId, String type) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void newModel(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<RequestmentDto> findAllTree(RequestmentDto reqDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> findTreeIdByPid(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer addMasterTmp(String json, String id, String type) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String findJsonTreeById(String id, String type) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer editTreeByProductId(String productId, String resulet, String state) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String EnterTree(String productId, String type, String time) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer findCountNotEnterByTreeId(String productId, String state) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public MasterDto addTreeNode(MasterDto masterDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String findEnterTreeById(String productId, Integer version) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+  
+}

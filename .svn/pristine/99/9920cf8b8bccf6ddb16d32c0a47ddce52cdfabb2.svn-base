@@ -1,0 +1,14 @@
+package com.edp.serviceI.mail;
+
+import java.util.List;
+
+import com.edp.serviceI.dto.MailInfoDto;
+
+
+public interface MailInfoServiceI {
+
+	List<MailInfoDto> getMailByUserId(String state, Integer id,Integer pageNow,Integer pageSize);
+
+	Integer editMail(MailInfoDto dto);
+
+}

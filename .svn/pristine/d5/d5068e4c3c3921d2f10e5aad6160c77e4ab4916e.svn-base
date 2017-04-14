@@ -1,0 +1,327 @@
+KISSY.add("scene-module/src/sceneList",function(S,IO, Cookie){
+	function SceneList(){
+		var _this = this;
+		var cookie = new Cookie();
+		var userRole = "3";
+		var userBool = false;
+		var baseProduct = [];
+		
+		/**
+		 * 初始化场景
+		 */
+		this.init = function(){
+			//获取项目名称
+			$("#productName").text(_this.getProductById(cookie.getCookie("productId")));
+			//获取用户权限
+			_this.getUserRole();
+			//场景列表
+			_this.getSceneList();
+			
+			if(userRole === "3" && userBool){
+				_this.dataValidator();
+				
+				$("#save_Data").on("click",function(){
+					$('#save_Form').bootstrapValidator('validate');
+					if($('#save_Form').data('bootstrapValidator').isValid()){
+						_this.saveScene();
+					}
+				});
+			}
+			
+			$(".back").on("click",function(){
+				IO.get("views/myself/myself.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	     			localStorage.setItem("target","myself");
+	         	});
+			});
+		}
+		
+		/**
+		 * 获取项目的场景列表
+		 */
+	    this.getSceneList = function(){
+			var teamId = cookie.getCookie("teamId");
+			if(userRole === "3" && userBool){
+				$("#sceneList").html('<a id="addScene" href="javascript:;" data-toggle="modal">+</a>');
+			}else{
+				$("#sceneList").html('<a id="addScene" href="javascript:;" data-toggle="modal" style="display:none;">+</a>');
+			}
+			//获取项目列表
+			$.ajax({
+	             type: "POST",
+	             url: "TreeController/findTreeNodeByPid.action?id="+ cookie.getCookie("taskId"),
+	             async: true,
+	             dataType: "json",
+	             success: function(data){
+	             	 var add="";
+                     for(var i=0; i<data.length; i++) {
+                    	add += '<div class="myScene" id="books_'+data[i].id+'">';
+                    	if(userRole === "3" && userBool){
+                    		add += '<a class="books" style="cursor:pointer" id="books_'+data[i].id+'"></a>';
+                    	}
+    	             	add += '<div class="imginfo" id="img_'+data[i].id+'">&nbsp;</div><a href="javascript:;" class="wode" id="'+data[i].id+'">'+data[i].treeName+'</a>';
+                     	if(userRole === "3" && userBool){
+	                     	add += '<dl id="dl_'+data[i].id+'"><dd class="togglelist" id="'+data[i].id+'" data-toggle="modal"><a href="javascript:;">'+'编辑'+'</a></dd>';
+	                     	add += '<dd  class="togglelist2" id="'+data[i].id+'" data-toggle="modal"><a href="javascript:;">'+'删除'+'</a></dd><dl>';
+                     	}
+                     	add += '</div>';
+                     }
+                     $("#addScene").before(add);
+                     
+                     //跳转到表设计
+     				$(".wode").click(function(){
+     					var id = this.id;
+     		 			window.open("activitiController/create.do?id="+ id + "&type=6","_self");
+     				});
+     				 //跳转到表设计
+     				$(".imginfo").click(function(){
+     					var id = (this.id).split("_");
+     					window.open("activitiController/create.do?id="+ id[1] + "&type=6","_self");
+     				});
+     				if(userRole === "3" && userBool){
+     					  //toggle
+                		 $(".books").click(function(){
+                			var ids = (this.id).split("_");
+                			$("#dl_"+ids[1]).toggle();
+                		 });
+	                     //删除
+	             		 $(".togglelist2").click(function(){
+	             			$("#dl_" + this.id).toggle();
+	             			 _this.delScene(this.id);
+	             		 });
+	             		 //编辑
+	             		 $(".togglelist").click(function(){
+	             			$("#dl_" + this.id).toggle();
+	             			_this.editScene(this.id);
+	             		 });
+     				}
+                  }
+        	});
+			if(userRole === "3" && userBool){
+				//跳转到新建项目
+		  		$("#addScene").click(function(){
+		  			_this.addScene();
+		  		});
+			}
+		}
+	    
+	    /**
+	     * 表单验证
+	     */
+	    this.dataValidator = function(){
+	    	$('#save_Form').bootstrapValidator({
+	            message: 'This value is not valid',
+	            feedbackIcons: {
+	                valid: 'glyphicon glyphicon-ok',
+	                invalid: 'glyphicon glyphicon-remove',
+	                validating: 'glyphicon glyphicon-refresh'
+	            },
+	            fields: {
+	            	sceneName: {
+	                    message: 'The username is not valid',
+	                    validators: {
+	                        notEmpty: {
+	                            message: '请输入场景名称!'
+	                        },
+	                        stringLength: {
+	                            max: 20,
+	                            message: '长度最大不能超过20!'
+	                        },
+	                        regexp: {
+	                            regexp: /^[a-zA-Z0-9\u2E80-\u9FFF\.\_\-]+$/,
+	                            message: '输入的名称格式错误!(只能输入汉字、字母、数字、.、_、-)'
+	                        }
+	                    }
+	                },
+	                sceneDesc: {
+	                    validators: {
+	                    	stringLength: {
+	                            max: 200,
+	                            message: '长度最大不能超过200!'
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    }
+	    
+	    /**
+	     * 保存场景数据
+	     */
+	    this.saveScene = function(){
+			 //验证成功，保存数据
+	    	var saveData = {
+	    		treeName: $("#sceneName").val(),
+	    		treeDesc: $("#sceneDesc").val(),
+	    		treeParent: cookie.getCookie("taskId"),
+	    		treeId: cookie.getCookie("productId")
+	    	};
+	    	var url = "TreeController/addSceneByTree.action";
+	    	var id = $("#sava_id").val();
+	    	if(id !== null && id !== ""){
+	    		saveData.id = id;
+	    		url = "TreeController/editTreeNode.action";
+	    	}
+	    	$.ajax({
+      		  	type : 'post',
+      		  	url : url,
+      		  	data : saveData,
+      		  	dataType : "json",
+      		  	async : false,
+      		  	success : function(data) {
+      		  		if (data !== null && data === '0000') {
+      		  			_this.getSceneList();
+      		  			$("#saveModal").modal('hide');
+      		  		} else {
+      		  			var error = data !== "" ? data : "保存失败，请联系管理员!";
+      		  			$("#error").html(error);
+      		  		}
+      		  	}   
+      	  	});
+	    }
+		
+	    /**
+	     * 添加场景的点击事件
+	     */
+		this.addScene = function(){
+			//清除表单验证信息
+			$("#save_Form").data('bootstrapValidator').destroy();
+			$('#save_Form').data('bootstrapValidator', null);
+			_this.dataValidator();
+			
+			//清空表单
+			$("#sava_id").val("");
+			$("#sceneName").val("");
+			$("#sceneDesc").val("");
+			
+			$("#myModalLabel").html("新建场景");
+			$("#error").html("");
+			$("#saveModal").modal('show');
+		}
+		
+		/**
+		 * 修改场景信息
+		 */
+		this.editScene = function(id){
+			//清除表单验证信息
+			$("#save_Form").data('bootstrapValidator').destroy();
+			$('#save_Form').data('bootstrapValidator', null);
+			_this.dataValidator();
+			$("#error").html("");
+			$.ajax({
+	             type: "POST",
+	             url: "TreeController/findTreeNodeById.action",
+	             async: true,
+	             dataType: "json",
+	             data:{id: id},
+	             success: function(data){
+	            	//项目跳转
+	            	if(data !== null){
+	            		$("#myModalLabel").html("编辑场景");
+	            		$("#sava_id").val(data.id);
+	            		$("#sceneName").val(data.treeName);
+	            		$("#sceneDesc").val(data.treeDesc);
+	            		$("#saveModal").modal('show');
+	            	}else{
+	            		$("#myModal").modal('show');
+	            		$("#modelInfo").html("查询失败，请联系管理员!");
+	            	}
+                 }
+       	 	});
+		};
+		
+		/**
+		 * 删除场景信息
+		 */
+		this.delScene = function(id){
+			$("#delModal").modal('show');
+			$("#del_Data").on("click",function(){
+				$.ajax({
+					type: "POST",
+					url: "TreeController/editTreeNode.action",
+					async: true,
+					dataType: "json",
+					data:{id: id, treeState: "00"},
+					success: function(data){
+						if(data !== "" && data === "0000"){
+							$("#delModal").modal('hide');
+							_this.getSceneList();
+						}else{
+							var error = data !== undefined ? data : "删除失败，请联系管理员!";
+							$("#myModal").modal('show');
+		            		$("#modelInfo").html(error);
+						}
+					}
+				});
+			});
+		};
+		
+		/**
+		 * 获取项目详情
+		 */
+		this.getProductById = function(productId){
+			var productName= "";
+			$.ajax({
+	             type: "POST",
+	             url: "productController/findProductById.action?productId=" + productId,
+	             async: false,
+	             dataType: "json",
+	             success: function(data){
+	            	 if(data !== null){
+	            		 productName = data.productName;
+	            	 }
+                }
+      	 	});
+			return productName;
+		}
+		
+		//获取登录人权限
+		this.getUserRole = function(){
+			$.ajax({
+	             type: "POST",
+	             url: "userController/getUser.action",
+	             data: {teamId: cookie.getCookie("teamId")},
+	             async: false,
+	             dataType: "json",
+	             success: function(data){
+          			if(data !== null && data !== ""){
+          				userRole = data.userRole;
+          				_this.verfiyTaskUser(data.id);
+          			}else{
+          				userRole = "";
+          			}
+                }
+      	 	});
+		};
+		
+		/**
+		 * 获取用户任务下是否有此未完成的数据库任务
+		 */
+		this.verfiyTaskUser = function(userId){
+			baseProduct = [];
+			$.ajax({
+	             type: "POST",
+	             data: {userId: userId, teamId: cookie.getCookie("teamId")},
+	             url: "TaskInfoController/findTaskInfoByUserId.action",
+	             async: false,
+	             dataType: "json",
+	             success: function(data){
+         			if(data !== null && data.length > 0){
+         				for (var i = 0; i < data[0].length; i++) {
+							if(""+userId+"" === data[0][i].taskOwner && data[0][i].taskType === "02"){
+								userBool = true;
+								baseProduct.push(data[0][i].productId);
+							}
+						}
+         			}
+               }
+     	 	});
+		};
+	}
+	
+	return SceneList;
+},{
+	requires : ['io',
+	            'common-module/src/cookie'
+	            ]
+});

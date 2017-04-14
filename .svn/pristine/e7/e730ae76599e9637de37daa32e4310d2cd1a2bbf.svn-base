@@ -1,0 +1,18 @@
+package com.edp.serviceI.tree;
+
+
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.TreeInfoDto;
+
+public interface TreeServiceI {
+
+
+	TreeInfoDto findTreeById(String productId);
+	
+	Integer addTreeNode(TreeInfoDto dto);
+	
+	Integer editTreeNode(TreeInfoDto dto);
+
+	Integer addProductTree(ProductDto productDto);
+
+}

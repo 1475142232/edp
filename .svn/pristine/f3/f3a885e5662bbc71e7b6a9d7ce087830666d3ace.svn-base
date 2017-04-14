@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.ProductInfoPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.ProductInfoPo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="product_desc" property="productDesc" jdbcType="VARCHAR" />
+    <result column="product_type" property="productType" jdbcType="CHAR" />
+    <result column="product_owner" property="productOwner" jdbcType="VARCHAR" />
+    <result column="product_creater" property="productCreater" jdbcType="VARCHAR" />
+    <result column="product_createtime" property="productCreatetime" jdbcType="VARCHAR" />
+    <result column="product_modifiedtime" property="productModifiedtime" jdbcType="VARCHAR" />
+    <result column="product_modifiedPerson" property="productModifiedperson" jdbcType="VARCHAR" />
+    <result column="product_state" property="productState" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, product_name, product_desc, product_type, product_owner, product_creater, product_createtime, 
+    product_modifiedtime, product_modifiedPerson, product_state
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.ProductInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from product_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from product_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from product_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.ProductInfoPoCriteria" >
+    delete from product_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.ProductInfoPo" >
+    insert into product_info (id, product_name, product_desc, 
+      product_type, product_owner, product_creater, 
+      product_createtime, product_modifiedtime, 
+      product_modifiedPerson, product_state)
+    values (#{id,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, #{productDesc,jdbcType=VARCHAR}, 
+      #{productType,jdbcType=CHAR}, #{productOwner,jdbcType=VARCHAR}, #{productCreater,jdbcType=VARCHAR}, 
+      #{productCreatetime,jdbcType=VARCHAR}, #{productModifiedtime,jdbcType=VARCHAR}, 
+      #{productModifiedperson,jdbcType=VARCHAR}, #{productState,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.ProductInfoPo" >
+    insert into product_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="productName != null" >
+        product_name,
+      </if>
+      <if test="productDesc != null" >
+        product_desc,
+      </if>
+      <if test="productType != null" >
+        product_type,
+      </if>
+      <if test="productOwner != null" >
+        product_owner,
+      </if>
+      <if test="productCreater != null" >
+        product_creater,
+      </if>
+      <if test="productCreatetime != null" >
+        product_createtime,
+      </if>
+      <if test="productModifiedtime != null" >
+        product_modifiedtime,
+      </if>
+      <if test="productModifiedperson != null" >
+        product_modifiedPerson,
+      </if>
+      <if test="productState != null" >
+        product_state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null" >
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="productDesc != null" >
+        #{productDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="productType != null" >
+        #{productType,jdbcType=CHAR},
+      </if>
+      <if test="productOwner != null" >
+        #{productOwner,jdbcType=VARCHAR},
+      </if>
+      <if test="productCreater != null" >
+        #{productCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="productCreatetime != null" >
+        #{productCreatetime,jdbcType=VARCHAR},
+      </if>
+      <if test="productModifiedtime != null" >
+        #{productModifiedtime,jdbcType=VARCHAR},
+      </if>
+      <if test="productModifiedperson != null" >
+        #{productModifiedperson,jdbcType=VARCHAR},
+      </if>
+      <if test="productState != null" >
+        #{productState,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.ProductInfoPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from product_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update product_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productName != null" >
+        product_name = #{record.productName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productDesc != null" >
+        product_desc = #{record.productDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productType != null" >
+        product_type = #{record.productType,jdbcType=CHAR},
+      </if>
+      <if test="record.productOwner != null" >
+        product_owner = #{record.productOwner,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productCreater != null" >
+        product_creater = #{record.productCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productCreatetime != null" >
+        product_createtime = #{record.productCreatetime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productModifiedtime != null" >
+        product_modifiedtime = #{record.productModifiedtime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productModifiedperson != null" >
+        product_modifiedPerson = #{record.productModifiedperson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productState != null" >
+        product_state = #{record.productState,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update product_info
+    set id = #{record.id,jdbcType=VARCHAR},
+      product_name = #{record.productName,jdbcType=VARCHAR},
+      product_desc = #{record.productDesc,jdbcType=VARCHAR},
+      product_type = #{record.productType,jdbcType=CHAR},
+      product_owner = #{record.productOwner,jdbcType=VARCHAR},
+      product_creater = #{record.productCreater,jdbcType=VARCHAR},
+      product_createtime = #{record.productCreatetime,jdbcType=VARCHAR},
+      product_modifiedtime = #{record.productModifiedtime,jdbcType=VARCHAR},
+      product_modifiedPerson = #{record.productModifiedperson,jdbcType=VARCHAR},
+      product_state = #{record.productState,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.ProductInfoPo" >
+    update product_info
+    <set >
+      <if test="productName != null" >
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="productDesc != null" >
+        product_desc = #{productDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="productType != null" >
+        product_type = #{productType,jdbcType=CHAR},
+      </if>
+      <if test="productOwner != null" >
+        product_owner = #{productOwner,jdbcType=VARCHAR},
+      </if>
+      <if test="productCreater != null" >
+        product_creater = #{productCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="productCreatetime != null" >
+        product_createtime = #{productCreatetime,jdbcType=VARCHAR},
+      </if>
+      <if test="productModifiedtime != null" >
+        product_modifiedtime = #{productModifiedtime,jdbcType=VARCHAR},
+      </if>
+      <if test="productModifiedperson != null" >
+        product_modifiedPerson = #{productModifiedperson,jdbcType=VARCHAR},
+      </if>
+      <if test="productState != null" >
+        product_state = #{productState,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.ProductInfoPo" >
+    update product_info
+    set product_name = #{productName,jdbcType=VARCHAR},
+      product_desc = #{productDesc,jdbcType=VARCHAR},
+      product_type = #{productType,jdbcType=CHAR},
+      product_owner = #{productOwner,jdbcType=VARCHAR},
+      product_creater = #{productCreater,jdbcType=VARCHAR},
+      product_createtime = #{productCreatetime,jdbcType=VARCHAR},
+      product_modifiedtime = #{productModifiedtime,jdbcType=VARCHAR},
+      product_modifiedPerson = #{productModifiedperson,jdbcType=VARCHAR},
+      product_state = #{productState,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

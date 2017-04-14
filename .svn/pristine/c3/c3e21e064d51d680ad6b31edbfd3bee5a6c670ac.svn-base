@@ -1,0 +1,56 @@
+KISSY.add("systemlogin-module/src/login",function(S){
+
+	function teamCreat(){
+		function getTreamlist(){
+			//团队列表获取-----
+			$.ajax({
+	             type: "GET",
+	             url: "TeamController/getAllTream.action",
+	             async: true,
+	             dataType: "json",
+	             success: function(data){
+	                 for(var i=0; i<data.length; i++) {
+	                 	var add = '<div class="addNav">';
+	                 	add += '<div class="navList">';
+	                 	add += '<a href="javascript:;" id="'+data.id+'">'+data.teamName+'</a>';
+	                 	add += '</div>';
+	                 	add += '</div>';
+	                 }
+	                 
+	              }
+	        });
+		}
+		getTreamlist();
+		
+		// 新增弹出窗口
+		$(".addNavBtn").click(function(){
+			$(".addNavAlert").show().find("input").val("");
+		});
+		
+		// 确定创建团队-----
+		$(".addNavOk").click(function(){
+			var _data = $(".addNavName").val();
+			$.ajax({
+	             type: "POST",
+	             url: "TeamController/addTream.action",
+	             async: true,
+	             dataType: "json",
+	             data:_data,
+	             success: function(data){
+	                 getTreamlist();
+					
+	             }
+	        });
+		});
+		
+		// 取消创建团队
+		$(".addNavNo").click(function(){
+			$(".addNavAlert").hide();
+		});
+	}
+	
+
+	return teamCreat;
+},{
+	requires : []
+});

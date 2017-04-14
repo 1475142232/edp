@@ -1,0 +1,128 @@
+KISSY.add("problem-module/src/problemdetail",function(S,IO, Cookie){
+	function ProblemDetail(){
+		_this = this;
+		var cookie = new Cookie();
+		var problemId = "";
+		
+		this.init = function(id){
+			problemId = id;
+			
+			_this.getProblemDetail();
+			
+			_this.getTransferUser();
+			
+			$("#problem_back").on("click",function(){
+				//返回问题列表
+	 			IO.get("views/problem/problem_list.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	         	});
+			});
+			
+		}
+		
+		this.getProblemDetail = function(){
+			//获取项目列表
+			$.ajax({
+	             type: "POST",
+	             url: "ProblemController/findProblemById.action?problemId="+problemId,
+	             async: true,
+	             dataType: "json",
+	             success: function(data){
+	            	 if(data !== null && data !== ""){
+	            		 $("#problem_title").text(data.problemName);
+	            		 $("#problem_desc").text(data.problemDesc);
+	            		 $("#problem_user").text(data.problemStarteName);
+	            		 $("#problem_time").text(data.problemStarteTime);
+	            		 //回复列表
+	            		 _this.getReplyList(data);
+	            	 }
+	             }
+			});
+		};
+		
+		/**
+		 * 渲染回复列表
+		 */
+		this.getReplyList = function(data){
+			$(".g_replyBar").html("");
+			var children = data.children;
+		    for (var i = 0; i < children.length; i++) {
+				var html = '<li>'
+   					+'<span class="g_replayname">'+ children[i].replyUserName +'</span>'
+   					+'<span class="g_replaycon" id="desc_'+i+'"></span>'
+   					+'<span class="g_replaytime">'+ children[i].replyTime +'</span>'
+   					+'</li>';
+				$(".g_replyBar").prepend(html);
+				$("#desc_" + i).text(children[i].replyDesc);
+			}
+		    
+		    $("#my_Relpy").on("click", function(){
+		    	$("#addModal").modal('show');
+		    	$("#reply_Desc").val("");
+		    });
+		    
+		    $("#reply_Submit").on("click", function(){
+		    	$("#addModal").modal('show');
+		    	_this.addReplyInfo(data.id);
+		    });
+		};
+		
+		this.addReplyInfo = function(id){
+			var desc = $("#reply_Desc").val();
+			if(desc === undefined || desc === ""){
+				return;
+			}
+			var saveData = {problemId: id,replyDesc: desc};
+	    	$.ajax({
+      		  	type : 'post',
+      		  	url : "ReplyController/addReply.action",
+      		  	data : saveData,
+      		  	dataType : "json",
+      		  	async : false,
+      		  	success : function(data) {
+      		  		if (data !== null && data !== "") {
+      		  			var desc = (data.replyDesc);  
+	      		  		var html = '<li>'
+	       					+'<span class="g_replayname">'+ data.replyUserName +'</span>'
+	       					+'<span class="g_replaycon" id="desc_'+data.id+'"></span>'
+	       					+'<span class="g_replaytime">'+ data.replyTime +'</span>'
+	       					+'</li>';
+	    				$(".g_replyBar").prepend(html);
+	    				$("#addModal").modal('hide');
+	    				$("#desc_"+data.id).text(data.replyDesc);
+      		  		} else {
+      		  			var error = data !== "" ? data : "回复失败，请联系管理员!";
+      		  			$("#error").html(error);
+      		  		}
+      		  	}   
+      	  	});
+		};
+		
+		/**
+		 * 获取转移的解决人列表
+		 */
+		this.getTransferUser = function(){
+			var teamId = cookie.getCookie("teamId");
+			$("#transfer_User").html("");
+			//获取人员列表
+			$.ajax({
+	             type: "GET",
+	             url: "userController/findUserByTeamId.action?teamId="+teamId,
+	             async: true,
+	             dataType: "json",
+	             success: function(data){
+	             	  if(data !== null && data.length > 0){
+	             		 $("#transfer_User").append(new Option("请选择",""));
+	             		 for (var i = 0; i < data.length; i++) {
+	             			 $("#transfer_User").append(new Option(data[i].userName, data[i].id));
+						 }
+	             	  }
+	             }
+			});		
+		};
+	};
+	
+	return ProblemDetail;
+},{
+	requires : ['io','common-module/src/cookie']
+});

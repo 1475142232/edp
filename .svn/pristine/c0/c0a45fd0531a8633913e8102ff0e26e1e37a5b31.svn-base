@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="./src/fullcalendar-module/css/agenda-day.css">
+
+</head>
+<body>
+  <!-- 我的任务 -->
+<div class="content-box-zhu">
+	<div class="task-dateil">
+		<div class="task-dateil-left">
+			<ul class="task-dateil-ul">
+				<li class="task-dateil-li1">
+					<span style="font-size: 20px;" id="my_no_task">0</span>
+					<span>未完成的任务</span>
+				</li>
+				<li class="task-dateil-li2"><div class="task-dateil-xian">&nbsp;</div></li>
+				<li class="task-dateil-li1">
+					<span style="font-size: 20px;" id="my_yes_task">0</span>
+					<span>已完成的任务</span>
+				</li>
+			</ul>
+		</div>
+		<div class="task-dateil-right">
+			<img id="problem_back" style="float:right;cursor: pointer;" src="./src/problem-module/img/u211.png">
+		</div>
+	</div>
+	<div class="task-dateil-heng">&nbsp;</div>
+    <div class="task-dateil-task">
+		<div class="task-deteil-list">
+			<div class="task-deteil-no">
+				<div class="task-list-top">
+					<img src="./src/myself-module/img/no_task.png" width="34px" height="34px"><span class="top-span">未完成的任务</span>
+					<hr class="top-heng">
+				</div>
+				<div class="task-list-center" id="myNoList">
+					<div class="task-list-info">
+						<div class="task-list-info-name">
+							<span class="info-taskname">12</span>
+							<span class="info-tasktime">交付时间：</span>
+							<span class="info-tasktime">09/21/2016</span>
+						</div>
+						<div class="task-list-info-desc">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="task-deteil-yes">
+				<div class="task-list-top">
+					<img src="./src/myself-module/img/yes-task.png" width="34px" height="34px"><span class="top-span">已完成的任务</span>
+					<hr class="top-heng">
+				</div>
+				<div class="task-list-center" id="myYesList"><div class="task-list-info">暂无相关任务。<div></div></div></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="./src/module-config.js"></script>
+<script src="./src/fullcalendar-module/agenda-entry.js"></script>
+</body>
+</html>

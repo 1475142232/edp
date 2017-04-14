@@ -1,0 +1,462 @@
+package com.edp.admin.user;
+
+import com.alibaba.fastjson.JSON;
+import com.edp.admin.common.BaseController;
+import com.edp.admin.login.UserInfoBean;
+import com.edp.common.jedis.JedisUtils;
+import com.edp.common.utils.MD5Util;
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.TaskInfoDto;
+import com.edp.serviceI.dto.UserDto;
+import com.edp.serviceI.dto.UserInfoDto;
+import com.edp.serviceI.product.ProductServiceI;
+import com.edp.serviceI.taskInfo.TaskInfoServiceI;
+import com.edp.serviceI.user.UserServiceI;
+import com.google.gson.Gson;
+
+import redis.clients.jedis.Jedis;
+
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+@RequestMapping("userController")
+public class UserController extends BaseController {
+	
+	@Autowired
+	private UserServiceI userServiceI;
+	@Resource
+    private TaskInfoServiceI taskInfoServiceI;
+	@Autowired
+	private ProductServiceI productService;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+
+	
+	private Gson gson = new Gson();
+	
+	/**
+	 * updatePwd:(用户修改密码). <br/>
+	 *
+	 * @author yangzhipeng
+	 * @param userJson userJson
+	 * @return 成功 失败
+	 * @since JDK 1.6
+	 */
+	@RequestMapping(value = "/updatePwd", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public boolean updatePwd(String oldPwd, String newPwd,HttpSession session) {
+		UserDto user=(UserDto)session.getAttribute("user");
+		UserDto dto = new UserDto();
+		dto.setUserName(user.getUserName());
+		dto.setUserPassword(MD5Util.MD5(oldPwd));
+		return false;
+	}
+	
+	/**
+	 * comparePassword:(用户修改密码，用户输入原密码和库里的密码进行比较). <br/>
+	 *
+	 * @author yangzhipeng
+	 * @param userName 用户名
+	 * @param beforePassWord 页面原密码
+	 * @return
+	 * @since JDK 1.7
+	 */
+	@RequestMapping(value = "/comparePassword", method = { RequestMethod.GET, RequestMethod.POST })
+    @ResponseBody
+	public String comparePassword(String userName, String beforePassWord) {
+	    String returnVal = "";
+
+	    return returnVal;
+	}
+	
+	/**
+	 * resetPassword:(用户重置密码). <br/>
+	 *
+	 * @author yangzhipeng
+	 * @param userId 用户主键
+	 * @return 成功 失败
+	 * @since JDK 1.7
+	 */
+	@RequestMapping(value = "/resetPassword", method = { RequestMethod.GET, RequestMethod.POST })
+    @ResponseBody
+	public boolean resetPassword(String userId) {
+	    boolean flag = false;
+
+	    return flag;
+	}
+     
+	/**
+	 * 
+	 * @author zhang_cancan 2016/5/16
+	 */
+	@RequestMapping(value = "/userList", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String userList(UserDto dto,HttpSession session) {
+		UserDto user=(UserDto)session.getAttribute("user");
+		dto.setUserDept(user.getUserDept());
+//	    UserDto userDto=userServiceI.findAllUser(dto);
+	    return gson.toJson(1);
+	}
+	
+	/**
+	 * zhang_cancan 2016/8/11
+	 * 
+	 */
+	@RequestMapping(value = "/userRoleList", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String userRoleList(String id, HttpSession session){
+		Jedis client = JedisUtils.getJedis();
+		String rolt=client.get("ROLE");
+		Map<String,String> JsonRolt = (Map<String,String>)JSON.parse(rolt);
+		JedisUtils.returnResource(client);
+		return JsonRolt.get(id);
+	}
+	/**
+	 * 
+	 * @author zhang_cancan 2016/5/18
+	 */
+	@RequestMapping(value = "/findUserById", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String findUserById(Integer id){
+//		UserDto userDto = userServiceI.findUserById(id);
+		return gson.toJson(1);
+	}
+	/**
+	 * 
+	 * @author zhang_cancan 2016/5/18
+	 */
+	@RequestMapping(value = "/editUserById", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String editUserById(UserDto dto){
+		//获取系统时间
+//		Integer edit = userServiceI.editUserById(dto);
+		return gson.toJson(1);
+	}
+	
+	/**
+	 * 
+	 * @author zhang_cancan 2016/5/19
+	 */
+	@RequestMapping(value = "/editPwdById", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String editPwdById(Integer id){
+		//获取系统时间
+		UserDto dto = new UserDto();
+		dto.setId(id);
+		dto.setUserPassword(MD5Util.MD5("111111"));
+//		userServiceI.editUserById(dto);
+		return gson.toJson(dto);
+	}
+	/**
+	 * 
+	 * @author zhang_cancan 2016/5/19
+	 */
+	@RequestMapping(value = "/delUserInfoById", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String delUserInfoById(Integer id){
+//		userServiceI.delUserInfoById(id);
+		return gson.toJson(id);
+	}
+	/**
+	 * 
+	 * @author zhang_cancan 2016/5/19
+	 */
+	@RequestMapping(value = "/addUserInfo", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String addUserInfo(UserDto dto,HttpSession session){
+//		Integer d=userServiceI.findUserByName(dto.getUserName());
+		//获取系统时间
+//		if(d==0 && (!dto.getUserName().trim().equals("")) &&(dto.getUserName()!=null)){
+        Date today = new Date();
+	    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		//获取session中的用户信息
+		UserInfoBean userInfoBean=(UserInfoBean)session.getAttribute("userInfoBean");
+		UserDto userDto=(UserDto)session.getAttribute("user");
+        //
+		dto.setUserCreate(userInfoBean.getUsername());
+		dto.setUserCreatetime(sdf.format(today));
+		dto.setUserPassword(MD5Util.MD5("111111"));
+		dto.setUserDept(userDto.getUserDept());
+//		userServiceI.addUserInfo(dto);
+		return gson.toJson(dto);
+//		}else{
+//			return gson.toJson("");
+//		}
+	}
+	/**
+	 * 
+	 * @author zhang_cancan 2016/5/24
+	 * 
+	 */
+	@RequestMapping(value = "/delUser", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String delUser(Integer id,Integer parent){
+//		Integer res=userServiceI.delUserInfo(id,parent);
+		return gson.toJson(1);
+	}
+	/**
+	 * 
+	 * @author zhang_cancan 2016/8/12
+	 * 
+	 */
+	@RequestMapping(value = "/findUserTree", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String findUserTree(String id,String type,HttpSession session){
+		Jedis client = JedisUtils.getJedis();
+		String rolt=client.get("USER_ROLE");
+		Map<String,String> JsonRolt = (Map<String,String>)JSON.parse(rolt);
+		JedisUtils.returnResource(client);
+		return JsonRolt.get(id);
+	}
+	
+	/**
+	 * 
+	 * @author zhang_cancan 2016/8/1
+	 * 
+	 */
+	@RequestMapping(value = "/SelectUserById", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String SelectUserById(String ProductId){
+//		List<UserDto> users=userServiceI.getUserByProductId(ProductId);
+		return gson.toJson(1);
+	}
+	
+	/**
+	 * 
+	 * @author zhang_cancan 2016/9/19
+	 * 获取用户权限
+	 * 
+	 */
+	@RequestMapping(value = "/SelectRoleById", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String SelectRoleById(HttpSession session){
+		UserInfoDto user=(UserInfoDto)session.getAttribute("user");
+		return gson.toJson(user.getUserRole());
+	}
+	
+	/**
+	 * 
+	 * @author zhang_cancan 2016/9/19
+	 * 修改权限
+	 * 
+	 */
+	@RequestMapping(value = "/editRoleById", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String editRoleById(String role,Integer userId,String teamId,HttpSession session){
+		UserInfoDto user=new UserInfoDto();
+		user.setId(userId);
+		user.setUserRole(role);
+		userServiceI.editUserRoleById(user,teamId);
+		return gson.toJson("0000");
+	}
+	
+	/**
+	 * 
+	 * @author zhang_cancan 2016/5/24
+	 * 
+	 */
+	@RequestMapping(value = "/findUserTreeRole", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String findUserTreeRole(String id,String type,HttpSession session){
+
+	    return gson.toJson(1);
+	}
+	
+	
+	/**
+	 * 
+	 * @author zhang_cancan 2016/8/31
+	 * 
+	 */
+	@RequestMapping(value = "/registerUser.action", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String registerUser(UserInfoDto dto,String teamId,HttpSession session){
+		//获取系统时间
+		List<UserInfoDto> count = userServiceI.findAllUser(dto);
+		if(count.size() == 0){
+	        Date today = new Date();
+	        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		    dto.setUserCreatetime(sdf.format(today));
+	     	dto.setUserPassword(MD5Util.MD5(dto.getUserPassword()));
+		    Integer reg=userServiceI.registerUser(dto,teamId);
+		    return gson.toJson("0000");
+		}else{
+			return gson.toJson("用户名、邮箱已存在");
+		}
+	}
+	
+	/**
+	 * 
+	 *  @author zhang_cancan 2016/9/2
+	 *  
+	 */
+	@RequestMapping(value = "/findUserByProductId.action", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String findUserByProductId(String ProductId){
+		List<UserInfoDto> dto=userServiceI.findUserByProductId(ProductId);
+		return gson.toJson(dto);
+	}
+	
+	/**
+	 * 
+	 * @author zhang_cancan 2016/9/2
+	 */
+	@RequestMapping(value = "/getUser.action", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String getUser(String teamId,HttpSession session){
+		UserInfoDto user=(UserInfoDto)session.getAttribute("user");
+		user.setUserRole(userServiceI.findRoleById(teamId, user.getId()));
+		user.setUserPassword("");
+		user.setUserCreate("");
+		user.setUserCreatetime("");
+		return gson.toJson(user);
+	}
+	
+	/**
+	 * 
+	 *  @author zhang_cancan 2016/9/2
+	 *  
+	 */
+	@RequestMapping(value = "/findUserByTeamId.action", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String findUserByTeamId(String teamId){
+		List<UserInfoDto> dto=userServiceI.findUserByTeamId(teamId);
+		return gson.toJson(dto);
+	}
+	/**
+	 * 
+	 *  @author zhang_cancan 2016/9/14
+	 *  
+	 */
+	@RequestMapping(value = "/selectUserByTeamId.action", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String selectUserByTeamId(String teamId ,HttpSession session){
+		UserInfoDto user=(UserInfoDto)session.getAttribute("user");
+		String userIds = user.getId()+ "";
+		List<UserInfoDto> dto=userServiceI.selectUserByTeamId(teamId,userIds);
+		return gson.toJson(dto);
+	}
+	@RequestMapping(value = "/selectUserByCreate.action", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String selectUserByCreate(String teamId , String userId){
+		List<UserInfoDto> dto=userServiceI.selectUserByTeamId(teamId,userId);
+		return gson.toJson(dto);
+
+	}
+	
+	/**
+	 * 
+	 *  @author zhang_cancan 2016/9/7
+	 *  
+	 */
+	@RequestMapping(value = "/delUserByTeamId.action", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String delUserByTeamId(String teamId,Integer userId){
+		List<ProductDto> productDto=productService.getAllProduct(teamId,userId);
+		Integer count = 0;
+		for(int i = 0 ; i < productDto.size() ; i++){
+			List<TaskInfoDto> TaskInfoDto = taskInfoServiceI.findTaskByProductId(productDto.get(i).getId(),userId);
+			count+=TaskInfoDto.size();
+		}
+		if(count == 0){
+		   userServiceI.delUserByTeamId(teamId,userId);
+		   return gson.toJson("0000");
+		}else{
+		   return gson.toJson("有未完成工单");
+		}
+		
+	}
+	/**
+	 *  @author zhang_cancan 2016/9/14
+	 */
+	@RequestMapping(value = "/delUserByProductId.action", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String delUserByProductId(String productId,Integer userId){
+		List<TaskInfoDto> TaskInfoDto = taskInfoServiceI.findTaskByProductId(productId,userId);
+		if(TaskInfoDto.size()!=0){
+			return gson.toJson("有未完成工单");
+		}else{
+			userServiceI.delUserByProductId(productId,userId);
+			return gson.toJson("0000");
+		}
+	}
+	/**
+	 * 
+	 * @author zhang_cancan 2016/9/14
+	 * 邀请用户
+	 * 
+	 */
+	@RequestMapping(value = "/findUrlByTeamId.action", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String findUrlByTeamId(String teamId){
+//		String ip = getServerIp();
+        String url = "http://127.0.0.1:8080/edp-admin/loginController/registerPage.action?teamId="+teamId;
+		return gson.toJson(url);
+	}
+	
+	private String  getServerIp(){  
+		String SERVER_IP = "";
+	    try {  
+	        Enumeration netInterfaces = NetworkInterface.getNetworkInterfaces();  
+	        InetAddress ip = null;  
+	        while (netInterfaces.hasMoreElements()) {  
+	            NetworkInterface ni = (NetworkInterface) netInterfaces  
+	                    .nextElement();  
+	            ip = (InetAddress) ni.getInetAddresses().nextElement();  
+	            SERVER_IP = ip.getHostAddress();  
+	            if (!ip.isSiteLocalAddress() && !ip.isLoopbackAddress()  
+	                    && ip.getHostAddress().indexOf(":") == -1) {  
+	                SERVER_IP = ip.getHostAddress();  
+	                break;  
+	            } else {  
+	                ip = null;  
+	            }  
+	        }  
+	    } catch (SocketException e) {  
+	        // TODO Auto-generated catch block  
+	        e.printStackTrace();  
+	    }  
+	     
+	     return SERVER_IP;  
+	 }  
+	/**
+	 * 
+	 * @author zhang_cancan 2016/9/14
+	 * 修改密码
+	 * 
+	 */
+	@RequestMapping(value = "/editPassWord.action", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String editPassWord(String passWord , String NewPass ,HttpSession session){
+		UserInfoDto user=(UserInfoDto)session.getAttribute("user");
+		if(user.getUserPassword().equals(MD5Util.MD5(passWord))){
+			user.setUserPassword(MD5Util.MD5(NewPass));
+			userServiceI.editUserById(user);
+			return gson.toJson("0000");
+		}else{
+			return gson.toJson("密码错误！");
+		}
+		
+	}
+	 
+}

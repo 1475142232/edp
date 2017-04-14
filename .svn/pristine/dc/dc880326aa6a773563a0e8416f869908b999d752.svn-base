@@ -1,0 +1,15 @@
+/**
+ * 用户管理
+ */
+KISSY.add('usermanage-module/src/userDelete', function(S,UserManage){
+	function UserDelete(){
+		this.renderInformation = function(){
+			var userManage = new UserManage();
+			userManage.init('uCancel');
+		};
+		
+	};
+	return UserDelete;
+},{
+    requires : ['usermanage-module/src/userManage']
+});

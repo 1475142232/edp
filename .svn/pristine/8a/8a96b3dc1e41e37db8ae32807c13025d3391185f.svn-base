@@ -1,0 +1,592 @@
+package com.edp.admin.functionInfo;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.edp.admin.common.BaseController;
+import com.edp.admin.login.UserInfoBean;
+import com.edp.common.constant.Constants;
+import com.edp.common.jedis.JedisUtils;
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.serviceI.bytearrayInfo.ByteArrayInfoServiceI;
+import com.edp.serviceI.dto.BytearrayInfoDto;
+import com.edp.serviceI.dto.ColumnPicDto;
+import com.edp.serviceI.dto.ControlDto;
+import com.edp.serviceI.dto.CtableDto;
+import com.edp.serviceI.dto.FunColumnDto;
+import com.edp.serviceI.dto.FunConTrolDto;
+import com.edp.serviceI.dto.FunctionInfoDto;
+import com.edp.serviceI.dto.MasterDto;
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import com.edp.serviceI.product.ProductServiceI;
+import com.edp.serviceI.sceneinfo.SceneInfoServiceI;
+import com.edp.serviceI.tree.TreeServiceI;
+import com.google.gson.Gson;
+
+import redis.clients.jedis.Jedis;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+
+
+@Controller
+@RequestMapping("functionInfoController")
+public class FunctionInfoController extends BaseController {
+
+    @Autowired
+    private FunctionInfoServiceI functionInfoServiceI;
+    @Autowired
+    private TreeServiceI treeServiceI;
+    @Autowired
+    private ByteArrayInfoServiceI byteArrayInfoServiceI;
+    @Autowired
+	private ProductServiceI productService;
+	@Autowired
+	private SceneInfoServiceI sceneInfoService;
+    
+    
+   
+
+    private static final Logger log = LoggerFactory.getLogger(FunctionInfoController.class);
+    private Gson gson = new Gson();
+
+    /**
+     * @param funcName
+     * @param funcCheck
+     * @param ParentId
+     * @param opType    操作类型   1.正常操作,2.变更操作  modify by changer 2016-5-23
+     * @param session
+     * @return
+     */
+    //添加属性
+    @RequestMapping(value = "/addFunctionInfo.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String addFunctionInfo(String funcName, String funcCheck1,String funcCheck2,String funcCheck3,String funcCheck4, String ParentId, String opType, String GroupId,HttpSession session) {
+    	if("0".equals(funcCheck1)){
+    		funcName+="\r\n"+"增加功能";
+    	} 
+       	if("1".equals(funcCheck2)){
+       		funcName+="\r\n"+"修改功能";
+    	}
+       	if("2".equals(funcCheck3)){
+       		funcName+="\r\n"+"删除功能";
+    	}
+       	if("3".equals(funcCheck4)){
+       		funcName+="\r\n"+"查询功能";
+    	}
+       	List<FunctionInfoDto>  funcDto=new ArrayList<FunctionInfoDto>();
+       	List<MasterDto> masterDtos= new ArrayList<MasterDto>();
+    	try{
+            String[] names = funcName.split("\r\n");//鏍规嵁鍥炶溅鎴彇瀛楃涓�"\n")
+           
+            //鑾峰彇绯荤粺鏃堕棿
+            Date today = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            //鑾峰彇session涓殑鐢ㄦ埛淇℃伅
+            UserInfoBean userInfoBean = (UserInfoBean) session.getAttribute("userInfoBean");
+            for (int i = 0; i < names.length; i++) {
+                FunctionInfoDto dto = new FunctionInfoDto();
+                MasterDto masterDto = new MasterDto();//鍒涘缓瑕佹彃鍏ョ殑鏂拌妭鐐圭殑鎵胯浇绫�
+            	MasterDto master=new MasterDto();
+                if (names[i].trim().equals("")) {
+                    continue;
+                }
+                String id = SequenceManage.getSequence("");
+                dto.setFuncId(id);
+                dto.setFuncName(names[i].trim());
+                dto.setFuncCreater(userInfoBean.getUsername());
+                dto.setFuncCreateTime(sdf.format(today));
+                String state="";
+    			Jedis client = JedisUtils.getJedis();
+                if ("2".equals(opType)) {
+    				String change=client.get("CHANGE_NODE");
+    				Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+                    dto.setFuncState(Constants.TreeStates.CHANGE_ADD);
+                    masterDto.setTreeNodeState(Constants.TreeStates.CHANGE_ADD);
+                    master.setTreeNodeState(Constants.TreeStates.CHANGE_ADD);
+                    state=Constants.TreeStates.CHANGE_ADD;
+                } else {
+    				String change=client.get("NORMAL_NODE");
+    				Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+                    dto.setFuncState(Constants.TreeStates.NORMAL_ADD);
+                    masterDto.setTreeNodeState(Constants.TreeStates.NORMAL_ADD);
+                    master.setTreeNodeState(Constants.TreeStates.NORMAL_ADD);
+                    state=Constants.TreeStates.NORMAL_ADD;
+                }
+                functionInfoServiceI.addFunctionInfo(dto);
+                funcDto.add(dto);
+                masterDto.setId(id);
+                masterDto.setTreeNodeType("7");
+                masterDto.setTreeNodeName(names[i].trim());
+                masterDto.setTreeNodeId((String) session.getAttribute("productId"));
+                masterDto.setTreeId(id);
+    			masterDto.setText(names[i]);
+    			treeServiceI.addTreeNode(masterDto);
+                String qId=SequenceManage.getSequence("");
+                master.setId(qId);
+                master.setTreeNodeType("11");
+                master.setTreeNodeName("功能流程图");
+                master.setTreeNodeId((String) session.getAttribute("productId"));
+                master.setText("功能流程图");
+                master.setTreeNodeParent(id);
+                master.setTreeId(qId);
+                treeServiceI.addTreeNode(master);
+                treeServiceI.newModel(qId);
+                List<MasterDto> list=new ArrayList<MasterDto>();
+                list.add(master);
+                masterDto.setChildren(list);
+    			if("2".equals(opType)){
+    				Constants.CHANGE_NODE.get((String) session.getAttribute("productId")).add(masterDto);
+            		Map<String,List<Object>> JsonChange=Constants.CHANGE_NODE;
+    				client.set("CHANGE_NODE", gson.toJson(JsonChange));
+    			}else{
+    				Constants.NORMAL_NODE.get((String) session.getAttribute("productId")).add(masterDto);
+    				Map<String,List<Object>> JsonNormal=Constants.NORMAL_NODE;
+    				client.set("NORMAL_NODE", gson.toJson(JsonNormal));
+    			}
+    			JedisUtils.returnResource(client);
+                String tree=treeServiceI.findJsonTreeById((String) session.getAttribute("productId"),state);
+                JSONObject a=JSON.parseObject(tree);
+                JSONArray jsonArr = (JSONArray) a.get("children");
+    			JSONObject b= (JSONObject)jsonArr.get(1);
+    			JSONArray bArr=(JSONArray)b.get("children");
+    			for(int j=0;j<bArr.size();j++){
+    				JSONObject c=(JSONObject)bArr.get(j);
+    				if(c.get("id").equals(GroupId)){
+    					if(c.containsKey("children")==false){
+    						c.put("children", new JSONArray());
+    					}
+						JSONArray jsonArrs= (JSONArray)c.get("children");
+						jsonArrs.add(JSON.parseObject(gson.toJson(masterDto)));
+    				}
+    			}
+    			treeServiceI.editTreeByProductId((String) session.getAttribute("productId"),a.toString(),state);
+                masterDtos.add(masterDto);
+            }
+        }catch (Exception e ){
+            e.printStackTrace();
+        }
+
+        return gson.toJson(masterDtos);
+    }
+
+    //根据id获取功能
+    @RequestMapping(value = "/getFunctionInfoDtoById.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String getFunctionInfoDtoById(String funcId,Integer version,String refType) {
+    	if(refType.equals("1")){
+    		version=functionInfoServiceI.findMaxVersionByFunId(funcId,"01");
+    	}else if(refType.equals("2")){
+    		version=functionInfoServiceI.findMinVersionByFunId(funcId,"11");
+    	}
+        FunctionInfoDto functionInfoById = functionInfoServiceI.getFunctionInfo(funcId, version);
+        return gson.toJson(functionInfoById);
+    }
+
+    //获取所有功能
+    @RequestMapping(value = "/getAllFunctionInfo.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String getAllFunctionInfo(FunctionInfoDto dto) {
+
+        FunctionInfoDto getAllFunctionInfo = functionInfoServiceI.getAllFunctionInfo(dto);
+
+        return gson.toJson(getAllFunctionInfo);
+    }
+
+    //修改功能
+    @RequestMapping(value = "/updateFunctionInfo.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String updateFunctionInfo(FunctionInfoDto dto, String refType,HttpSession session) {
+        //获取session中的用户信息
+        UserInfoBean userInfoBean = (UserInfoBean) session.getAttribute("userInfoBean");
+        Date today = new Date();
+	    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        RequestmentDto requestmentDto=treeServiceI.findTreeNodeById(dto.getFuncId());
+	    ProductDto  productDto=productService.getProductById((String)session.getAttribute("productId"));  
+	    String state="";
+	    String funId=dto.getFuncId();
+	    MasterDto po=new MasterDto();
+        if(refType.equals("66")){
+        	String oldId=dto.getFuncId();
+        	String id=SequenceManage.getSequence("");
+        	dto.setFuncId(id);
+        	dto.setFuncCreater(userInfoBean.getUsername());
+        	dto.setFuncCreateTime(sdf.format(today));
+        	functionInfoServiceI.addFunctionInfo(dto);
+        	requestmentDto.setTreeId(requestmentDto.getId());
+        	requestmentDto.setId(id);
+        	requestmentDto.setTreeNodeName(dto.getFuncName());
+        	requestmentDto.setTreeNodeDesc(dto.getFuncSpec());
+        	requestmentDto.setTreeNodeCreateperson(userInfoBean.getUsername());
+        	requestmentDto.setTreeNodeCreatetime(sdf.format(today));
+        	po = BeanCopyUtils.populateTbyDBySpring(requestmentDto, MasterDto.class);
+        	Jedis client = JedisUtils.getJedis();
+        	if("2".equals(refType)){
+				String change=client.get("CHANGE_NODE");
+				Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+		    	requestmentDto.setTreeNodeState(Constants.TreeStates.CHANGE_ADD);
+		    	state=Constants.TreeStates.CHANGE_ADD;
+		    	Constants.CHANGE_NODE.get(productDto.getId()).add(po);
+				Map<String,List<Object>> JsonChange=Constants.CHANGE_NODE;
+				client.set("CHANGE_NODE", gson.toJson(JsonChange));
+			}else{
+				String change=client.get("NORMAL_NODE");
+				Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+				requestmentDto.setTreeNodeState(Constants.TreeStates.NORMAL_ADD);
+				state=Constants.TreeStates.NORMAL_ADD;
+				Constants.NORMAL_NODE.get(productDto.getId()).add(po);
+				Map<String,List<Object>> JsonNormal=Constants.NORMAL_NODE;
+				client.set("NORMAL_NODE", gson.toJson(JsonNormal));
+			}
+        	JedisUtils.returnResource(client);
+        	treeServiceI.addTreeNode(requestmentDto, productDto.getId());
+		    FunConTrolDto func=new FunConTrolDto();
+		    func.setFuncId(oldId);
+		    List<FunConTrolDto> funControl=sceneInfoService.selectFunControl(func);
+		    for(int i=0;i<funControl.size();i++){
+		    	funControl.get(i).setId(null);
+		    	funControl.get(i).setFuncId(id);
+		    	sceneInfoService.insertFunConTrol(funControl.get(i));
+		    }
+		    FunColumnDto funcol=new FunColumnDto();
+		    funcol.setFuncId(oldId);
+		    List<FunColumnDto> funcolumn=functionInfoServiceI.selectFunColumn(funcol);
+		    for(int i=0;i<funcolumn.size();i++){
+		    	funcolumn.get(i).setId(null);
+		    	funcolumn.get(i).setFuncId(id);
+		    	functionInfoServiceI.insertFunColumn(funcolumn.get(i));
+		    }	    
+        }else{
+        	dto.setFuncCreater(userInfoBean.getUsername());
+        	dto.setFuncCreateTime(sdf.format(today));
+        	functionInfoServiceI.updateFunctionInfo(dto);
+        	requestmentDto.setTreeNodeName(dto.getFuncName());
+        	requestmentDto.setTreeNodeDesc(dto.getFuncSpec());
+        	requestmentDto.setTreeId(requestmentDto.getId());
+        	treeServiceI.editTreeNode(requestmentDto);
+        	List<Object> object;
+			Jedis client = JedisUtils.getJedis();
+        	if("2".equals(refType)){
+				String change=client.get("CHANGE_NODE");
+				Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+				object=Constants.CHANGE_NODE.get(productDto.getId());
+				state="11";
+			}else{
+				String change=client.get("NORMAL_NODE");
+				Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+				object=Constants.NORMAL_NODE.get(productDto.getId());
+				state="01";
+			}		
+        	 for(int i=0;i<object.size();i++){
+              	MasterDto masterDto=JSON.parseObject(object.get(i).toString(), MasterDto.class);
+              	if(masterDto.getId().equals(requestmentDto.getId())){
+              		po = BeanCopyUtils.populateTbyDBySpring(requestmentDto, MasterDto.class);
+              		object.set(i, po);
+              		break;
+              	}
+              }		
+ 			if("2".equals(refType)){
+				String change=client.get("CHANGE_NODE");
+				Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			}else{
+				String change=client.get("NORMAL_NODE");
+				Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			}
+			JedisUtils.returnResource(client);
+        }       
+        MasterDto master=BeanCopyUtils.populateTbyDBySpring(requestmentDto,MasterDto.class);
+		String tree=treeServiceI.findJsonTreeById(productDto.getId(),state);
+		JSONObject a = JSON.parseObject(tree); 
+		JSONArray jsonArr = (JSONArray) a.get("children");
+		JSONObject b= (JSONObject)jsonArr.get(1);
+		JSONArray jsonArrs= (JSONArray)b.get("children");
+		for(int i=0;i<jsonArrs.size();i++){
+			JSONObject c = (JSONObject)jsonArrs.get(i);
+			if(c.containsKey("children") == false){
+				c.put("children", new JSONArray());
+			}
+			JSONArray jsonArrc = (JSONArray)c.get("children");
+			for(int j=0;j<jsonArrc.size();j++){
+				JSONObject json=(JSONObject)jsonArrc.get(j);
+				if(json.get("id").equals(funId)){
+					JSONObject masterJson=JSON.parseObject(gson.toJson(master));
+					masterJson.put("children", json.get("children"));
+					jsonArrc.set(j, masterJson);
+					po.setTreeNodeParent((String)c.get("id"));
+					po.setText(po.getTreeNodeName());
+					List<MasterDto> masterList=JSONArray.parseArray(gson.toJson(masterJson.get("children")),MasterDto.class);
+					po.setChildren(masterList);
+					break;
+				}
+			}
+		}
+		treeServiceI.editTreeByProductId(productDto.getId(),a.toString(),state);
+		//预存
+		return gson.toJson(master);
+
+    }
+
+    //删除功能
+    @RequestMapping(value = "/delFunctionInfo.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String delFunctionInfo(String id,Integer version) {
+
+        functionInfoServiceI.deleteFunctionInfo(id, version);
+        return null;
+
+    }
+
+  //上传功能
+    @RequestMapping(value = "/upload.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String fileUpload(String treeNodeParent,String name,String type, HttpServletRequest request, HttpServletRequest response, HttpSession session) throws Exception {
+        CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+      //鑾峰彇绯荤粺鏃堕棿
+        Date today = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //鑾峰彇session涓殑鐢ㄦ埛淇℃伅
+        UserInfoBean userInfoBean = (UserInfoBean) session.getAttribute("userInfoBean");
+        String id=SequenceManage.getSequence("");
+        MasterDto dto = new MasterDto();
+        List<MasterDto> dtoes=new ArrayList<MasterDto>();
+        if (commonsMultipartResolver.isMultipart(request)) {
+            MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request;
+            Iterator<String> iterator = multipartHttpServletRequest.getFileNames();
+
+            while (iterator.hasNext()) {
+
+                MultipartFile multipartFile = multipartHttpServletRequest.getFile(iterator.next());
+
+                if (multipartFile != null) {
+
+                        BytearrayInfoDto byteDto=new BytearrayInfoDto();
+                        byteDto.setFileType("02");
+                        byteDto.setFileName(name);
+                        byteDto.setFileBytes(multipartFile.getBytes());
+                        byteDto.setFileTargetid(id);
+                        byteDto.setFileCreator(userInfoBean.getUsername());
+                        byteDto.setFileCreateTime(sdf.format(today));
+                        byteDto.setFileVersion((Integer) session.getAttribute("version"));
+                        byteArrayInfoServiceI.saveBytearrayInfo(byteDto);
+                        dto.setId(id);
+                        dto.setTreeNodeName(name);
+                        dto.setTreeNodeType("12");
+                        String treeNodeState="";
+                        if(type.equals("1")){
+                        	treeNodeState=Constants.TreeStates.NORMAL_ADD;
+                           dto.setTreeNodeState(Constants.TreeStates.NORMAL_ADD);
+                        }else if(type.equals("2")){
+                        	treeNodeState=Constants.TreeStates.CHANGE_ADD;
+                           dto.setTreeNodeState(Constants.TreeStates.CHANGE_ADD);
+                        }
+                        dto.setText(name);
+                        dto.setTreeNodeId((String) session.getAttribute("productId"));
+                        dto.setTreeId(id);
+                        treeServiceI.addTreeNode(dto);
+                        RequestmentDto requestmentDto=new RequestmentDto();
+                        requestmentDto.setId(dto.getId());
+                        requestmentDto.setTreeId(dto.getId());
+                        treeServiceI.editTreeNode(requestmentDto);
+                		String tree=treeServiceI.findJsonTreeById((String) session.getAttribute("productId"),treeNodeState);
+                		JSONObject a = JSON.parseObject(tree); 
+                		JSONArray jsonArr = (JSONArray) a.get("children");
+                		JSONObject b= (JSONObject)jsonArr.get(2);
+                		if(b.containsKey("children") == false){
+                			b.put("children", new JSONArray());
+                		}
+                		JSONArray jsonArrs= (JSONArray)b.get("children");
+                		jsonArrs.add(JSON.parseObject(gson.toJson(dto)));
+            			Jedis client = JedisUtils.getJedis();
+                		if("2".equals(type)){
+            				String change=client.get("CHANGE_NODE");
+            				Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+                			Constants.CHANGE_NODE.get((String) session.getAttribute("productId")).add(dto);
+            				Map<String,List<Object>> JsonChange=Constants.CHANGE_NODE;
+            				client.set("CHANGE_NODE", gson.toJson(JsonChange));
+                		}else{
+            				String change=client.get("NORMAL_NODE");
+            				Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+                			Constants.NORMAL_NODE.get((String) session.getAttribute("productId")).add(dto);
+            				Map<String,List<Object>> JsonNormal=Constants.NORMAL_NODE;
+            				client.set("NORMAL_NODE", gson.toJson(JsonNormal));
+                		}
+            			JedisUtils.returnResource(client);
+                		treeServiceI.editTreeByProductId((String) session.getAttribute("productId"),a.toString(),treeNodeState);
+                        dtoes.add(dto);
+                }
+
+
+            }
+        }
+        return this.getGson().toJson(dtoes);
+    };
+    
+	/**
+	 * @author zhang_cancan  2016/6/12
+	 * 查询fc_name
+	 */
+    @RequestMapping(value = "/findFcNameByCId.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String findFcNameByCId(String type,String control_id){
+    	ControlDto dto=new ControlDto();
+    	if("1".equals(type)){
+    		dto=functionInfoServiceI.findFcNameByCId(control_id,Constants.TreeStates.NORMAL_ADD);
+    	}else if("2".equals(type)){
+    		dto=functionInfoServiceI.findFcNameByCId(control_id,Constants.TreeStates.CHANGE_ADD);
+    	}
+    	return this.getGson().toJson(dto);
+    }
+    
+	/**
+	 * @author zhang_cancan  2016/6/12
+	 * 保存
+	 */
+    @RequestMapping(value = "/addFcName.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String addFcName(ControlDto dto,String type,HttpSession session){
+    	Integer fc_version=(Integer)session.getAttribute("Version");
+    	dto.setFc_version(fc_version+1);
+    	if("1".equals(type)){
+    		functionInfoServiceI.deleFC(dto.getControl_id(),dto.getScene_id(),Constants.TreeStates.NORMAL_ADD);
+    		if(!dto.getFunc_id().equals(null)){
+    			dto.setFc_state(Constants.TreeStates.NORMAL_ADD);
+    		    functionInfoServiceI.addFcName(dto);
+    		}
+    	}else if("2".equals(type)){
+    		functionInfoServiceI.deleFC(dto.getControl_id(),dto.getScene_id(),Constants.TreeStates.CHANGE_ADD);
+    		if(!dto.getFunc_id().equals(null)){
+    			dto.setFc_state(Constants.TreeStates.CHANGE_ADD);
+    		    functionInfoServiceI.addFcName(dto);
+    		}    
+    	}
+    	return this.getGson().toJson("1");
+    }
+    /**
+	 * @author zhang_cancan  2016/6/16
+	 * 保存
+	 */
+    @RequestMapping(value = "/findPicById.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String findPicById(String id,HttpServletResponse resp){
+    	 BytearrayInfoDto byteDto=byteArrayInfoServiceI.findPicById(id);
+    	 resp.setContentType("image/*");
+    	 try {
+			resp.getOutputStream().write(byteDto.getFileBytes());
+			resp.flushBuffer();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	 return null;
+    }
+    /**
+	 * @author zhang_cancan  2016/6/17
+	 * 保存
+	 */
+    @RequestMapping(value = "/saveFuncColumn.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String saveFuncColumn(String control_id,String funcId,String value){       
+    	CtableDto[] req=getDTOArray(value,CtableDto.class);
+    	functionInfoServiceI.delFuncColumn(control_id,funcId);
+    	for(int i=0;i<req.length;i++){
+    		for(int j=0;j<req[i].getChildren().size();j++){
+    			functionInfoServiceI.saveFuncColumn(control_id,req[i].getId(),req[i].getChildren().get(j).getId(),funcId);
+    		}
+    	}
+    	
+    	return this.getGson().toJson("1");
+    }
+    /**
+     * @author zhang_cancan 2016/6/17
+     * @param jsonString
+     * @param clazz
+     * @return
+     */
+    public static CtableDto[] getDTOArray(String jsonString, Class clazz){           
+        JSONArray array = JSONArray.parseArray(jsonString);    
+        CtableDto[] obj = new CtableDto[array.size()];        
+        for(int i = 0; i < array.size(); i++){        
+            JSONObject jsonObject = array.getJSONObject(i);      
+            obj[i] = (CtableDto)JSONObject.toJavaObject(jsonObject, clazz);
+        }        
+        return obj;        
+    }      
+    /**
+     * @author zhang_cancan 2016/6/20
+     */
+    @RequestMapping(value = "/addPicColumn.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String addPicColumn(ColumnPicDto dto){       
+    	functionInfoServiceI.addPicColumn(dto);
+    	return this.getGson().toJson(dto);
+    }
+    /**
+     * @author zhang_cancan 2016/6/20
+     */
+    @RequestMapping(value = "/findPicColumn.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String findPicColumn(String PicId){       
+    	List<ColumnPicDto> dto=functionInfoServiceI.findPicColumn(PicId);
+    	return this.getGson().toJson(dto);
+    }
+    /**
+     * @author zhang_cancan 2016/6/20
+     */
+    @RequestMapping(value = "/delPicColumn.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String delPicColumn(Integer id){       
+    	functionInfoServiceI.delPicColumn(id);
+    	return this.getGson().toJson("1");
+    }
+    /**
+     * @author zhang_cancan 2016/6/20
+     */
+    @RequestMapping(value = "/addfuncPic.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String addfuncPic(Integer id){       
+    	functionInfoServiceI.delPicColumn(id);
+    	return this.getGson().toJson("1");
+    }
+    /**
+     * @author zhang_cancan 2016/6/20
+     */
+    @RequestMapping(value = "/addfuncPicById.action", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public String addfuncPicById(Integer funcId,String funcPId){    
+    	functionInfoServiceI.addfuncPicById(funcId,funcPId);
+    	return this.getGson().toJson("1");
+    }
+    
+    
+    
+    
+    
+    
+    
+   
+
+}

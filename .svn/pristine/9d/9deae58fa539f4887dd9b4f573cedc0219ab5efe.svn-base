@@ -1,0 +1,55 @@
+package com.edp.admin.tree;
+
+import com.edp.serviceI.dto.TreeInfoDto;
+import com.edp.serviceI.tree.TreeServiceI;
+import com.google.gson.Gson;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+
+
+import java.util.List;
+
+/**
+ * 
+ * tree请求模块
+ * @time  2016/4/20
+ * @author zhang_cancan
+ *
+ */
+@Controller
+@RequestMapping("TreeController")
+public class TreeController {
+	
+	@Autowired
+	private TreeServiceI treeServiceI;
+	
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(TreeController.class);
+	private Gson gson = new Gson();
+	
+	@RequestMapping(value = "/findTreeById.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String findTreeById(String productId){
+		TreeInfoDto tree=treeServiceI.findTreeById(productId);
+		return gson.toJson(tree);		
+	}
+	
+	/**
+	 * 查询场景、功能等
+	 * zhang_cancan 2016/9/18
+	 */
+	@RequestMapping(value = "/findTreeByType.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String findTreeByType(String productId,String type){
+		List<TreeInfoDto> typeTree = treeServiceI.findTreeByType(productId,type);
+		return gson.toJson(typeTree);
+	}
+}

@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.PlanInfoPOMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.PlanInfoPO" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="plan_name" property="planName" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="VARCHAR" />
+    <result column="end_time" property="endTime" jdbcType="VARCHAR" />
+    <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+    <result column="product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="workload_plan" property="workloadPlan" jdbcType="INTEGER" />
+    <result column="workload_done" property="workloadDone" jdbcType="INTEGER" />
+    <result column="workload_base" property="workloadBase" jdbcType="INTEGER" />
+    <result column="plan_state" property="planState" jdbcType="CHAR" />
+    <result column="plan_id" property="planId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, plan_name, start_time, end_time, create_user, create_time, product_id, product_name, 
+    workload_plan, workload_done, workload_base, plan_state, plan_id
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.PlanInfoPOCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from plan_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from plan_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from plan_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.PlanInfoPOCriteria" >
+    delete from plan_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.PlanInfoPO" >
+    insert into plan_info (id, plan_name, start_time, 
+      end_time, create_user, create_time, 
+      product_id, product_name, workload_plan, 
+      workload_done, workload_base, plan_state, 
+      plan_id)
+    values (#{id,jdbcType=INTEGER}, #{planName,jdbcType=VARCHAR}, #{startTime,jdbcType=VARCHAR}, 
+      #{endTime,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=VARCHAR}, 
+      #{productId,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, #{workloadPlan,jdbcType=INTEGER}, 
+      #{workloadDone,jdbcType=INTEGER}, #{workloadBase,jdbcType=INTEGER}, #{planState,jdbcType=CHAR}, 
+      #{planId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.PlanInfoPO" >
+    insert into plan_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="planName != null" >
+        plan_name,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="createUser != null" >
+        create_user,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="productId != null" >
+        product_id,
+      </if>
+      <if test="productName != null" >
+        product_name,
+      </if>
+      <if test="workloadPlan != null" >
+        workload_plan,
+      </if>
+      <if test="workloadDone != null" >
+        workload_done,
+      </if>
+      <if test="workloadBase != null" >
+        workload_base,
+      </if>
+      <if test="planState != null" >
+        plan_state,
+      </if>
+      <if test="planId != null" >
+        plan_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="planName != null" >
+        #{planName,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null" >
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null" >
+        #{productId,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null" >
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="workloadPlan != null" >
+        #{workloadPlan,jdbcType=INTEGER},
+      </if>
+      <if test="workloadDone != null" >
+        #{workloadDone,jdbcType=INTEGER},
+      </if>
+      <if test="workloadBase != null" >
+        #{workloadBase,jdbcType=INTEGER},
+      </if>
+      <if test="planState != null" >
+        #{planState,jdbcType=CHAR},
+      </if>
+      <if test="planId != null" >
+        #{planId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.PlanInfoPOCriteria" resultType="java.lang.Integer" >
+    select count(*) from plan_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update plan_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.planName != null" >
+        plan_name = #{record.planName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.startTime != null" >
+        start_time = #{record.startTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.endTime != null" >
+        end_time = #{record.endTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createUser != null" >
+        create_user = #{record.createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productId != null" >
+        product_id = #{record.productId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productName != null" >
+        product_name = #{record.productName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.workloadPlan != null" >
+        workload_plan = #{record.workloadPlan,jdbcType=INTEGER},
+      </if>
+      <if test="record.workloadDone != null" >
+        workload_done = #{record.workloadDone,jdbcType=INTEGER},
+      </if>
+      <if test="record.workloadBase != null" >
+        workload_base = #{record.workloadBase,jdbcType=INTEGER},
+      </if>
+      <if test="record.planState != null" >
+        plan_state = #{record.planState,jdbcType=CHAR},
+      </if>
+      <if test="record.planId != null" >
+        plan_id = #{record.planId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update plan_info
+    set id = #{record.id,jdbcType=INTEGER},
+      plan_name = #{record.planName,jdbcType=VARCHAR},
+      start_time = #{record.startTime,jdbcType=VARCHAR},
+      end_time = #{record.endTime,jdbcType=VARCHAR},
+      create_user = #{record.createUser,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=VARCHAR},
+      product_id = #{record.productId,jdbcType=VARCHAR},
+      product_name = #{record.productName,jdbcType=VARCHAR},
+      workload_plan = #{record.workloadPlan,jdbcType=INTEGER},
+      workload_done = #{record.workloadDone,jdbcType=INTEGER},
+      workload_base = #{record.workloadBase,jdbcType=INTEGER},
+      plan_state = #{record.planState,jdbcType=CHAR},
+      plan_id = #{record.planId,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.PlanInfoPO" >
+    update plan_info
+    <set >
+      <if test="planName != null" >
+        plan_name = #{planName,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null" >
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null" >
+        product_id = #{productId,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null" >
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="workloadPlan != null" >
+        workload_plan = #{workloadPlan,jdbcType=INTEGER},
+      </if>
+      <if test="workloadDone != null" >
+        workload_done = #{workloadDone,jdbcType=INTEGER},
+      </if>
+      <if test="workloadBase != null" >
+        workload_base = #{workloadBase,jdbcType=INTEGER},
+      </if>
+      <if test="planState != null" >
+        plan_state = #{planState,jdbcType=CHAR},
+      </if>
+      <if test="planId != null" >
+        plan_id = #{planId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.PlanInfoPO" >
+    update plan_info
+    set plan_name = #{planName,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=VARCHAR},
+      end_time = #{endTime,jdbcType=VARCHAR},
+      create_user = #{createUser,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=VARCHAR},
+      product_id = #{productId,jdbcType=VARCHAR},
+      product_name = #{productName,jdbcType=VARCHAR},
+      workload_plan = #{workloadPlan,jdbcType=INTEGER},
+      workload_done = #{workloadDone,jdbcType=INTEGER},
+      workload_base = #{workloadBase,jdbcType=INTEGER},
+      plan_state = #{planState,jdbcType=CHAR},
+      plan_id = #{planId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

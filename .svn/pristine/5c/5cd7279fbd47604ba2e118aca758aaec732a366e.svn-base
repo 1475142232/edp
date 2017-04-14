@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title></title>
+	<style>
+		.bui-select-list{
+			overflow: auto;
+			overflow-x: auto;
+			max-height: 150px;
+			_height : 150px;
+		}
+
+		.bui-tree-list ul{
+			width: 300px;
+		}
+	</style>
+</head>
+<body>     
+<!-- 初始隐藏 dialog内容 -->    
+	<div id="content" class="content">      
+		<form class="form-horizontal" id="userForm">
+			<div class="row">          
+				<div class="control-group">
+					<label class="control-label"><s>*</s>用户名：</label>            
+					<div class="controls">              
+						<input id="userName" name="userName" type="text" data-rules="{required:true}" class="input-normal control-text">
+					</div>          
+				</div>    
+ 			</div> 
+ 			<div class="row">          
+				<div class="control-group">
+					<label class="control-label">姓名：</label>            
+					<div class="controls">              
+						<input id="realName" name="realName" type="text" class="input-normal control-text">
+					</div>          
+				</div>    
+ 			</div>
+ 			<div class="row">
+ 				<div class="control-group">
+ 					<label class="control-label">所属机构：</label>
+ 					<div class="controls" id="orgDiv">
+ 						<input name="orgCode" id="orgCode" type="hidden" class="input-normal control-text">
+ 						<input name="orgName" id="orgName" type="text" class="input-normal control-text">
+ 					</div>
+ 					<!-- <label style="color:red;"><s>*</s></label>  -->         
+ 				</div>
+ 			</div>
+ 			<div class="row">
+ 				<div class="control-group">
+ 					<label class="control-label">手机号：</label>            
+ 					<div class="controls">              
+ 						<input name="phoneNum" id="phoneNum" type="text" class="input-normal control-text">
+ 					</div>          
+ 				</div>
+ 			</div>
+			<div class="row">
+				<div class="control-group">
+					<label class="control-label">身份证号：</label>
+					<div class="controls">
+						<input name="centNo" id="centNo" type="text" class="input-normal control-text">
+					</div>
+				</div>
+			</div>
+ 			<div class="row">                   
+ 				<div class="control-group">            
+ 					<label class="control-label">角色：</label>            
+ 					<div class="controls">              
+ 						<select name="roleId" id="roleId" class="input-normal">
+							<option value="1">超级管理员</option>                
+							<option value="2">普通管理员</option>
+							<option value="3">普通操作员</option>
+						</select>
+ 					</div>          
+ 				</div>               
+ 			</div>
+ 			<div class="row hide" >                   
+ 				<div class="control-group">            
+ 					<label class="control-label">角色名：</label>            
+ 					<div class="controls">              
+ 						  <input name="roleName" id="roleName" type="text" data-rules="{required:true}" class="input-normal control-text">
+ 					</div>          
+ 				</div>               
+ 			</div>
+ 			<div class="row">
+ 				<input type="button" class="button button-danger button-move" id="submitUser" value="确定"/><input type="button" class="button" id="clearUser" value="重置"/>
+ 			</div>
+ </form>    
+ </div>       
+</body>
+</html>

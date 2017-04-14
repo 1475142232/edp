@@ -1,0 +1,37 @@
+package com.edp.dao.mapper;
+
+import com.edp.dao.domain.ProductInfoPo;
+import com.edp.dao.domain.ProductInfoPoCriteria;
+import com.edp.dao.domain.TaskInfoPo;
+
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+public interface ProductInfoPoMapper {
+    int countByExample(ProductInfoPoCriteria example);
+
+    int deleteByExample(ProductInfoPoCriteria example);
+
+    int deleteByPrimaryKey(String id);
+
+    int insert(ProductInfoPo record);
+
+    int insertSelective(ProductInfoPo record);
+
+    List<ProductInfoPo> selectByExample(ProductInfoPoCriteria example);
+
+    ProductInfoPo selectByPrimaryKey(String id);
+
+    int updateByExampleSelective(@Param("record") ProductInfoPo record, @Param("example") ProductInfoPoCriteria example);
+
+    int updateByExample(@Param("record") ProductInfoPo record, @Param("example") ProductInfoPoCriteria example);
+
+    int updateByPrimaryKeySelective(ProductInfoPo record);
+
+    int updateByPrimaryKey(ProductInfoPo record);
+
+	List<ProductInfoPo> getAllProduct(@Param("team_id") String teamId, @Param("user_id")Integer id);
+
+	Integer addUTPId( @Param("user_id")Integer userId, @Param("team_id")String teamId, @Param("product_id")String id,@Param("role_type")Integer role_type);
+
+}

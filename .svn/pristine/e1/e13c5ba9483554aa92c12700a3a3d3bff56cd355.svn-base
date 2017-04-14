@@ -1,0 +1,1361 @@
+KISSY.add("tasklist-module/src/tasklist",function(S,IO,Event,Taskdetails){
+	function TaskList(){
+		var tableId = "ready1";
+		var _productId = "";//项目id
+		var taskId = "";//分栏id
+		var alertId = '';//模态框id
+		var listId = "";//任务id
+		var _this = this;
+		var alertNews = '';
+		var taskState = "01,02,03,04";
+		var taskType = "";
+		//内容获取
+		this.getTasklist = function(productId){
+			_productId = productId;
+			
+		//新增栏
+			var table_add = '<div class="main-common" id="add_column"><a href="javascript:void(0);" data-target="#add-column" data-toggle="modal" style="width:125px;">增加添加项目阶段</a><div class="modal fade" id="add-column" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false" ><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">新建项目阶段</h4></div><div class="modal-body container-fluid"><div class="row"><div class="col-md-11 col-md-offset-1"><label for="fenceId">阶段名称：</label><input type="text" name="fenceId" id="fenceId" class="input-lg" style="width:  379px;" /></div></div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="submit" class="btn btn-primary" id="btn_add_column">确认</button></div></div></div></div></div>';
+			$('.project-main-wrap').html(table_add);
+			
+			var url = 'fenceController/getAllFence.action?productId='+productId+"&taskState="+taskState;//'fenceController/getAllFence.action';
+			$.ajax({
+				url: url,
+				type: 'get',
+				cache: false,
+				async: true,
+				dataType: 'json',
+				success: function (data){
+				//增加任务模态框（Modal）
+					var modal_ready1 = '<div class="modal fade bs-example-modal-lg" id="add-ready1" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="true"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">新建立项任务</h4></div><div class="modal-body container-fluid"><form id="form-add-ready1"><div class="row"><div class="col-md-5 col-md-offset-1"><label for="taskName">任务名称：</label><input type="text" name="taskName" id="taskName" class="form-control" style="width: 255px;display: inline-block;" /></div><div class="col-md-5"><label for="taskOwner;" style="width: 70px;">&nbsp;责 任 人：</label><select name="taskOwner" id="taskOwner" class="form-control" style="width: 150px;height: 34px;margin-right: 10px;display: inline-block;"></select><input type="text" placeholder="名称查询" class="form-control" style="width: 89px;display: inline-block;" /></div></div><div class="row marginTop"><div class="col-md-5 col-md-offset-1"><label for="taskEvalTime">任务估时： </label><input type="text" name="taskEvalTime" id="taskEvalTime" class="form-control" style="width: 210px;display: inline-block;" /><span>&nbsp;&nbsp;小时</span></div><div class="col-md-5"><label for="taskStartTime">开始时间：</label><input type="text" name="taskStartTime" id="taskStartTime" class="form-control" style="width: 255px;display: inline-block;" /></div></div><div class="row marginTop"><div class="col-md-5 col-md-offset-1"><label for="taskDoneTime">完成时间：</label><input type="text" name="taskDoneTime" id="taskDoneTime" class="form-control" style="width: 255px;display: inline-block;" /></div></div><div class="row marginTop"><div class="col-md-11 col-md-offset-1"><label for="taskSpec" style="vertical-align: top;">任务说明：</label><textarea name="taskSpec" class="form-control" id="taskSpec" style="width: 79.5%;height: 120px;display: inline-block;"></textarea></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="submit" class="btn btn-primary" id="btn_add_ready1">确认</button></div></div></div></div>';
+				//增加任务（栏）模态框（Modal）
+					var modal_ready2 = '<div class="modal fade bs-example-modal-lg" id="add-ready2" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="true"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">新建任务</h4></div><div class="modal-body container-fluid"><form id="form-add-ready2"><div class="row"><div class="col-md-5 col-md-offset-1"><label for="taskName">任务名称：</label><input type="text" name="taskName" id="taskName" class="form-control" style="width: 255px;display: inline-block;" /></div><div class="col-md-5"><label for="taskOwner;" style="width: 70px;">&nbsp;责 任 人：</label><select name="taskOwner" id="taskOwner" class="form-control" style="width: 150px;height: 34px;margin-right: 10px;display: inline-block;"></select><input type="text" placeholder="名称查询" class="form-control" style="width: 89px;display: inline-block;" /></div></div><div class="row marginTop"><div class="col-md-5 col-md-offset-1"><label for="taskEvalTime">任务估时： </label><input type="text" name="taskEvalTime" id="taskEvalTime" class="form-control" style="width: 210px;display: inline-block;" /><span>&nbsp;&nbsp;小时</span></div><div class="col-md-5"><label for="taskStartTime">开始时间：</label><input type="text" name="taskStartTime" id="taskStartTime" class="form-control" style="width: 255px;display: inline-block;" /></div></div><div class="row marginTop"><div class="col-md-5 col-md-offset-1"><label for="taskDoneTime">完成时间：</label><input type="text" name="taskDoneTime" id="taskDoneTime" class="form-control" style="width: 255px;display: inline-block;" /></div></div><div class="row marginTop"><div class="col-md-11 col-md-offset-1"><label for="taskSpec" style="vertical-align: top;">任务说明：</label><textarea name="taskSpec" class="form-control" id="taskSpec" style="width: 79.5%;height: 120px;display: inline-block;"></textarea></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="submit" class="btn btn-primary" id="btn_add_ready2">确认</button></div></div></div></div>';
+				//增加需求任务模态框（Modal） 
+					var modal_need = '<div class="modal fade bs-example-modal-lg" id="add-need" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="true"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">新建需求任务</h4></div><div class="modal-body container-fluid"><form id="form-add-need"><div class="row"><div class="col-md-5 col-md-offset-1"><label for="taskName">任务名称：</label><input type="text" class="form-control" name="taskName" id="taskName" style="width: 255px;display: inline-block;" /></div><div class="col-md-5"><label for="taskOwner" style="width: 70px;">&nbsp;责 任 人：</label><select name="taskOwner" id="taskOwner" class="form-control" style="width: 255px;height: 34px;display: inline-block;"></select></div></div><div class="row marginTop"><div class="col-md-5 col-md-offset-1"><label for="taskType">任务类型： </label><select name="taskType" id="taskType" class="form-control" style="width: 255px;height: 34px;display: inline-block;"><option value="">请选择需求类型</option><option value="02">场景流程图</option><option value="03">界面原型图</option></select></div><div class="col-md-5"><label for="taskEvalTime">任务估时： </label><input type="text" name="taskEvalTime" id="taskEvalTime" class="form-control" style="width: 210px;display: inline-block;" /><span>&nbsp;&nbsp;小时</span></div></div><div class="row marginTop"><div class="col-md-5 col-md-offset-1"><label for="taskStartTime">开始时间：</label><input type="text" name="taskStartTime" id="taskStartTime" class="form-control" style="width: 255px;display: inline-block;" /></div><div class="col-md-5"><label for="taskDoneTime">完成时间：</label><input type="text" name="taskDoneTime" id="taskDoneTime" class="form-control" style="width: 255px;display: inline-block;" /></div></div><div class="row marginTop"><div class="col-md-11 col-md-offset-1"><label for="taskSpec" style="vertical-align: top;">任务说明：</label><textarea name="taskSpec" class="form-control" id="taskSpec" style="width: 79.5%;display: inline-block;height: 120px;"></textarea></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary" id="btn_add_need">确认</button></div></div></div></div>';
+				//增加设计任务模态框（Modal）
+					var modal_design = '<div class="modal fade bs-example-modal-lg" id="add-design" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="true"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">新建设计任务</h4></div><div class="modal-body container-fluid"><form id="form-add-design"><div class="row"><div class="col-md-5 col-md-offset-1"><label for="taskName">任务名称：</label><input type="text" name="taskName" id="taskName" class="form-control"style="width: 255px;display: inline-block;" /></div><div class="col-md-5"><label for="taskOwner" style="width: 70px;">&nbsp;责 任 人：</label><select name="taskOwner" id="taskOwner" class="form-control" style="height: 34px;width: 255px;display: inline-block;"></select></div></div><div class="row marginTop"><div class="col-md-5 col-md-offset-1"><label for="taskType">任务类型： </label><select name="taskType" id="taskType" class="form-control" style="width: 255px;height: 34px;display: inline-block;"><option value="">请选择需求类型</option><option value="04">功能流程图</option><option value="05">原型图限制条件</option><option value="06">设计数据库</option><option value="07">设计接口</option></select></div><div class="col-md-5"><label for="taskEvalTime">任务估时：</label><input type="text" name="taskEvalTime" id="taskEvalTime" class="form-control"style="width: 210px;display: inline-block;" /><span>&nbsp;&nbsp;小时</span></div></div><div class="row marginTop"><div class="col-md-5 col-md-offset-1"><label for="taskStartTime">开始时间：</label><input type="text" name="taskStartTime" id="taskStartTime" class="form-control"style="width: 255px;display: inline-block;" /></div><div class="col-md-5"><label for="taskDoneTime">结束时间：</label><input type="text" name="taskDoneTime" id="taskDoneTime" class="form-control"style="width: 255px;display: inline-block;" /></div></div><div class="row marginTop"><div class="col-md-11 col-md-offset-1"><label for="taskSpec" style="vertical-align: top;">任务说明：</label><textarea name="taskSpec" class="form-control"style="width: 79.5%;display: inline-block;height: 120px;"  id="taskSpec"></textarea></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary" id="btn_add_design">确认</button></div></div></div></div>';
+				//分配工单模态框（Modal）
+					var modal_list = '<div class="modal fade bs-example-modal-lg" id="add-list" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="true"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">分配工单</h4></div><div class="modal-body container-fluid"><form id="form-add-list"><div class="row"><div class="col-md-5 col-md-offset-1"><label for="taskName">选择工单：</label><select name="taskName" id="taskName" class="form-control" style="width: 255px;height: 34px;display: inline-block;"><option value="01">01</option><option value="02">02</option><option value="03">03</option></select></div><div class="col-md-5"><label for="taskOwner" style="width: 70px;">&nbsp;责 任 人：</label><select name="taskOwner" id="taskOwner" class="form-control" style="height: 34px;width: 255px;display: inline-block;"></select></div></div><div class="row marginTop"><div class="col-md-5 col-md-offset-1"><label for="taskEvalTime">任务估时： </label><input type="text" name="taskEvalTime" id="taskEvalTime" class="form-control" style="width: 210px;display: inline-block;" /><span>&nbsp;&nbsp;小时</span></div><div class="col-md-5"><label for="taskStartTime">开始时间：</label><input type="text" name="taskStartTime" id="taskStartTime" class="form-control" style="width: 255px;display: inline-block;" /></div></div><div class="row marginTop"><div class="col-md-11 col-md-offset-1"><label for="taskDoneTime">结束时间：</label><input type="text" name="taskDoneTime" id="taskDoneTime" class="form-control" style="width: 255px;display: inline-block;" />	</div></div><div class="row marginTop"><div class="col-md-11 col-md-offset-1"><label for="taskSpec" style="vertical-align: top;">任务说明：</label><textarea name="taskSpec" class="form-control" style="width: 79.5%;display: inline-block;height: 120px;" id="taskSpec"></textarea></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary" id="btn_add_list">确认</button></div></div></div></div>';
+				//测试任务模态框（Modal）
+					var modal_test = '<div class="modal fade bs-example-modal-lg" id="add-test" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="true"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">工单</h4></div><div class="modal-body container-fluid"><form id="form-add-test"><div class="row"><div class="col-md-5 col-md-offset-1"><label for="taskName">选择工单：</label><select name="taskName" id="taskName" class="form-control" style="width: 255px;height: 34px;display: inline-block;"><option value="01">01</option><option value="02">02</option><option value="03">03</option></select></div><div class="col-md-5"><label for="taskOwner" style="width: 70px;">&nbsp责 任 人：</label><select name="taskOwner" id="taskOwner" class="form-control" style="height: 34px;width: 255px;display: inline-block;"></select></div></div><div class="row marginTop"><div class="col-md-5 col-md-offset-1"><label for="taskEvalTime">任务估时： </label><input type="text" name="taskEvalTime" id="taskEvalTime" class="form-control" style="width: 210px;display: inline-block;" /><span>&nbsp;&nbsp;小时</span></div><div class="col-md-5"><label for="taskStartTime">开始时间：</label><input type="text" name="taskStartTime" id="taskStartTime" class="form-control" style="width: 255px;display: inline-block;" /></div></div><div class="row marginTop"><div class="col-md-11 col-md-offset-1"><label for="taskDoneTime">结束时间：</label><input type="text" name="taskDoneTime" id="taskDoneTime" class="form-control" style="width: 255px;display: inline-block;" />	</div></div><div class="row marginTop"><div class="col-md-11 col-md-offset-1"><label for="taskSpec" style="vertical-align: top;">任务说明：</label><textarea name="taskSpec" class="form-control" style="width: 79.5%;display: inline-block;height: 120px;" id="taskSpec"></textarea></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary" id="btn_add_test">确认</button></div></div></div></div>';
+				//新增栏模态框（Modal）
+					var modal_column = '<div class="modal fade" id="add-column" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true" ><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">新建项目阶段</h4></div><div class="modal-body container-fluid"><div class="row"><div class="col-md-11 col-md-offset-1"><label for="fenceId">阶段名称： </label><input type="text" name="fenceId" id="fenceId" class="input-lg" style="width:  379px;" /></div></div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="submit" class="btn btn-primary" id="btn_add_column">确认</button></div></div></div></div>';
+				//问题详情模态框	（Modal）
+					var modal_question = '<div class="modal fade" id="add-quedtion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">详情</h4></div><div class="modal-body container-fluid"><br /><br /><br /><br /><br /><br /><br /><br /><br /></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="submit" class="btn btn-primary" id="btn_add_question">确认</button></div></div></div></div>';
+				//任务详情模态框	（Modal）
+					var modal_flow = '<div class="modal fade" id="add-flow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">详情</h4></div><div class="modal-body container-fluid"><br /><br /><br /><br /><br /><br /><br /><br /><br /></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="submit" class="btn btn-primary" id="btn_add_ready">确认</button></div></div></div></div>';
+					
+					var Modal;
+					for(var i = 0; i < data.length; i++){
+						if (data[i].fenceType == 01) {
+							tableId = "ready1";
+							Modal = modal_ready1;
+						} else if (data[i].fenceType == 02) {
+							tableId = "need";
+							Modal = modal_need;
+						} else if (data[i].fenceType == 03) {
+							tableId = "design";
+							Modal = modal_design;
+						} else if (data[i].fenceType == 04) {
+							tableId = "list";
+							Modal = modal_list;
+						} else if (data[i].fenceType == 05) {
+							tableId = "test";
+							Modal = modal_test;
+						} else if (data[i].fenceType == 06) {
+							tableId = "question";
+						} else if (data[i].fenceType == 07) {
+							tableId = "column";
+							Modal = modal_column;
+						}
+						
+					//生成并插入栏
+						var table;
+						if (tableId == "question") {
+							table = "<div class='main-common' id='"+tableId+"'><p class='title'>"+data[i].fenceName+"</p></div>";
+						}else if (tableId == "ready1") {
+							table = "<div class='main-common' id='"+tableId+"'><p class='title'>"+data[i].fenceName+"</p>"+
+							"<a class='addmodel ' href='javascript:void(0);' data-target='#add-ready1' data-toggle='modal' id='"+data[i].id+"'>增加"+data[i].fenceName+"任务</a>"+Modal+"</div>";
+						}else if (tableId == "column") {
+							table = "<div class='main-common' id='"+tableId+"'><p class='title'>"+data[i].fenceName+"<span class='glyphicon glyphicon glyphicon-trash' id='del_"+data[i].id+"'></span></p>"+
+							"<a class='addmodel ' href='javascript:void(0);' data-target='#add-ready2' data-toggle='modal' id='"+data[i].id+"'>增加"+data[i].fenceName+"任务</a>"+modal_ready2+"</div>";
+						}else{
+							table = "<div class='main-common' id='"+tableId+"'><p class='title'>"+data[i].fenceName+"</p>"+
+							"<a class='addmodel' href='javascript:void(0);' data-target='#add-"+tableId+"' data-toggle='modal'  id='"+data[i].id+"'>增加"+data[i].fenceName+"</a>"+Modal+"</div>";
+						}
+						$("#add_column").before(table);
+						
+					//生成任务列表
+						var child = data[i].children;
+						for(var j = 0; j < child.length; j++ ){
+							if (tableId == "ready1") {
+							//增加任务
+								var ready = '<div class="row task_common" id="child_'+child[j].id+'" style="position: relative;">'
+								+'<i class="glyphicon glyphicon-remove"></i><i class="glyphicon glyphicon-wrench"></i>'
+								+'<p>任务名称：'+child[j].taskName+'</p><p>分配人：'+child[j].taskOwner+'</p></div>';
+								$('#'+tableId+' a').eq(0).after(ready);
+							} else if (tableId == "need") {
+							//增加需求任务
+								var need = '<div class="row task_common" id="child_'+child[j].id+'" style="position: relative;">'
+								+'<i class="glyphicon glyphicon-remove"></i><i class="glyphicon glyphicon-wrench"></i>'
+								+'<p>结束人：'+child[j].taskOwner+'</p><p>结束时间：'+child[j].taskDoneTime+'</p><p>状态：'+child[j].taskState+'</p></div>';
+								$('#'+tableId+' a').eq(0).after(need);
+							} else if (tableId == "design") {
+							//增加设计任务
+								var design = '<div class="row task_common" id="child_'+child[j].id+'" style="position: relative;">'
+								+'<i class="glyphicon glyphicon-remove"></i><i class="glyphicon glyphicon-wrench"></i>'
+								+'<p>任务名称：'+child[j].taskName+'</p><p>任务类型：'+child[j].taskType+'</p></div>';
+								$('#'+tableId+' a').eq(0).after(design);
+							} else if (tableId == "list") {
+							//分配工单
+								var list = '<div class="row task_common" id="child_'+child[j].id+'" style="position: relative;">'
+								+'<i class="glyphicon glyphicon-remove"></i><i class="glyphicon glyphicon-wrench"></i>'
+								+'<p>任务名称：'+child[j].taskName+'</p><p>任务估时：'+child[j].taskEvalTime+'</p><p>任务说明：'+child[j].taskSpec+'</p></div>';
+								$('#'+tableId+' a').eq(0).after(list);
+							}else if (tableId == "test") {
+							//测试工单
+								var test = '<div class="row task_common" id="child_'+child[j].id+'" style="position: relative;">'
+								+'<i class="glyphicon glyphicon-remove"></i><i class="glyphicon glyphicon-wrench"></i>'
+								+'<p>任务名称：'+child[j].taskName+'</p><p>任务估时：'+child[j].taskEvalTime+'</p><p>任务说明：'+child[j].taskSpec+'</p></div>';
+								$('#'+tableId+' a').eq(0).after(test);
+							}else if (tableId == "column") {
+							//新增
+								var column = '<div class="row task_common" id="child_'+child[j].id+'" style="position: relative;">'
+								+'<i class="glyphicon glyphicon-remove"></i><i class="glyphicon glyphicon-wrench"></i>'
+								+'<p>任务名称：'+child[j].taskName+'</p><p>任务估时：'+child[j].taskEvalTime+'</p><p>任务说明：'+child[j].taskSpec+'</p></div>';
+								$('#'+tableId+' a').eq(0).after(column);
+							}else if (tableId == "question") {
+							//问题
+								var question = '<div class="row task_common" id="child_'+child[j].id+'" style="position: relative;">'
+								+'<p>任务说明：'+child[j].taskSpec+'</p></div>';
+								$('#'+tableId+' p').eq(0).after(question);
+							}
+						}
+					}
+					
+					$(".addmodel").unbind('click');
+					$(".addmodel").on("click", function(){
+						listId = '';
+						alertId = $(this).parent().attr("id");
+						taskId = this.id;
+						taskType = this.fenceType;
+						if (alertId == 'ready1') {
+							_this.ClearForm('form-add-ready1');
+							$('#add-ready1 #myModalLabel').html("新建立项任务");
+						}else if (alertId == 'need') {
+							_this.ClearForm('form-add-need');
+							$('#add-need #myModalLabel').html("新建需求任务");
+						}else if (alertId == 'design') {
+							_this.ClearForm('form-add-design');
+							$('#add-design #myModalLabel').html("新建设计任务");
+						}else if (alertId == 'list') {
+							_this.ClearForm('form-add-list');
+							$('#add-list #myModalLabel').html("分配工单");
+						}else if (alertId == 'test') {
+							_this.ClearForm('form-add-test');
+							$('#add-test #myModalLabel').html("新建测试任务");
+						}else if (alertId == 'column') {
+							_this.ClearForm('form-add-ready2');
+							$('#add-ready2 #myModalLabel').html("新建任务");
+						}
+						
+					});
+					//任务详情
+					_this.taskDetails();
+					//获取负责人列表
+					_this.getUserList();
+					//任务编辑
+					_this.readyListEdit();
+					//日历
+					$('input[name="taskStartTime"]').daterangepicker({
+						singleDatePicker: true,
+						autoclose: false,
+				        beforeShowDay: $.noop,
+				        calendarWeeks: false,
+				        clearBtn: false,
+				        daysOfWeekDisabled: [],
+				        endDate: Infinity,
+				        forceParse: true,
+				        format: 'yyyy/mm/dd',
+				        keyboardNavigation: true,
+				        language: 'cn',
+				        minViewMode: 0,
+				        orientation: "auto",
+				        rtl: false,
+				        startDate: -Infinity,
+				        startView: 0,
+				        todayBtn: false,
+				        todayHighlight: false,
+				        weekStart: 0
+						},
+						function(start, end, label) {
+//							alert(start.format('YYYY-MM-DD'));
+						}
+					);
+					$('input[name="taskDoneTime"]').daterangepicker({
+						singleDatePicker: true,
+						autoclose: false,
+				        beforeShowDay: $.noop,
+				        calendarWeeks: false,
+				        clearBtn: false,
+				        daysOfWeekDisabled: [],
+				        endDate: Infinity,
+				        forceParse: true,
+				        format: 'yyyy/mm/dd',
+				        keyboardNavigation: true,
+				        language: 'cn',
+				        minViewMode: 0,
+				        orientation: "auto",
+				        rtl: false,
+				        startDate: -Infinity,
+				        startView: 0,
+				        todayBtn: false,
+				        todayHighlight: false,
+				        weekStart: 0
+						},
+						function(start, end, label) {
+//							alert(start.format('YYYY-MM-DD'));
+						}
+					);
+					//增加新增（栏）任务
+					$("#btn_add_ready2").on('click',function(){
+						var project = _this.serialize("form-add-ready2");
+						project.fenceId = taskId;
+						project.productId = _productId;
+						project.taskType = '11';
+						_this.taskValidator();
+						//验证表单
+						$('#form-add-ready2').bootstrapValidator('validate');
+			        	if($('#form-add-ready2').data('bootstrapValidator').isValid()){
+			        		$("#add-ready2").modal("hide");
+			        		$.ajax({
+			        		    url: 'TaskInfoController/addTaskInfo.action',
+			        		    type: 'post',
+			        		    cache: false,
+			        		    async: true,
+			        		    dataType: 'json',
+			        		    data: project,
+			        		    success: function (data){
+			        		    	if (data !== null && data === '0000') {
+			        		    		$(".project-main-wrap").html('');
+			        		    		_this.getTasklist(_productId);
+			        		    	} else{
+			        		    		$("#mymodual").modal("show");
+			        		    		$('#hint').html('增加失败！');
+			        		    	}
+			        		   }
+		        		   });
+			        	}
+					});
+					//增加准备任务
+					$("#btn_add_ready1").on('click',function(){
+						if (listId == '') {
+							var project = _this.serialize("form-add-ready1");
+							project.fenceId = taskId;
+							project.productId = _productId;
+							project.taskType = '01';
+							_this.taskValidator();
+							//验证表单
+							$('#form-add-ready1').bootstrapValidator('validate');
+							if($('#form-add-ready1').data('bootstrapValidator').isValid()){
+								$("#add-ready1").modal("hide");
+								$.ajax({
+									url: 'TaskInfoController/addTaskInfo.action',
+									type: 'post',
+									cache: false,
+									async: true,
+									dataType: 'json',
+									data: project,
+									success: function (data){
+										if (data !== null && data === '0000') {
+											$(".project-main-wrap").html('');
+											_this.getTasklist(_productId);
+										} else{
+											$("#mymodual").modal("show");
+											$('#hint').html('增加失败！');
+										}
+									}
+								});
+							}
+						}
+					});
+					//增加需求任务
+					$("#btn_add_need").on('click',function(){
+						if (listId == '') {
+							var project = _this.serialize("form-add-need");
+							project.fenceId = taskId;
+							project.productId = _productId;
+							_this.taskValidator();
+							//验证表单
+							$('#form-add-need').bootstrapValidator('validate');
+							if($('#form-add-need').data('bootstrapValidator').isValid()){
+								$("#add-need").modal("hide");
+								$.ajax({
+									url: 'TaskInfoController/addTaskInfo.action',
+									type: 'post',
+									cache: false,
+									async: true,
+									dataType: 'json',
+									data: project,
+									success: function (data){
+										if (data !== null && data === '0000') {
+											$(".project-main-wrap").html('');
+											_this.getTasklist(_productId);
+										} else{
+											$("#mymodual").modal("show");
+											$('#hint').html('增加失败！');
+										}
+									}
+								});
+							}
+						}
+					});
+					//增加设计任务
+					$("#btn_add_design").on('click',function(){
+						if (listId == '') {
+							var project = _this.serialize("form-add-design");
+							project.fenceId = taskId;
+							project.productId = _productId;
+							_this.taskValidator();
+							//验证表单
+							$('#form-add-design').bootstrapValidator('validate');
+							if($('#form-add-design').data('bootstrapValidator').isValid()){
+								$("#add-design").modal("hide");
+								$.ajax({
+									url: 'TaskInfoController/addTaskInfo.action',
+									type: 'post',
+									cache: false,
+									async: true,
+									dataType: 'json',
+									data: project,
+									success: function (data){
+										if (data !== null && data === '0000') {
+											$(".project-main-wrap").html('');
+											_this.getTasklist(_productId);
+										} else{
+											$("#mymodual").modal("show");
+											$('#hint').html('增加失败！');
+										}
+									}
+								});
+							}
+						}
+					});
+					//增加开发任务
+					$("#btn_add_list").on('click',function(){
+						if (listId == '') {
+							var project = _this.serialize("form-add-list");
+							project.fenceId = taskId;
+							project.productId = _productId;
+							project.taskType = '08';
+							_this.taskValidator();
+							//验证表单
+							$('#form-add-list').bootstrapValidator('validate');
+							if($('#form-add-list').data('bootstrapValidator').isValid()){
+								$("#add-list").modal("hide");
+								$.ajax({
+									url: 'TaskInfoController/addTaskInfo.action',
+									type: 'post',
+									cache: false,
+									async: true,
+									dataType: 'json',
+									data: project,
+									success: function (data){
+										if (data !== null && data === '0000') {
+											$(".project-main-wrap").html('');
+											_this.getTasklist(_productId);
+										} else{
+											$("#mymodual").modal("show");
+											$('#hint').html('增加失败！');
+										}
+									}
+								});
+							}
+						}
+					});
+					//增加测试任务
+					$("#btn_add_test").on('click',function(){
+						if (listId == '') {
+							var project = _this.serialize("form-add-test");
+							project.fenceId = taskId;
+							project.productId = _productId;
+							project.taskType = '09';
+							_this.taskValidator();
+							//验证表单
+							$('#form-add-test').bootstrapValidator('validate');
+							if($('#form-add-test').data('bootstrapValidator').isValid()){
+								$("#add-test").modal("hide");
+								$.ajax({
+									url: 'TaskInfoController/addTaskInfo.action',
+									type: 'post',
+									cache: false,
+									async: true,
+									dataType: 'json',
+									data: project,
+									success: function (data){
+										if (data !== null && data === '0000') {
+											$(".project-main-wrap").html('');
+											_this.getTasklist(_productId);
+										} else{
+											$("#mymodual").modal("show");
+											$('#hint').html('增加失败！');
+										}
+									}
+								});
+							}
+						}
+					});
+					//增加column
+					$("#btn_add_column").on('click',function(){
+						var project = $("#fenceId").val();
+						if (project == ""){
+							$("#fenceId").after("<p style='margin: 10px 0 0 70px;color: red;'>请输入名称！</p>");
+						} else {
+							$.ajax({
+								url: 'fenceController/addFence.action',
+								type: 'post',
+								cache: false,
+								async: true,
+								dataType: 'json',
+								data: {
+									productId:productId,
+									fenceName:project,
+									fenceType:"07"
+								},
+								success: function (data){
+									if (data !== null && data === '0000') {
+										$(".project-main-wrap").html('');
+										_this.getTasklist(_productId);
+									} else{
+										$("#mymodual").modal("show");
+										$('#hint').html('增加失败！');
+									}
+								}
+							});
+						}
+						
+					});
+					//删除任务
+					Event.detach(".glyphicon-remove");
+					$(".glyphicon-remove").on('click',function(ev){
+						var Event=ev||window.event;
+						if (Event.stopPropagation){
+							Event.stopPropagation();//非IE阻止事件传播
+						}else{
+							Event.cancelBubble=true;//IE阻止事件冒泡
+						}
+						listId = $(this).parent().attr("id").split("_")[1];
+						$("#delate-list").modal("show");
+						$("#btn-add-delate-lis").unbind("click");
+						$("#btn-add-delate-lis").on('click',function(){
+							$.ajax({
+								url: 'TaskInfoController/editTaskInfo.action',
+								type: 'post',
+								cache: false,
+								async: true,
+								dataType: 'json',
+								data: {
+									id:listId,
+									taskState:"00"
+								},
+								success: function (data){
+									if (data !== null && data === '0000') {
+										$("#delate-list").modal("hide");
+										$(".project-main-wrap").html('');
+										_this.getTasklist(_productId);
+									} else{
+										$("#mymodual").modal("show");
+										$('#hint').html('删除失败！');
+									}
+								}
+							});
+						})
+					})
+					//删除column
+					$(".glyphicon-trash").on('click',function(){
+						var columnId = $(this).attr('id').split("_")[1];
+						$("#delate-column").modal("show");
+						$("#delate-column #btn-add-delate-col").on('click',function(){
+							$.ajax({
+								url: 'fenceController/editFence.action',
+								type: 'post',
+								cache: false,
+								async: true,
+								dataType: 'json',
+								data: {
+									id:columnId
+								},
+								success: function (data){
+									if (data !== null && data === '0000') {
+										$("#delate-column").modal("hide");
+										$(".project-main-wrap").html('');
+										_this.getTasklist(_productId);
+									} else{
+										$("#mymodual").modal("show");
+										$('#hint').html('删除失败！');
+									}
+								}
+							});
+						})
+					});
+					
+					$(".project-hd-info input").unbind("click");
+					//任务状态筛选框
+					$(".project-hd-info input").on('click',function(){
+						taskState = "";
+						var val1 = $("#success1").val();
+						var val2 = $("#success2").val();
+						var val3 = $("#success3").val();
+						var val4 = $("#success4").val();
+						var check1 = $("#success1").is(':checked');
+						var check2 = $("#success2").is(':checked');
+						var check3 = $("#success3").is(':checked');
+						var check4 = $("#success4").is(':checked');
+						if(check1){
+							taskState += val1;
+						}else{
+							taskState += "";
+						}
+						if(check2){
+							if(taskState !== ""){
+								taskState += "," + val2;
+							}else{
+								taskState += val2;
+							}
+						}else{
+							taskState += "";
+						}
+						if(check3){
+							if(taskState !== ""){
+								taskState += "," + val3;
+							}else{
+								taskState += val3;
+							}
+						}else{
+							taskState += "";
+						}
+						if(check4){
+							if(taskState !== ""){
+								taskState += "," + val4;
+							}else{
+								taskState += val4;
+							}
+						}else{
+							taskState += "";
+						}
+						$.ajax({
+							type:"post",
+							url:"fenceController/getAllFence.action",
+							cache: false,
+							async:true,
+							data: {taskState : taskState},
+							dataType: 'json',
+							success: function(data){
+								if (data !== null && data !== '') {
+									$(".project-main-wrap").html('');
+									_this.getTasklist(_productId);
+								} else{
+									$("#mymodual").modal("show");
+									$('#hint').html('操作失败！');
+								}
+							}
+						});
+					});
+					
+				}
+			});
+		}
+		//准备任务编辑
+		this.readyListEdit = function(){
+			$('.glyphicon-wrench').unbind('click');
+			$('.glyphicon-wrench').on('click',function(ev){
+				var Event=ev||window.event;
+				if (Event.stopPropagation){
+					Event.stopPropagation();//非IE阻止事件传播
+				}else{
+					Event.cancelBubble=true;//IE阻止事件冒泡
+				}
+				listId = $(this).parent().attr("id").split("_")[1];
+				alertId = $(this).parent().parent().attr('id');
+				$.ajax({
+					url:"TaskInfoController/findTaskInfoById.action",
+					type:"post",
+					cache: false,
+					async: true,
+					dataType: 'json',
+					data: {id : listId},
+					success: function(data){
+						if (data !== null && data !== '') {
+							if (alertId == 'ready1') {
+								$("#add-ready1").modal("show");
+								$('#add-ready1 #myModalLabel').html("修改立项任务");
+								$('#add-ready1 input[name="taskName"]').val(data.taskName);
+								$('#add-ready1 select[name="taskOwner"]').val(data.taskOwner);
+								$('#add-ready1 input[name="taskEvalTime"]').val(data.taskEvalTime);
+								$('#add-ready1 input[name="taskStartTime"]').val(data.taskStartTime);
+								$('#add-ready1 input[name="taskDoneTime"]').val(data.taskDoneTime);
+								$('#add-ready1 input[name="taskSpec"]').val(data.taskSpec);
+								_this.ready1Submit();
+							}else if (alertId == 'need') {
+								$("#add-need").modal("show");
+								$('#add-need #myModalLabel').html("修改需求任务");
+								$('#add-need input[name="taskName"]').val(data.taskName);
+								$('#add-need select[name="taskOwner"]').val(data.taskOwner);
+								$('#add-need select[name="taskType"]').val(data.taskType);
+								$('#add-need input[name="taskEvalTime"]').val(data.taskEvalTime);
+								$('#add-need input[name="taskStartTime"]').val(data.taskStartTime);
+								$('#add-need input[name="taskDoneTime"]').val(data.taskDoneTime);
+								$('#add-need input[name="taskSpec"]').val(data.taskSpec);
+								_this.needSubmit();
+							}else if (alertId == 'design') {
+								$("#add-design").modal("show");
+								$('#add-design #myModalLabel').html("修改设计任务");
+								$('#add-design input[name="taskName"]').val(data.taskName);
+								$('#add-design select[name="taskOwner"]').val(data.taskOwner);
+								$('#add-design select[name="taskType"]').val(data.taskType);
+								$('#add-design input[name="taskEvalTime"]').val(data.taskEvalTime);
+								$('#add-design input[name="taskStartTime"]').val(data.taskStartTime);
+								$('#add-design input[name="taskDoneTime"]').val(data.taskDoneTime);
+								$('#add-design input[name="taskSpec"]').val(data.taskSpec);
+								_this.designSubmit();
+							}else if (alertId == 'list') {
+								$("#add-list").modal("show");
+								$('#add-list #myModalLabel').html("修改设计任务");
+								$('#add-list input[name="taskName"]').val(data.taskName);
+								$('#add-list select[name="taskOwner"]').val(data.taskOwner);
+								$('#add-list input[name="taskEvalTime"]').val(data.taskEvalTime);
+								$('#add-list input[name="taskStartTime"]').val(data.taskStartTime);
+								$('#add-list input[name="taskDoneTime"]').val(data.taskDoneTime);
+								$('#add-list input[name="taskSpec"]').val(data.taskSpec);
+								_this.designSubmit();
+							}else if (alertId == 'test') {
+								$("#add-test").modal("show");
+								$('#add-test #myModalLabel').html("修改测试任务");
+								$('#add-test select[name="taskName"]').val(data.taskName);
+								$('#add-test select[name="taskOwner"]').val(data.taskOwner);
+								$('#add-test input[name="taskEvalTime"]').val(data.taskEvalTime);
+								$('#add-test input[name="taskStartTime"]').val(data.taskStartTime);
+								$('#add-test input[name="taskDoneTime"]').val(data.taskDoneTime);
+								$('#add-test input[name="taskSpec"]').val(data.taskSpec);
+								_this.testSubmit();
+							}else if (alertId == 'column') {
+								$("#add-ready2").modal("show");
+								$('#add-ready2 #myModalLabel').html("修改任务");
+								$('#add-ready2 input[name="taskName"]').val(data.taskName);
+								$('#add-ready2 select[name="taskOwner"]').val(data.taskOwner);
+								$('#add-ready2 input[name="taskEvalTime"]').val(data.taskEvalTime);
+								$('#add-ready2 input[name="taskStartTime"]').val(data.taskStartTime);
+								$('#add-ready2 input[name="taskDoneTime"]').val(data.taskDoneTime);
+								$('#add-ready2 input[name="taskSpec"]').val(data.taskSpec);
+								_this.ready2Submit();
+							}
+						} else{
+							$("#mymodual").modal("show");
+							$('#hint').html('操作失败！');
+						}
+					}
+				})
+				
+			})
+		}
+		//立项准备表单修改后提交
+		this.ready1Submit = function(){
+			$("#btn_add_ready1").unbind('click');
+			$("#btn_add_ready1").on('click',function(){
+				_this.taskValidator();
+				//验证表单
+				$('#form-add-ready1').bootstrapValidator('validate');
+				if($('#form-add-ready1').data('bootstrapValidator').isValid()){
+					if (listId !== '') {
+						var object = _this.serialize('form-add-ready1');
+						object.id = listId;
+						$.ajax({
+							url:"TaskInfoController/editTaskInfo.action",
+							type:"post",
+							cache: false,
+							async: true,
+							data: object,
+							dataType: 'json',
+							success: function (data) {
+								if (data !== null && data !== '') {
+									$("#add-ready1").modal("hide");
+									$('body').removeClass('modal-open');
+									$('.modal-backdrop').remove();
+									$(".project-main-wrap").html('');
+									_this.getTasklist(_productId);
+								} else{
+									$("#mymodual").modal("show");
+									$('#hint').html('操作失败！');
+								}
+							}
+						});
+					}
+				}
+			})
+		}
+		//需求表单修改后提交
+		this.needSubmit = function(){
+			$("#btn_add_need").on('click',function(){
+				_this.taskValidator();//验证表单
+				$('#form-add-need').bootstrapValidator('validate');
+				if($('#form-add-need').data('bootstrapValidator').isValid()){
+					if (listId !== '') {
+						var object = _this.serialize('form-add-need');
+						object.id = listId;
+						$.ajax({
+							url:"TaskInfoController/editTaskInfo.action",
+							type:"post",
+							cache: false,
+							async: true,
+							data: object,
+							dataType: 'json',
+							success: function (data) {
+								if (data !== null && data !== '') {
+									$("#add-need").modal("hide");
+									$('body').removeClass('modal-open');
+									$('.modal-backdrop').remove();
+									$(".project-main-wrap").html('');
+									_this.getTasklist(_productId);
+								} else{
+									$("#mymodual").modal("show");
+									$('#hint').html('操作失败！');
+								}
+							}
+						});
+					}
+				}
+			})
+		}
+		//设计表单修改后提交
+		this.designSubmit = function(){
+			$("#btn_add_design").on('click',function(){
+				_this.taskValidator();//验证表单
+				$('#form-add-design').bootstrapValidator('validate');
+				if($('#form-add-design').data('bootstrapValidator').isValid()){
+					if (listId !== '') {
+						var object = _this.serialize('form-add-design');
+						object.id = listId;
+						$.ajax({
+							url:"TaskInfoController/editTaskInfo.action",
+							type:"post",
+							cache: false,
+							async: true,
+							data: object,
+							dataType: 'json',
+							success: function (data) {
+								if (data !== null && data !== '') {
+									$("#add-design").modal("hide");
+									$('body').removeClass('modal-open');
+									$('.modal-backdrop').remove();
+									$(".project-main-wrap").html('');
+									_this.getTasklist(_productId);
+								} else{
+									$("#mymodual").modal("show");
+									$('#hint').html('操作失败！');
+								}
+							}
+						});
+					}
+				}
+			})
+		}
+		//分配表单修改后提交
+		this.listSubmit = function(){
+			$("#btn_add_list").on('click',function(){
+				_this.taskValidator();//验证表单
+				$('#form-add-list').bootstrapValidator('validate');
+				if($('#form-add-list').data('bootstrapValidator').isValid()){
+					if (listId !== '') {
+						var object = _this.serialize('form-add-list');
+						object.id = listId;
+						$.ajax({
+							url:"TaskInfoController/editTaskInfo.action",
+							type:"post",
+							cache: false,
+							async: true,
+							data: object,
+							dataType: 'json',
+							success: function (data) {
+								if (data !== null && data !== '') {
+									$("#add-list").modal("hide");
+									$('body').removeClass('modal-open');
+									$('.modal-backdrop').remove();
+									$(".project-main-wrap").html('');
+									_this.getTasklist(_productId);
+								} else{
+									$("#mymodual").modal("show");
+									$('#hint').html('操作失败！');
+								}
+							}
+						});
+					}
+				}
+			})
+		}
+		//测试表单修改后提交
+		this.testSubmit = function(){
+			$("#btn_add_test").on('click',function(){
+				_this.taskValidator();//验证表单
+				$('#form-add-test').bootstrapValidator('validate');
+				if($('#form-add-test').data('bootstrapValidator').isValid()){
+					if (listId !== '') {
+						var object = _this.serialize('form-add-test');
+						object.id = listId;
+						$.ajax({
+							url:"TaskInfoController/editTaskInfo.action",
+							type:"post",
+							cache: false,
+							async: true,
+							data: object,
+							dataType: 'json',
+							success: function (data) {
+								if (data !== null && data !== '') {
+									$("#add-test").modal("hide");
+									$('body').removeClass('modal-open');
+									$('.modal-backdrop').remove();
+									$(".project-main-wrap").html('');
+									_this.getTasklist(_productId);
+								} else{
+									$("#mymodual").modal("show");
+									$('#hint').html('操作失败！');
+								}
+							}
+						});
+					}
+				}
+			})
+		}
+		//新增栏表单修改后提交
+		this.ready2Submit = function(){
+			$("#btn_add_ready2").on('click',function(){
+				_this.taskValidator();//验证表单
+				$('#form-add-ready1').bootstrapValidator('validate');
+				if($('#form-add-ready1').data('bootstrapValidator').isValid()){
+					if (listId !== '') {
+						var object = _this.serialize('form-add-ready2');
+						object.id = listId;
+						$.ajax({
+							url:"TaskInfoController/editTaskInfo.action",
+							type:"post",
+							cache: false,
+							async: true,
+							data: object,
+							dataType: 'json',
+							success: function (data) {
+								if (data !== null && data !== '') {
+									$("#add-ready2").modal("hide");
+									$('body').removeClass('modal-open');
+									$('.modal-backdrop').remove();
+									$(".project-main-wrap").html('');
+									_this.getTasklist(_productId);
+								} else{
+									$("#mymodual").modal("show");
+									$('#hint').html('操作失败！');
+								}
+							}
+						});
+					}
+				}
+			})
+		}
+		//任务详情
+		this.taskDetails = function(){
+			$('.task_common').unbind('click');
+			$('.task_common').on('click',function(){
+				listId = $(this).attr("id").split("_")[1];	
+	 			IO.get("views/tasklist/taskdetails.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	     			var taskdetails = new Taskdetails();
+	     			taskdetails.getTaskDetails(listId);
+	         	});
+			})
+		}
+		//获取负责人并插入
+		this.getUserList = function(){
+			$.ajax({
+				url: 'userController/findUserByProductId.action?ProductId='+_productId,
+				type: 'post',
+				cache: false,
+				async: true,
+				dataType: 'json',
+				success: function (obj){
+					$("select[name='taskOwner']").html('<option value="">请选择</option>');
+					for (var i = 0; i < obj.length; i++) {
+						$("select[name='taskOwner']").append('<option value="'+obj[i].id+'">'+obj[i].userName+'</option>')
+					}
+				}
+			})
+		}
+		//序列化表单
+		this.serialize = function(form){
+			var $form = (typeof(form)=="string" ? $("#"+form) : form);
+			var dataArray =  $form.serializeArray();
+			var result={};
+			$(dataArray).each(function(){
+				//如果在结果对象中存在这个值，那么就说明是多选的情形。
+				if(result[this.name]){
+					//多选的情形，值是数组，直接push
+					result[this.name].push(this.value);
+				}else{
+					//获取当前表单控件元素
+					var element = $form.find("[name='"+ this.name +"']")[0];
+					//获取当前控件类型
+					var type = ( element.type || element.nodeName ).toLowerCase();
+					//如果控件类型为多选那么值就是数组形式，否则就是单值形式。
+					result[this.name] = (/^(select-multiple|checkbox)$/i).test(type) ? [this.value] : this.value;
+				}
+			});
+			return result;
+		};
+		this.taskValidator = function(){
+		//增加准备任务表单验证
+	    	$('#form-add-ready1').bootstrapValidator({
+	            message: 'This value is not valid',
+	            feedbackIcons: {
+	                valid: 'glyphicon glyphicon-ok',
+	                invalid: 'glyphicon glyphicon-remove',
+	                validating: 'glyphicon glyphicon-refresh'
+	            },
+	            fields: {
+	            	taskName: {
+	                    message: 'The username is not valid',
+	                    validators: {
+	                        notEmpty: {
+	                            message: '请输入任务名称!'
+	                        },
+	                        stringLength: {
+	                            max: 60,
+	                            message: '长度最大不能超过60!'
+	                        },
+	                        regexp: {
+	                            regexp: /^[a-zA-Z0-9\u2E80-\u9FFF\.\_\-]+$/,
+	                            message: '输入的名名称格式错误!(只能输入汉字、字母、数字、.、_、-)'
+	                        }
+	                    }
+	                },
+	                taskOwner: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请选择分配人!'
+	                        },
+	                        stringLength: {
+	                            max: 20,
+	                            message: '长度最大不能超过20!'
+	                        }
+	                    }
+	                },
+	                taskEvalTime: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请填写任务估时!'
+	                        },
+	                        stringLength: {
+	                            max: 3,
+	                            message: '长度最大不能超过3!'
+	                        },
+	                        regexp: {
+								regexp: /^[0-9]*$/,
+								message: '输入的时间格式错误!(只能输入数字)'
+							}
+	                    }
+	                },
+	                taskSpec: {
+	                    validators: {
+	                    	stringLength: {
+	                            max: 50,
+	                            message: '长度最大不能超过50!'
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    	//增加新增栏任务
+	    	$('#form-add-ready2').bootstrapValidator({
+	            message: 'This value is not valid',
+	            feedbackIcons: {
+	                valid: 'glyphicon glyphicon-ok',
+	                invalid: 'glyphicon glyphicon-remove',
+	                validating: 'glyphicon glyphicon-refresh'
+	            },
+	            fields: {
+	            	taskName: {
+	                    message: 'The username is not valid',
+	                    validators: {
+	                        notEmpty: {
+	                            message: '请输入任务名称!'
+	                        },
+	                        stringLength: {
+	                            max: 60,
+	                            message: '长度最大不能超过60!'
+	                        },
+	                        regexp: {
+	                            regexp: /^[a-zA-Z0-9\u2E80-\u9FFF\.\_\-]+$/,
+	                            message: '输入的名名称格式错误!(只能输入汉字、字母、数字、.、_、-)'
+	                        }
+	                    }
+	                },
+	                taskOwner: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请选择分配人!'
+	                        },
+	                        stringLength: {
+	                            max: 20,
+	                            message: '长度最大不能超过20!'
+	                        }
+	                    }
+	                },
+	                taskEvalTime: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请填写任务估时!'
+	                        },
+	                        stringLength: {
+	                            max: 3,
+	                            message: '长度最大不能超过3!'
+	                        },
+	                        regexp: {
+								regexp: /^[0-9]*$/,
+								message: '输入的时间格式错误!(只能输入数字)'
+							}
+	                    }
+	                },
+	                taskSpec: {
+	                    validators: {
+	                    	stringLength: {
+	                            max: 50,
+	                            message: '长度最大不能超过50!'
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    	//增加需求任务表单验证
+	    	$('#form-add-need').bootstrapValidator({
+	            message: 'This value is not valid',
+	            feedbackIcons: {
+	                valid: 'glyphicon glyphicon-ok',
+	                invalid: 'glyphicon glyphicon-remove',
+	                validating: 'glyphicon glyphicon-refresh'
+	            },
+	            fields: {
+	            	taskName: {
+	                    message: 'The username is not valid',
+	                    validators: {
+	                        notEmpty: {
+	                            message: '请输入任务名称!'
+	                        },
+	                        stringLength: {
+	                            max: 60,
+	                            message: '长度最大不能超过60!'
+	                        },
+	                        regexp: {
+	                            regexp: /^[a-zA-Z0-9\u2E80-\u9FFF\.\_\-]+$/,
+	                            message: '输入的名名称格式错误!(只能输入汉字、字母、数字、.、_、-)'
+	                        }
+	                    }
+	                },
+	                taskOwner: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请选择分配人!'
+	                        },
+	                        stringLength: {
+	                            max: 20,
+	                            message: '长度最大不能超过20!'
+	                        }
+	                    }
+	                },
+	                taskType: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请选择任务类型!'
+	                        },
+	                        stringLength: {
+	                            max: 2,
+	                            message: '长度最大不能超过2!'
+	                        }
+	                    }
+	                },
+	                taskEvalTime: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请填写任务估时!'
+	                        },
+	                        stringLength: {
+	                            max: 3,
+	                            message: '长度最大不能超过3!'
+	                        },
+	                        regexp: {
+								regexp: /^[0-9]*$/,
+								message: '输入的时间格式错误!(只能输入数字)'
+							}
+	                    }
+	                },
+	                taskSpec: {
+	                    validators: {
+	                    	stringLength: {
+	                            max: 50,
+	                            message: '长度最大不能超过50!'
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    	//增加设计任务表单验证
+	    	$('#form-add-design').bootstrapValidator({
+	            message: 'This value is not valid',
+	            feedbackIcons: {
+	                valid: 'glyphicon glyphicon-ok',
+	                invalid: 'glyphicon glyphicon-remove',
+	                validating: 'glyphicon glyphicon-refresh'
+	            },
+	            fields: {
+	            	taskName: {
+	                    message: 'The username is not valid',
+	                    validators: {
+	                        notEmpty: {
+	                            message: '请输入任务名称!'
+	                        },
+	                        stringLength: {
+	                            max: 60,
+	                            message: '长度最大不能超过60!'
+	                        },
+	                        regexp: {
+	                            regexp: /^[a-zA-Z0-9\u2E80-\u9FFF\.\_\-]+$/,
+	                            message: '输入的名名称格式错误!(只能输入汉字、字母、数字、.、_、-)'
+	                        }
+	                    }
+	                },
+	                taskOwner: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请选择分配人!'
+	                        },
+	                        stringLength: {
+	                            max: 20,
+	                            message: '长度最大不能超过20!'
+	                        }
+	                    }
+	                },
+	                taskType: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请选择任务类型!'
+	                        },
+	                        stringLength: {
+	                            max: 2,
+	                            message: '长度最大不能超过2!'
+	                        }
+	                    }
+	                },
+	                taskEvalTime: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请填写任务估时!'
+	                        },
+	                        stringLength: {
+	                            max: 3,
+	                            message: '长度最大不能超过3!'
+	                        },
+	                        regexp: {
+								regexp: /^[0-9]*$/,
+								message: '输入的时间格式错误!(只能输入数字)'
+							}
+	                    }
+	                },
+	                taskSpec: {
+	                    validators: {
+	                    	stringLength: {
+	                            max: 50,
+	                            message: '长度最大不能超过50!'
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    	//增加开发任务表单验证
+	    	$('#form-add-list').bootstrapValidator({
+	            message: 'This value is not valid',
+	            feedbackIcons: {
+	                valid: 'glyphicon glyphicon-ok',
+	                invalid: 'glyphicon glyphicon-remove',
+	                validating: 'glyphicon glyphicon-refresh'
+	            },
+	            fields: {
+	            	taskName: {
+	                    message: 'The username is not valid',
+	                    validators: {
+	                        notEmpty: {
+	                            message: '请输入任务名称!'
+	                        },
+	                        stringLength: {
+	                            max: 60,
+	                            message: '长度最大不能超过60!'
+	                        },
+	                        regexp: {
+	                            regexp: /^[a-zA-Z0-9\u2E80-\u9FFF\.\_\-]+$/,
+	                            message: '输入的名名称格式错误!(只能输入汉字、字母、数字、.、_、-)'
+	                        }
+	                    }
+	                },
+	                taskOwner: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请选择分配人!'
+	                        },
+	                        stringLength: {
+	                            max: 20,
+	                            message: '长度最大不能超过20!'
+	                        }
+	                    }
+	                },
+	                taskType: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请选择任务类型!'
+	                        },
+	                        stringLength: {
+	                            max: 2,
+	                            message: '长度最大不能超过2!'
+	                        }
+	                    }
+	                },
+	                taskEvalTime: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请填写任务估时!'
+	                        },
+	                        stringLength: {
+	                            max: 3,
+	                            message: '长度最大不能超过3!'
+	                        },
+	                        regexp: {
+								regexp: /^[0-9]*$/,
+								message: '输入的时间格式错误!(只能输入数字)'
+							}
+	                    }
+	                },
+	                taskSpec: {
+	                    validators: {
+	                    	stringLength: {
+	                            max: 50,
+	                            message: '长度最大不能超过50!'
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    	//增加测试任务表单验证
+	    	$('#form-add-test').bootstrapValidator({
+	            message: 'This value is not valid',
+	            feedbackIcons: {
+	                valid: 'glyphicon glyphicon-ok',
+	                invalid: 'glyphicon glyphicon-remove',
+	                validating: 'glyphicon glyphicon-refresh'
+	            },
+	            fields: {
+	            	taskName: {
+	                    message: 'The username is not valid',
+	                    validators: {
+	                        notEmpty: {
+	                            message: '请输入任务名称!'
+	                        },
+	                        stringLength: {
+	                            max: 60,
+	                            message: '长度最大不能超过60!'
+	                        },
+	                        regexp: {
+	                            regexp: /^[a-zA-Z0-9\u2E80-\u9FFF\.\_\-]+$/,
+	                            message: '输入的名名称格式错误!(只能输入汉字、字母、数字、.、_、-)'
+	                        }
+	                    }
+	                },
+	                taskOwner: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请选择分配人!'
+	                        },
+	                        stringLength: {
+	                            max: 20,
+	                            message: '长度最大不能超过20!'
+	                        }
+	                    }
+	                },
+	                taskType: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请选择任务类型!'
+	                        },
+	                        stringLength: {
+	                            max: 2,
+	                            message: '长度最大不能超过2!'
+	                        }
+	                    }
+	                },
+	                taskEvalTime: {
+	                	validators: {
+	                		notEmpty: {
+	                            message: '请填写任务估时!'
+	                        },
+	                        stringLength: {
+	                            max: 3,
+	                            message: '长度最大不能超过3!'
+	                        },
+	                        regexp: {
+								regexp: /^[0-9]*$/,
+								message: '输入的时间格式错误!(只能输入数字)'
+							}
+	                    }
+	                },
+	                taskSpec: {
+	                    validators: {
+	                    	stringLength: {
+	                            max: 50,
+	                            message: '长度最大不能超过50!'
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    	
+	    };
+	    this.ClearForm = function (id) {
+	        var objId = document.getElementById(id);
+	        if (objId == undefined) {
+	            return;
+	        }
+	        for (var i = 0; i < objId.elements.length; i++) {
+	            if (objId.elements[i].type == "text") {
+	                objId.elements[i].value = "";
+	            }
+	            else if (objId.elements[i].type == "password") {
+	                objId.elements[i].value = "";
+	            }
+	            else if (objId.elements[i].type == "radio") {
+	                objId.elements[i].checked = false;
+	            }
+	            else if (objId.elements[i].type == "checkbox") {
+	                objId.elements[i].checked = false;
+	            }
+	            else if (objId.elements[i].type == "select-one") {
+	                objId.elements[i].options[0].selected = true;
+	            }
+	            else if (objId.elements[i].type == "select-multiple") {
+	                for (var j = 0; j < objId.elements[i].options.length; j++) {
+	                    objId.elements[i].options[j].selected = false;
+	                }
+	            }
+	            else if (objId.elements[i].type == "textarea") {
+	                objId.elements[i].value = "";
+	            }
+	        }
+	    }
+	    
+	}
+	return TaskList;
+},{
+	requires : ['io',
+	            'event',
+	            'tasklist-module/src/taskdetails',
+	            ]
+});

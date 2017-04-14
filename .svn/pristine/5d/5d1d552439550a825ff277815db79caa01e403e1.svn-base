@@ -1,0 +1,72 @@
+package com.edp.admin.functionInfo;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.edp.admin.common.BaseController;
+import com.edp.admin.login.UserInfoBean;
+import com.edp.common.constant.Constants;
+import com.edp.common.jedis.JedisUtils;
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.serviceI.bytearrayInfo.ByteArrayInfoServiceI;
+import com.edp.serviceI.dto.BytearrayInfoDto;
+import com.edp.serviceI.dto.ColumnPicDto;
+import com.edp.serviceI.dto.ControlDto;
+import com.edp.serviceI.dto.CtableDto;
+import com.edp.serviceI.dto.FunColumnDto;
+import com.edp.serviceI.dto.FunConTrolDto;
+import com.edp.serviceI.dto.FunctionInfoDto;
+import com.edp.serviceI.dto.MasterDto;
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import com.edp.serviceI.product.ProductServiceI;
+import com.edp.serviceI.sceneinfo.SceneInfoServiceI;
+import com.edp.serviceI.tree.TreeServiceI;
+import com.google.gson.Gson;
+
+import redis.clients.jedis.Jedis;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+
+
+@Controller
+@RequestMapping("functionInfoController")
+public class FunctionInfoController extends BaseController {
+
+    @Autowired
+    private FunctionInfoServiceI functionInfoServiceI;
+  
+    
+    
+    
+    
+    
+    
+    
+   
+
+}

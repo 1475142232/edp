@@ -1,0 +1,64 @@
+.rowh{margin-top:50px;}
+.modifycode{
+	width:500px;
+	height:370px;
+	background:#fde3b9;
+	margin:50px auto 0 auto;
+	-webkit-border-radius:2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+	-moz-box-shadow:2px 2px 5px #fde3b9;; 
+	-webkit-box-shadow:2px 2px 5px #fde3b9;; 
+	box-shadow: 2px 2px 5px #fde3b9;
+	border: 1px solid #fde3b9;
+}
+.modifycode ul{margin-top:100px;text-algin:centent}
+.modifycode ul li {float:left;width:100%;margin-bottom:10px;}
+.modifycode ul li lable,.modifycode ul li input{float:left;}
+.modifycode ul li lable{width:25%;text-align:right;display:block;line-height:44px;}
+.modifycode ul li input{width:100%;height:35px;border: 1px solid #ededed;color:#ccc;}
+.modifycode P{padding-left:30%;}
+.button-move{margin-right:15px;}
+.content{  margin: 0 auto;padding: 5% 0 0 0;text-align: center;width: 500px;}
+#roleId{width:292px;}
+.rowsearch{margin-top:5%;}
+.searchmove{margin-left:20px}
+.controls em{color:#e74c3c;}
+.control-textval {
+    color: #636775;
+    display: inline-block;
+    height: 35px;
+    line-height:35px;
+    width: 150px;
+    text-align:center;
+}
+.controlborder{display:inline-block;float:left;}
+#beforeDiv{padding-top:10%;}
+.butpre{margin:3% auto;text-align: center}
+.notice{margin:5px;width:32%;float:left;border: 1px solid #fde3b9;}
+.notice h2{background:#fde3b9;height:40px;}
+.notice h2 span{float:left;line-height:40px;color:red;padding-left:5px;font-size:16px;}
+.notice h2 a{float: right;line-height: 40px; font-size: 12px;color:#666;padding-right: 5px;}
+.notice ul li{line-height:180%;padding-left:5px;}
+.notice ul li a{color:#666;font-size:15px;}
+.noticeDetails strong{font-size:18px;display: block;text-align: center;height:50px;line-height:50px;color:#000}
+.noticeDetails div{padding:1% 2% 1% 2%;}
+.noticeDetails div p{font-size:14px;line-height:180%;}
+.noticeDetails span{padding-left:2%;}
+.noticemore{    
+	width: 80%;
+    text-align: center;
+    margin: 0 auto;
+    font-size: 18px;
+    line-height: 200%;
+    background-color: #efefef;
+    padding: 15px 0px;}
+.noticemore ul li a{color:#454545;}
+.rowtree{margin-top:60px;float:left;}
+.row-bottom{margin-bottom:10px}
+.hiddentree{margin-top:60px;float:right;}
+.control-texttree{width: 190px;line-height: 30px;padding-left:5px;}
+.addOrg1{float:left;}
+.addOrg2{float:right;}
+.leftmover{float:left;margin:60px 50px 0 10px;}
+.control-center{text-align:center;}

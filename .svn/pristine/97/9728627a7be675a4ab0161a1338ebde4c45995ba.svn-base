@@ -1,0 +1,517 @@
+package com.edp.service.taskInfo;
+
+import com.alibaba.dubbo.common.utils.StringUtils;
+import com.alibaba.fastjson.JSON;
+import com.edp.common.constant.EDPCodeConstants;
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SqlFormatUtil;
+import com.edp.dao.domain.TaskInfoPo;
+import com.edp.dao.domain.TaskInfoPoCriteria;
+import com.edp.dao.mapper.TaskInfoPoMapper;
+import com.edp.serviceI.dto.TaskInfoDto;
+import com.edp.serviceI.taskInfo.TaskInfoServiceI;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.*;
+
+/**
+ * 工单信息服务实现
+ * Created by changer on 2016/7/20.
+ */
+@Service("taskInfoServiceI")
+public class TaskInfoServiceImpl implements TaskInfoServiceI {
+
+
+    @Resource
+    private TaskInfoPoMapper taskInfoPoMapper;
+
+
+    private Logger log = LoggerFactory.getLogger(TaskInfoServiceImpl.class);
+
+
+    /**
+     * 根据条件查询工单信息
+     *
+     * @param condition
+     * @return
+     */
+    @Override
+    public TaskInfoDto queryAllTaskInfosByCondition(TaskInfoDto condition) {
+
+        log.debug("根据条件查询所有的工单信息--start");
+
+        //创建返回对象
+        TaskInfoDto rtnDto = new TaskInfoDto();
+
+        //创建查询对象
+        TaskInfoPoCriteria example = new TaskInfoPoCriteria();
+        TaskInfoPoCriteria.Criteria criteria = example.createCriteria();
+
+        try {
+            //组装条件
+            if (condition != null) {
+
+                if (condition.getId() != null) {//主键查询
+                    log.debug("查询主键==>" + condition.getId());
+                    TaskInfoPo po = taskInfoPoMapper.selectByPrimaryKey(condition.getId()+"");
+                    if (po != null) {
+                        rtnDto = BeanCopyUtils.populateTbyDBySpring(po, TaskInfoDto.class);
+                    }
+                } else {//条件查询
+                    this.composeCondition(example, criteria, condition);
+
+                    int count = taskInfoPoMapper.countByExample(example);
+                    log.debug("工单记录条数===>" + count);
+                    List<TaskInfoDto> taskInfoDtos = new ArrayList<>();
+                    if (count > 0) {
+                        //调用条件查询方法
+                        List<TaskInfoPo> taskInfoPos = taskInfoPoMapper.selectByExampleWithBLOBs(example);
+                        taskInfoDtos = BeanCopyUtils.populateTListbyDListBySpring(taskInfoPos, TaskInfoDto.class);
+
+
+                    }
+                    rtnDto.setResults(count);
+                    rtnDto.setRows(taskInfoDtos);
+                }
+
+                rtnDto.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+                rtnDto.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG + "," + e.getMessage());
+        }
+
+        log.debug("根据条件查询所有的工单信息--end");
+        return rtnDto;
+    }
+
+
+    /**
+     * 根据产品编号查询工单信息
+     *
+     * @param productId
+     * @return
+     */
+    @Override
+    public TaskInfoDto querAllTaskInfosByProductId(String productId) {
+
+        TaskInfoDto rtnDto = new TaskInfoDto();
+        if (StringUtils.isNotEmpty(productId)) {
+            TaskInfoDto condition = new TaskInfoDto();
+            condition.setProductId(productId);
+            rtnDto = this.queryAllTaskInfosByCondition(condition);
+        }
+        return rtnDto;
+    }
+
+    /**
+     * 根据工单编号查询工单信息
+     *
+     * @param taskId
+     * @return
+     */
+    @Override
+    public TaskInfoDto findTaskInfoByTaskId(String taskId) {
+        TaskInfoDto rtnDto = new TaskInfoDto();
+        if (StringUtils.isNotEmpty(taskId)) {
+            TaskInfoDto condition = new TaskInfoDto();
+            condition.setTaskId(taskId);
+            rtnDto = this.queryAllTaskInfosByCondition(condition);
+        }
+        return rtnDto;
+    }
+
+    /**
+     * 根据主键查询工单信息
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public TaskInfoDto findTaskInfoByPrimaryKey(int id) {
+        TaskInfoDto condition = new TaskInfoDto();
+        condition.setId(id+"");
+        return queryAllTaskInfosByCondition(condition);
+    }
+
+    /**
+     * 根据版本查询工单信息
+     *
+     * @param version
+     * @return
+     */
+    @Override
+    public TaskInfoDto findTaskInfoByVersion(int version) {
+        //TODO 需要修改
+        TaskInfoDto condition = new TaskInfoDto();
+        condition.setTaskVersion(version);
+        return queryAllTaskInfosByCondition(condition);
+    }
+
+
+    /**
+     * 保存工单信息
+     *
+     * @param taskInfo
+     * @return
+     */
+    @Override
+    public TaskInfoDto saveTaskInfo(TaskInfoDto taskInfo) {
+        TaskInfoDto rtnDto = new TaskInfoDto();
+
+        try {
+            if (taskInfo != null && StringUtils.isNotEmpty(taskInfo.getTaskId())) {
+
+                TaskInfoPo taskInfoPo = BeanCopyUtils.populateTbyDBySpring(taskInfo, TaskInfoPo.class);
+
+                int result = taskInfoPoMapper.insert(taskInfoPo);
+                if (result > 0) {
+                    rtnDto.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+                    rtnDto.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+                } else {
+                    rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+                    rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+                }
+
+            } else {
+                rtnDto.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+                rtnDto.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+        }
+
+        return rtnDto;
+    }
+
+    /**
+     * 更新工单信息
+     *
+     * @param taskInfo
+     * @return
+     */
+    @Override
+    public TaskInfoDto updateTaskInfo(TaskInfoDto taskInfo) {
+
+        //创建返回对象
+        TaskInfoDto rtnDto = new TaskInfoDto();
+
+        try {
+            if (taskInfo != null ) {
+                TaskInfoPo taskInfoPo = BeanCopyUtils.populateTbyDBySpring(taskInfo, TaskInfoPo.class);
+                if(taskInfo.getId() != null ){//主键不为null，根据主键更新
+
+
+                    int result = taskInfoPoMapper.updateByPrimaryKeySelective(taskInfoPo);
+
+                    if (result > 0) {
+                        rtnDto.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+                        rtnDto.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+                    } else {
+                        rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+                        rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+                    }
+                }else if(StringUtils.isNotEmpty(taskInfo.getTaskId())){//根据工单编号更新
+
+                    //创建查询对象
+                    TaskInfoPoCriteria queryObj = new TaskInfoPoCriteria();
+                    TaskInfoPoCriteria.Criteria criteria = queryObj.createCriteria();
+
+                    criteria.andTaskIdEqualTo(taskInfo.getTaskId());
+
+                   int result =  taskInfoPoMapper.updateByExampleSelective(taskInfoPo,queryObj);
+
+                    if (result > 0) {
+                        rtnDto.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+                        rtnDto.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+                    } else {
+                        rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+                        rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+                    }
+                }else{//没有可关联字段,输入数据无效
+                    rtnDto.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+                    rtnDto.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+                }
+
+
+            } else {
+                rtnDto.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+                rtnDto.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+        }
+
+        return rtnDto;
+    }
+    /**
+     * 根据主键删除工单信息
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public TaskInfoDto deleteTaskInfoByPrimaryKey(int id) {
+        TaskInfoDto rtnDto = new TaskInfoDto();
+        taskInfoPoMapper.deleteByPrimaryKey(id+"");
+        rtnDto.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+        rtnDto.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+
+
+        return rtnDto;
+    }
+
+    /**
+     * 根据产品编号删除工单信息
+     *
+     * @param productId
+     * @return
+     */
+    @Override
+    public TaskInfoDto deleteTaskInfoByProductId(String productId) {
+        TaskInfoDto rtnDto = new TaskInfoDto();
+
+        //创建查询对象
+
+        TaskInfoPoCriteria example = new TaskInfoPoCriteria();
+
+        TaskInfoPoCriteria.Criteria criteria = example.createCriteria();
+
+
+        criteria.andProductIdEqualTo(productId);
+
+        //执行删除
+        taskInfoPoMapper.deleteByExample(example);
+
+
+        return rtnDto;
+    }
+
+
+    /**
+     * 根据多个编号查询工单信息
+     *
+     * @param ids
+     * @return
+     */
+    @Override
+    public TaskInfoDto queryTaskInfosByIds(String ids) {
+
+        //创建查询对象
+        TaskInfoDto rtnDto = new TaskInfoDto();
+
+
+        try {
+            if (StringUtils.isNotEmpty(ids)) {
+
+
+                //参数转换
+                List<String> paraList = new ArrayList<>();
+                Iterator<String> it = Splitter.on(",").omitEmptyStrings().trimResults().split(ids).iterator();
+                while (it.hasNext()) {
+                    paraList.add(it.next());
+                }
+
+
+                //创建查询对象
+                TaskInfoPoCriteria queryObj = new TaskInfoPoCriteria();
+                TaskInfoPoCriteria.Criteria criteria = queryObj.createCriteria();
+
+                //设置查询条件
+                criteria.andIdIn(paraList);
+                //获取符合条件的记录数
+                int count = taskInfoPoMapper.countByExample(queryObj);
+                List<TaskInfoDto> taskInfoDtos = new ArrayList<>();
+                if (count > 0) {
+
+                    List<TaskInfoPo> taskInfoPos = taskInfoPoMapper.selectByExample(queryObj);
+                    taskInfoDtos = BeanCopyUtils.populateTListbyDListBySpring(taskInfoPos, TaskInfoDto.class);
+
+                }
+
+                //设置返回数据
+                rtnDto.setResults(count);
+                rtnDto.setRows(taskInfoDtos);
+
+                rtnDto.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+                rtnDto.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+                log.info(EDPCodeConstants.SUCCESS_MSG);
+
+            } else {
+                rtnDto.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+                rtnDto.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+                log.info(EDPCodeConstants.INVALID_DATA_MSG + ",ids=" + ids);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+            log.info(EDPCodeConstants.ERROR_MSG + ",错误信息:" + e.getMessage());
+        }
+
+
+        return rtnDto;
+    }
+
+    /**
+     * 根据计划编号，查询工单池信息，过滤已选工单
+     * @param planId
+     * @return
+     */
+    @Override
+    public TaskInfoDto queryTaskInfosForPlan(String planId,String productId) {
+        log.info("计划工单选择过滤查询开始");
+        log.info("输入的参数:planId="+planId+",productId="+productId);
+        //创建返回对象
+        TaskInfoDto rtnDto = new TaskInfoDto();
+
+        List<TaskInfoDto> rows = Lists.newArrayList();
+
+        int count = 0;
+
+        try {
+            if(StringUtils.isNotEmpty(planId) && StringUtils.isNotEmpty(productId)){
+                //设置查询参数
+                Map<String,String> params = new HashMap<>();
+                params.put("planId",planId);
+                params.put("productId",productId);
+                //调用工单池查询方法
+//                List<TaskInfoPo> result = taskInfoPoMapper.queryTaskInfosForPlan(params);
+//                if(result != null && result.size()>0){
+//
+//                    count = result.size();
+//                    rows = BeanCopyUtils.populateTListbyDListBySpring(result,TaskInfoDto.class);
+//                }
+
+                rtnDto.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+                rtnDto.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+                log.info(EDPCodeConstants.SUCCESS_MSG);
+
+            }else{//参数不合法
+                rtnDto.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+                rtnDto.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+                log.info(EDPCodeConstants.INVALID_DATA_MSG+",planId="+planId+"/productId="+productId);
+            }
+
+            log.info("查询到的记录数="+count);
+            rtnDto.setResults(count);
+            rtnDto.setRows(rows);
+            log.info("计划工单选择过滤查询结束");
+
+        }catch (Exception e){
+            e.printStackTrace();
+            rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG+",错误信息="+e.getMessage());
+            log.info(EDPCodeConstants.ERROR_MSG);
+        }
+
+
+        return rtnDto;
+    }
+
+
+    /**
+     * 工单查询条件组装
+     *
+     * @param example
+     * @param condition
+     */
+    private void composeCondition(TaskInfoPoCriteria example, TaskInfoPoCriteria.Criteria criteria, TaskInfoDto condition) {
+
+        log.info("工单查询条件组装--start");
+
+        log.info("参数===>" + JSON.toJSONString(condition));
+        if (condition != null) {
+
+            //拼装分页信息
+            String pageStr = SqlFormatUtil.makeupOrderByAndLimit("id", SqlFormatUtil.ORDER_BY_DIRECTION_DESC, condition.getPageIndex(), condition.getLimit());
+            example.setOrderByClause(pageStr);
+
+
+            //拼装查询条件
+            if (StringUtils.isNotEmpty(condition.getProductId())) {//产品编号
+                criteria.andProductIdEqualTo(condition.getProductId());
+            }
+
+            if (StringUtils.isNotEmpty(condition.getProductName())) {//产品名称
+                criteria.andProductNameLike("%" + condition.getProductName() + "%");
+            }
+
+            if (StringUtils.isNotEmpty(condition.getTaskId())) {//工单编号
+                criteria.andTaskIdEqualTo(condition.getTaskId());
+            }
+
+            if (StringUtils.isNotEmpty(condition.getTaskName())) {//工单名称
+                criteria.andTaskNameLike("%" + condition.getTaskName() + "%");
+            }
+
+            if (StringUtils.isNotEmpty(condition.getTaskOwner())) {//工单负责人
+                criteria.andTaskOwnerEqualTo(condition.getTaskOwner());
+            }
+
+            if (StringUtils.isNotEmpty(condition.getTaskReceiveTime())) {//工单接收时间
+                criteria.andTaskReceiveTimeEqualTo(condition.getTaskReceiveTime());
+            }
+
+            if (StringUtils.isNotEmpty(condition.getTaskState())) {//工单状态
+                criteria.andTaskStateEqualTo(condition.getTaskState());
+            }
+
+            if (StringUtils.isNotEmpty(condition.getTaskType())) {//工单类型
+                criteria.andTaskTypeEqualTo(condition.getTaskType());
+            }
+
+            if (condition.getTaskVersion() != null && condition.getTaskVersion().byteValue() > 0) {//工单版本
+                criteria.andTaskVersionLessThanOrEqualTo(condition.getTaskVersion());
+            }
+
+            if (StringUtils.isNotEmpty(condition.getTaskStartTime())) {
+                criteria.andTaskStartTimeEqualTo(condition.getTaskStartTime());
+            }
+        }
+        log.info("工单查询条件组装--end");
+    }
+
+
+	@Override
+	public Integer addTaskInfo(TaskInfoDto taskInfo) {
+	    TaskInfoPo po= BeanCopyUtils.populateTbyDBySpring(taskInfo, TaskInfoPo.class);
+		return taskInfoPoMapper.insert(po);
+	}
+
+
+	@Override
+	public Integer editTaskInfo(TaskInfoDto taskInfo) {
+		TaskInfoPo po= BeanCopyUtils.populateTbyDBySpring(taskInfo, TaskInfoPo.class);
+		return taskInfoPoMapper.updateByPrimaryKeySelective(po);
+	}
+
+
+	@Override
+	public List<List<TaskInfoDto>> findTaskInfoByUserId(Integer userId) {
+		List<List<TaskInfoDto>> taskInfoDtoes=new ArrayList<List<TaskInfoDto>>();
+		String[] name = new String[]{"02","01","04"};
+		for(int i=0;i<name.length;i++){
+			TaskInfoPoCriteria example = new TaskInfoPoCriteria();
+	        TaskInfoPoCriteria.Criteria criteria = example.createCriteria();
+	        criteria.andTaskStateEqualTo(name[i]);
+	        criteria.andTaskOwnerEqualTo(userId+"");
+	        List<TaskInfoPo> po = taskInfoPoMapper.selectByExample(example);
+	        List<TaskInfoDto> taskInfoDto=BeanCopyUtils.populateTListbyDListBySpring(po,TaskInfoDto.class);
+	        taskInfoDtoes.add(taskInfoDto);
+		}
+		return taskInfoDtoes;
+	}
+
+}

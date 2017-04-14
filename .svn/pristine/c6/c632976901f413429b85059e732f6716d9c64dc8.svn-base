@@ -1,0 +1,49 @@
+KISSY.add("fullcalendar-module/src/calendar",function(S,IO){
+	
+	function Calendar(){
+		var _this = this;
+		var date = new Date();
+		var d = date.getDate();
+		var m = date.getMonth();
+		var y = date.getFullYear();
+		this.init=function(){
+			_this.goCalendar();
+		}
+		
+		this.goCalendar = function(){
+			var event = [];
+			$.ajax({
+				 type: "post",
+	             url: "TaskInfoController/findTaskInfoByTime.action",
+	             dataType: "json",      
+	             success: function(data){
+	            	 for(var i=0;i<data.length;i++){
+	            		 event.push({
+	            			 "id": data[i].id,
+	            			 "title": data[i].taskName,
+	            			 "start": new Date(data[i].taskStarteYear, data[i].taskStarteMonth, data[i].taskStarteDay),
+	            			 "end": new Date(data[i].taskDoneYear, data[i].taskDoneMonth, data[i].taskDoneDay)	 
+	            		 })
+	            	 }
+	            	 $('#calendar').fullCalendar({
+	     				header: {
+	     					left: 'prev,next today',
+	     					center: 'title',
+	     					right: 'month,agendaWeek,agendaDay'
+	     				},
+	     				editable: false,
+	     				events: event,
+	     				dayClick: function(date, allDay, jsEvent, view) { 
+	     					alert(date );
+	     				}
+	     			});
+	            	 
+	             }
+			})
+		}
+		
+	}	
+	return Calendar;
+},{
+	requires : ['io']
+});

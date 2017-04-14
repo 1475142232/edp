@@ -1,0 +1,79 @@
+KISSY.add("teamcreat-module/src/teamcreat",function(S,IO,Projectlist){
+
+	function teamCreat(){
+		function getTreamlist(){
+			//团队列表获取-----
+			$.ajax({
+	             type: "GET",
+	             url: "TeamController/getAllTream.action",
+	             async: true,
+	             dataType: "json",
+	             success: function(data){
+	            	 
+	            	 var add = '<div class="navList">';
+	                 for(var i=0; i<data.length; i++) {
+	                 	add += '<div class="addNav project" id="'+data[i].id+'">';
+	                 	add += '<a href="javascript:;">'+data[i].teamName+'</a>';
+	                 	add += '</div>';
+	                 }
+	                 add += '<a href="javascript:;" class="addNavBtn"  data-toggle="modal" data-target="#myModal">新建团队</a>';
+	                 add += '</div>';
+	                 $("#addNav").html(add);
+	                 
+	                 // 新增弹出窗口
+	                 $(".addNavBtn").click(function(){
+	                	 $(".addNavAlert").show().find("input").val("");
+	                 });
+	                 
+	                //团队获取Id
+	         		$(".project").click(function(){
+	         			var teamId = this.id;
+	         			$("#navTop").show();
+	         			//团队跳转
+	         			IO.get("views/team/projectlist.html",null,function(){
+	             			$("#mainpage").html(arguments[0], true);
+	             			var projectlist = new Projectlist();
+	             			projectlist.getproductList(teamId);
+	                 	});
+	         		});
+	              }
+	        });
+		}
+		getTreamlist();
+		
+		
+		// 确定创建团队-----
+		$(".addNavOk").click(function(){
+			var _data = {teamName: $(".addNavName").val()};
+			var teamName = $(".addNavName").val();
+			if(teamName != "" || teamName != null ){
+				//console.log($(".addNavName").val());
+				$.ajax({
+		             type: "POST",
+		             url: "TeamController/addTream.action",
+		             async: true,
+		             dataType: "json",
+		             data:_data,
+		             success: function(data){
+		        		 $(".addNavAlert").hide();
+		                 getTreamlist();
+		             }
+		        });
+			}else{
+				 $(".addNavName").attr("placeholder","请输入团队名称");
+			}
+		});
+		
+		// 取消创建团队
+		$(".addNavNo").click(function(){
+			$(".addNavAlert").hide();
+		});
+	}
+	
+
+	return teamCreat;
+},{
+	requires : ['io',
+	            'teamcreat-module/src/projectlist'
+	            ]
+});

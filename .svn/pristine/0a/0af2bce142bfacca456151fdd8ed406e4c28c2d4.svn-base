@@ -1,0 +1,288 @@
+/**
+ * 用户管理
+ */
+KISSY.add('usermanage-module/src/userManage', function(S,Event,Pageing,AlertDialog,IO,Node,Overlay, Validator,Select,Data){
+	function UserManage(){
+		var _this = this;
+		var pageing = new Pageing();
+		var alertDialog = new AlertDialog();
+		var validator = new Validator();
+		var deleteId;
+		var unitSelector;;
+		this.init = function(flag){
+			_this.initGrid(flag);
+			_this.initEvent();
+			unitSelector =_this.initselection("#orgDiv", "#orgCode","#orgName", "sysDictController/queryDictByCondition.action?classname=unit");
+		};
+		
+		this.initGrid = function(flag){
+			var visible = true;
+			if(flag === "search"){
+				visible = false;
+			}
+			var columns = [ {
+				title : '用户名',
+				dataIndex : 'userName',
+				elCls : 'center wordCss',
+				cellTpl:'<span title = "{text}">{text}</span>' ,
+				sortable : false,
+				width : 240
+			}, {
+				title : '姓名',
+				dataIndex : 'realName',
+				elCls : 'center wordCss',
+				cellTpl:'<span title = "{text}">{text}</span>' ,
+				sortable : false,
+				width : 180
+			},{
+				title : '角色',
+				dataIndex : 'roleName',
+				elCls : 'center wordCss',
+				cellTpl:'<span title = "{text}">{text}</span>' ,
+				sortable : false,
+				width : 120
+			},{
+				title : '所在机构',
+				dataIndex : 'orgName',
+				elCls : 'center wordCss',
+				cellTpl:'<span title = "{text}">{text}</span>' ,
+				sortable : false,
+				width : 190
+			},{
+				title : '所在机构编号',
+				dataIndex : 'orgCode',
+				elCls : 'center wordCss',
+				cellTpl:'<span title = "{text}">{text}</span>' ,
+				sortable : false,
+				width : 190,
+				visible:false
+			} , {
+				title : '手机号',
+				dataIndex : 'phoneNum',
+				elCls : 'center wordCss',
+				cellTpl:'<span title = "{text}">{text}</span>' ,
+				sortable : false,
+				width : 130
+			}, {
+				title : '身份证号',
+				dataIndex : 'centNo',
+				elCls : 'center wordCss',
+				cellTpl:'<span title = "{text}">{text}</span>' ,
+				sortable : false,
+				width : 130,
+				visible:false
+			},{
+				title : '操作',
+				dataIndex : 'oper',
+				elCls : 'center',
+				sortable : false,
+				width : 180,
+				visible:visible,
+				renderer : function(value, obj) {
+					if(flag === 'uUpdate'){
+						return "<span class='uUpdate'>修改</span>";
+					}else if(flag === 'uCancel'){
+						return "<span class='uCancel'>删除</span>";
+					}else if(flag === 'resetPass'){
+						return "<span class='resetPass'>密码重置</span>";
+					}else{
+						return "";
+					}
+					
+				}
+			}
+			];
+			var url = 'userManageController/getUserList.action';
+			pageing.initPageing("userGrid", columns, url, 10, "", "pagingBar", "");
+		};
+		
+		this.initEvent = function(){
+			pageing.grid.on('itemclick', function(ev){
+				var item = ev.item, // 点击行的记录
+				target = $(ev.domTarget); // 点击的元素
+				var id = item.id;
+				if (target.hasClass('uUpdate')) {
+					_this.updateUser(item);
+				}else if(target.hasClass('uCancel')) {
+					deleteId = id;
+					alertDialog.showConfirmMessage("是否删除用户"+item.userName, _this.callback_success, 4, _this.callback_fail);
+				} else if (target.hasClass('resetPass')) {
+					deleteId = id;
+					alertDialog.showConfirmMessage("是否重置用户"+item.userName+"密码？", _this.resetPassword, 4, null);
+				} else {
+					return false;
+				}
+			});
+			
+			Event.on("#userSearch","click",function(){
+				var name = Node.all("#userName_q").val();
+				var role = Node.all("#role_q").val();
+				var dept = Node.all("#department_q").val();
+				var param = {userName:name,roleId:role,department:dept,pageIndex:0};
+				pageing.store.load(param);
+			});
+		};
+		
+		this.resetPassword = function() {
+			var url = 'userController/resetPassword.action';
+			var data = {userId:deleteId};
+			IO({
+				url: url,
+				type: "post",
+				data : data,
+				dataType : 'json',
+				cache : false,
+				async : false,
+				success: function(data){
+					if(data!==undefined){
+						if (data) {
+			    			alertDialog.showMessage("重置成功", "1", null);
+			    		} else {
+			    			alertDialog.showMessage("重置失败", "1", null);
+			    		}
+					}
+				},
+				error: function(XMLHttpRequest, textStatus, errorThrown){
+				}
+			});
+		};
+		
+		Event.on("#phoneNum", "keydown", function(){
+    		Node.all("#phoneNumLater").remove();
+    	});
+    	
+    	Event.on("#phoneNum", "blur", function(){
+    		if (!validator.validatePhone("phoneNum", "phoneNumLater")) {
+    			return;
+    		}
+    	});
+		
+		this.callback_success = function(){
+			var url = 'userManageController/cancelUser.action';
+			var data = {userId:deleteId};
+			IO({
+				url: url,
+				type: "post",
+				data : data,
+				dataType : 'json',
+				cache : false,
+				success: function(data){
+					pageing.store.load();
+				},
+				error: function(XMLHttpRequest, textStatus, errorThrown){
+				}
+			});
+		};
+
+		this.callback_fail = function(){
+			
+		};
+
+		this.initselection = function (targetId, valueField, textField,url) {
+
+			var store = new Data.Store({
+					url: url,
+					autoLoad: true
+				}),
+				select = new Select.Select({
+					render: targetId,
+					valueField: valueField,
+					multipleSelect: false,
+					store: store
+				});
+			select.render();
+
+			select.on('change', function (ev) {
+				Node.all(textField).val(ev.item.text);
+			});
+
+			return select;
+		};
+
+
+		this.updateUser = function(data){
+			var alertConfirmDialog = new Overlay.Dialog({
+				title : '<div style="text-align: center;font-size:16px;">用户修改</div>',
+				width : 650,
+			    height : 500,
+				mask : true, // 模态显示，默认选项
+				closeAction : 'destroy',
+				buttons : [ {
+					text : '确定',
+					elCls : 'button button-danger button-large button-move',
+					handler : function() {
+						var realName = Node.all("#realName").val();
+						var orgCode = Node.all("#orgCode").val();
+						var orgName = Node.all("#orgName").val();
+						var centNo = Node.all("#centNo").val();
+						var phoneNum = Node.all("#phoneNum").val();
+						var roleId = Node.all("#roleId").val(); 
+						var phoneNumAlter = Node.all("#phoneNumLater").html();
+						var roleName;
+						if(roleId == 1){
+			    			roleName = "超级管理员";
+			    		}else if(roleId == 2) {
+							roleName = "普通管理员";
+						}else {
+			    			roleName = "普通操作员";
+			    		}
+						if (phoneNumAlter != "" && phoneNumAlter != null && phoneNumAlter != undefined) {
+							alertDialog.showMessage("有未通过的验证信息，请重新输入", "1", "");
+							return;
+						} else {
+							var param = {id:data.id,orgCode:orgCode,orgName:orgName,phoneNum:phoneNum,roleId:roleId,roleName:roleName,realName:realName,centNo:centNo};
+							IO({
+								url: 'userManageController/updateUser.action',
+								type: "post",
+								data : param,
+								dataType : 'json',
+								cache : false,
+								async : false,
+								success: function(data){
+									if (data) {
+							    		alertDialog.showMessage("修改成功", "1", null);
+							    		pageing.store.load();
+							    	} else {
+							    		alertDialog.showMessage("修改失败", "1", null);
+							    	}
+									
+								},
+								error: function(XMLHttpRequest, textStatus, errorThrown){
+								}
+							});
+							this.close();
+						}
+					}
+				} ,{
+				      text : '取消',
+				      elCls : 'button button-large button-move',
+				      handler : function() {
+		    			  this.close();
+				      }
+				}],
+				contentId: 'content'
+			});
+			Node.all("#userName").val(data.userName);
+			Node.all("#realName").val(data.realName);
+			Node.all("#orgCode").val(data.orgCode);
+			Node.all("#orgName").val(data.orgName);
+			Node.all("#phoneNum").val(data.phoneNum);
+			Node.all("#centNo").val(data.centNo);
+			Node.all("#roleId").val(data.roleId);
+			unitSelector.setSelectedValue(data.orgCode);
+			alertConfirmDialog.show();
+			Node.all(".bui-ext-close").css("display", "none");
+		};
+	};
+	return UserManage;
+},{
+    requires : ['event',
+                'common-module/src/pageing-grid',
+                'common-module/src/alertDialog',
+                'io',
+                'node',
+                'bui/overlay',
+                'common-module/src/validator',
+		'bui/select',
+		'bui/data']
+});

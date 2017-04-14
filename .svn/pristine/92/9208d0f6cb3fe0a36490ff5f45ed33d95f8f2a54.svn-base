@@ -1,0 +1,63 @@
+package po;
+
+public class FenceInfoDto extends TreeBaseDto{
+    private Integer id;
+
+    private String fenceName;
+
+    private String fenceType;
+
+    private String r1;
+
+    private String r2;
+
+    private String r3;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getFenceName() {
+        return fenceName;
+    }
+
+    public void setFenceName(String fenceName) {
+        this.fenceName = fenceName == null ? null : fenceName.trim();
+    }
+
+    public String getFenceType() {
+        return fenceType;
+    }
+
+    public void setFenceType(String fenceType) {
+        this.fenceType = fenceType == null ? null : fenceType.trim();
+    }
+
+    public String getR1() {
+        return r1;
+    }
+
+    public void setR1(String r1) {
+        this.r1 = r1 == null ? null : r1.trim();
+    }
+
+    public String getR2() {
+        return r2;
+    }
+
+    public void setR2(String r2) {
+        this.r2 = r2 == null ? null : r2.trim();
+    }
+
+    public String getR3() {
+        return r3;
+    }
+
+    public void setR3(String r3) {
+        this.r3 = r3 == null ? null : r3.trim();
+    }
+}

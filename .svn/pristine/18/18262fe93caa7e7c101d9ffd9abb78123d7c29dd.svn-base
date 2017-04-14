@@ -1,0 +1,192 @@
+body {
+	background: url(../img/bg.jpg);
+}
+@media (min-width: 768px) {
+  .container {
+    width: 750px !important;
+  }
+}
+@media (min-width: 992px) {
+  .container {
+    width: 970px !important;
+  }
+}
+@media (min-width: 1200px) {
+  .container {
+    width: 1170px !important;
+  }
+}
+@media (min-width: 1440px) {
+  .container {
+    width: 1400px !important;
+  }
+}
+@media (min-width: 1920px) {
+  .container {
+    width: 1850px !important;
+  }
+}
+
+/*项目部分*/
+.wrap {
+	width: auto;
+	margin: 0 50px;
+}
+
+.project-container {
+	height: auto;
+	border: 1px solid #dbdfd6;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+	border-radius: 5px;
+	background: #fff;
+	padding: 15px 30px 15px;
+	overflow: hidden;
+}
+
+.project-header {
+	overflow: hidden;
+	padding-bottom: 15px;
+	border-bottom: 2px solid #E6E6E6;
+}
+
+.project-header span {
+	display: inline-block;
+}
+
+.project-hd-info {
+	float: left;
+}
+
+.project-hd-info>label {
+	margin: 0;
+	line-height: 14px;
+	font-size: 13px;
+}
+
+.project-hd-info .project-team {
+	width: 150px;
+	font-size: 26px;
+}
+
+.project-hd-info .project-date {
+	font-size: 20px;
+	cursor: pointer;
+}
+
+.project-hd-info .project-name {
+	width: 142px;
+}
+
+.project-hd-info input {
+	margin: 0 3px 0 8px;
+}
+
+.project-links {
+	font-size: 12px;
+	float: right;
+	overflow: hidden;
+}
+
+.project-links a {
+	line-height: 24px;
+	text-align: center;
+	float: left;
+	border-right: 1px solid #999;
+	margin: 8px 0px;
+	padding: 0px 8px;
+}
+
+.project-links a span {
+	display: block;
+}
+
+.project-main {
+	height: auto;
+	margin-top: 20px;
+}
+
+.project-main .project-main-wrap>div {
+	vertical-align: top;
+	display: inline-block;
+}
+
+.project-main-wrap {
+	width: auto;
+	white-space: nowrap;
+	overflow-x: auto;
+}
+
+.main-common {
+	width: 250px;
+	min-height: 500px;
+	margin-right: 10px;
+	padding: 15px 10px;
+	border: 1px solid #DDDDDD;
+	border-radius: 10px;
+}
+
+.main-common .title {
+	font-size: 20px;
+	font-weight: bolder;
+	text-align: center;
+	margin: 0 auto;
+	padding-bottom: 10px;
+	letter-spacing: 3px;
+	border-bottom: 2px solid #9BCE37;
+}
+.main-common textarea{
+	 overflow-y: auto;
+	 border-radius: 5px;
+	 resize: none;
+}
+.main-common a {
+	display: block;
+	width: 100px;
+	margin: 20px auto;
+	text-align: center;
+	text-decoration: underline;
+}
+.main-common span{
+	right: -27%;
+	top: 4px;
+	cursor: pointer;
+}
+.task_common{
+	width: 100%;
+	margin: 10px auto;
+	padding: 10px 10px;
+	border: 1px solid #DDDDDD;
+	border-radius: 5px;
+}
+.marginTop{
+	margin-top: 20px;
+}
+.modal-body small{
+    margin-left: 70px;
+	color: #FF0000;
+}
+
+.modal-body i{
+    top: 0px;
+    right: 41px;
+}
+.glyphicon-remove{
+	position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.glyphicon-wrench{
+	position: absolute;
+    right: 12px;
+    top: 32px;
+    font-size: 15px;
+    cursor: pointer;
+}
+.task_common{
+	cursor: pointer;
+}
+.project-links a:hover,.project-links a:link{
+	text-decoration:none;
+}

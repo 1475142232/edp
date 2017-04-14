@@ -1,0 +1,903 @@
+package com.edp.service.tree;
+
+import com.alibaba.dubbo.common.utils.StringUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.edp.common.constant.Constants;
+import com.edp.common.constant.EDPCodeConstants;
+import com.edp.common.jedis.JedisUtils;
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.dao.domain.FunctionInfoPo;
+import com.edp.dao.domain.FunctionInfoPoCriteria;
+import com.edp.dao.domain.ModuleInfoPo;
+import com.edp.dao.domain.RequestmentTreePo;
+import com.edp.dao.domain.RequestmentTreePoCriteria;
+import com.edp.dao.domain.TaskInfoPo;
+import com.edp.dao.mapper.FunctionInfoPoMapper;
+import com.edp.dao.mapper.ModuleInfoPoMapper;
+import com.edp.dao.mapper.RequestmentTreePoMapper;
+import com.edp.dao.mapper.TaskInfoPoMapper;
+import com.edp.serviceI.dto.MasterDto;
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.dto.TreeDto;
+import com.edp.serviceI.product.ProductServiceI;
+import com.edp.serviceI.tree.TreeServiceI;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import redis.clients.jedis.Jedis;
+
+import org.activiti.editor.constants.ModelDataJsonConstants;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+@Service(value = "TreeService")
+public class TreeServiceImpl implements TreeServiceI {
+
+    @Resource
+    private ProductServiceI productServiceI;
+    @Resource
+    private RequestmentTreePoMapper requestmentTreePoMapper;
+    @Autowired
+    private FunctionInfoPoMapper functionInfoPoMapper;
+    @Autowired
+	private ModuleInfoPoMapper moduleInfoMapper;
+    @Autowired
+    private RepositoryService repositoryService; 
+    @Resource
+    private TaskInfoPoMapper taskInfoPoMapper;
+
+
+    private final Logger log = LoggerFactory.getLogger(TreeServiceImpl.class);
+
+    @Override
+    public List<TreeDto> findTreeById(List<String> treeId,String state) {
+    	String id="";
+    	for(int i=0;i<treeId.size();i++){
+    		if(i!=0){
+    		    id+=","+treeId.get(i);
+    		}else{
+    			id+=treeId.get(i);
+    		}
+    	}
+        List<RequestmentTreePo> rts = requestmentTreePoMapper.findTreeById(id,state);
+        List<TreeDto> trees = BeanCopyUtils.populateTListbyDListBySpring(rts, TreeDto.class);
+        return trees;
+    }
+
+    @Override
+    public Integer addTreeNode(RequestmentDto reqDto, String id) {
+        reqDto.setTreeNodeId(id);
+        reqDto.setTreeNodeVersion(0);
+        RequestmentTreePo rmtp = BeanCopyUtils.populateTbyDBySpring(reqDto, RequestmentTreePo.class);
+        return requestmentTreePoMapper.insert(rmtp);
+    }
+
+
+    @Override
+    public RequestmentDto findTreeNodeById(String id) {
+        RequestmentTreePo po = requestmentTreePoMapper.selectByPrimaryKey(id);
+        RequestmentDto dto = BeanCopyUtils.populateTbyDBySpring(po, RequestmentDto.class);
+        return dto;
+    }
+
+    @Override
+    public Integer editTreeNode(RequestmentDto reqDto) {
+        RequestmentTreePo po = BeanCopyUtils.populateTbyDBySpring(reqDto, RequestmentTreePo.class);
+        return requestmentTreePoMapper.updateByPrimaryKeySelective(po);
+    }
+
+    @Override
+    public Integer delTreeNode(String id) {
+        return requestmentTreePoMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public Integer findCNodeByPid(String pId) {
+        RequestmentTreePoCriteria example = new RequestmentTreePoCriteria();
+        RequestmentTreePoCriteria.Criteria rc = example.createCriteria();
+        rc.andTreeNodeParentEqualTo(pId);
+        return requestmentTreePoMapper.countByExample(example);
+    }
+
+    @Override
+    public String addTreeNodeByProductId(String pId, String userName, String name, String type, String productId) {
+        //获取系统时间
+        Date today = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        RequestmentDto mDto = new RequestmentDto();
+        String mId = SequenceManage.getSequence("");
+        mDto.setId(mId);
+        mDto.setTreeNodeLevels(2);
+        mDto.setTreeNodeType(type);
+        mDto.setTreeNodeIfLeaf("0");
+        mDto.setTreeNodeParent(pId);
+        mDto.setTreeNodeName(name);
+        mDto.setTreeNodeCreateperson(userName);
+        mDto.setTreeNodeCreatetime(sdf.format(today));
+        mDto.setTreeNodeId(productId);
+        RequestmentTreePo rmtp = BeanCopyUtils.populateTbyDBySpring(mDto, RequestmentTreePo.class);
+        requestmentTreePoMapper.insert(rmtp);
+        return mId;
+    }
+
+    @Override
+    public String addTreeNodeByModuleId(String pId, String userName, String name, String type, String productId) {
+        //获取系统时间
+        Date today = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        RequestmentDto mDto = new RequestmentDto();
+        String mId = SequenceManage.getSequence("");
+        mDto.setId(mId);
+        mDto.setTreeNodeLevels(3);
+        mDto.setTreeNodeType(type);
+        mDto.setTreeNodeIfLeaf("1");
+        mDto.setTreeNodeParent(pId);
+        mDto.setTreeNodeName(name);
+        mDto.setTreeNodeCreateperson(userName);
+        mDto.setTreeNodeCreatetime(sdf.format(today));
+        mDto.setTreeNodeId(productId);
+        RequestmentTreePo rmtp = BeanCopyUtils.populateTbyDBySpring(mDto, RequestmentTreePo.class);
+        requestmentTreePoMapper.insert(rmtp);
+        return mId;
+    }
+
+    @Override
+    public Integer findCountTreeById(String id) {
+        RequestmentTreePoCriteria example = new RequestmentTreePoCriteria();
+        RequestmentTreePoCriteria.Criteria rc = example.createCriteria();
+        rc.andTreeNodeParentEqualTo(id);
+        List<RequestmentTreePo> rts = requestmentTreePoMapper.selectByExample(example);
+        return rts.size();
+    }
+
+    @Override
+    public List<String> findNodeByLevel(String treeNodeId, Integer treeNodeLevels,String state) {
+        List<String> s = new ArrayList<>();
+        try{
+           s= requestmentTreePoMapper.findNodeByLevel(treeNodeId, treeNodeLevels,state);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return s;
+    }
+
+    @Override
+    public RequestmentDto findTreeNodeId(String id) {
+        RequestmentTreePo po = requestmentTreePoMapper.selectByPrimaryKey(id);
+        RequestmentDto dto = BeanCopyUtils.populateTbyDBySpring(po, RequestmentDto.class);
+        return dto;
+    }
+
+    @Override
+    public List<RequestmentDto> findTreeNodesById(String pId) {
+        RequestmentTreePoCriteria example = new RequestmentTreePoCriteria();
+        RequestmentTreePoCriteria.Criteria rc = example.createCriteria();
+        rc.andTreeNodeParentEqualTo(pId);
+        List<RequestmentTreePo> rts = requestmentTreePoMapper.selectByExample(example);
+        List<RequestmentDto> dto = BeanCopyUtils.populateTListbyDListBySpring(rts, RequestmentDto.class);
+        return dto;
+    }
+
+    @Override
+    public Integer delTreeNodesByNodeId(String id) {
+        RequestmentTreePoCriteria example = new RequestmentTreePoCriteria();
+        RequestmentTreePoCriteria.Criteria rc = example.createCriteria();
+        rc.andTreeNodeIdEqualTo(id);
+        return requestmentTreePoMapper.deleteByExample(example);
+    }
+
+    @Override
+    public RequestmentDto getDOCbyProductId(String id) {
+
+        //获取叶节点
+        RequestmentTreePoCriteria example = new RequestmentTreePoCriteria();
+        RequestmentTreePoCriteria.Criteria rc = example.createCriteria();
+        rc.andTreeNodeParentEqualTo(id);
+        List<RequestmentTreePo> rts = requestmentTreePoMapper.selectByExample(example);
+        RequestmentTreePo po = rts.get(0);//根节点只有一个
+        RequestmentDto dto = BeanCopyUtils.populateTbyDBySpring(po, RequestmentDto.class);
+        return findTree(dto);
+    }
+
+    private RequestmentDto findTree(RequestmentDto sp) {
+        RequestmentTreePoCriteria example = new RequestmentTreePoCriteria();
+        RequestmentTreePoCriteria.Criteria rc = example.createCriteria();
+        rc.andTreeNodeParentEqualTo(sp.getId());
+        rc.andTreeNodeStateEqualTo("66");
+        List<RequestmentTreePo> s = requestmentTreePoMapper.selectByExample(example);
+        List<RequestmentDto> sd = BeanCopyUtils.populateTListbyDListBySpring(s, RequestmentDto.class);
+        if (sd.size() != 0) {
+            sp.setChildren(sd);
+            for (int i = 0; i < sd.size(); i++) {
+                sd.set(i, findTree(sd.get(i)));
+            }
+        }
+        return sp;
+    }
+
+    /**
+     * 正常需求确认,根据产品编号查出需求树中所有节点状态为正常新增/正常修改的记录,
+     * 将这些记录的节点状态更新为正常确认.
+     *
+     * @param productId 产品编号
+     * @return RequestmentDto
+     * @author changer  2016-5-23
+     */
+    @Override
+    public RequestmentDto normalRequestmentComfirm(String productId,Integer version) {
+
+        log.info("normalRequestmentComfirm==>start");
+
+        RequestmentTreePoCriteria example = new RequestmentTreePoCriteria();
+        RequestmentTreePoCriteria.Criteria criteria = example.createCriteria();
+        FunctionInfoPoCriteria funexample = new FunctionInfoPoCriteria();
+        FunctionInfoPoCriteria.Criteria functionCriteria = funexample.createCriteria();
+
+        RequestmentDto rtn = new RequestmentDto();
+        FunctionInfoPo fun = new FunctionInfoPo();
+
+
+        log.info("normalRequestmentComfirm==>productid=" + productId);
+        if (StringUtils.isEmpty(productId)) {
+            rtn.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+        } else {
+
+            criteria.andTreeNodeIdEqualTo(productId);//查询条件   -产品编号-查出整棵树
+
+            criteria.andTreeNodeStateEqualTo(Constants.TreeStates.NORMAL_ADD);
+
+
+           
+            List<RequestmentTreePo> reqs=requestmentTreePoMapper.selectByExample(example);
+            
+            if(reqs != null && reqs.size()>0){//存在新增的节点
+                RequestmentTreePo requestmentTreePo = new RequestmentTreePo();
+
+
+                requestmentTreePo.setTreeNodeState(Constants.TreeStates.REQUESTMENT_COMFIRMED);
+                requestmentTreePo.setTreeNodeVersion(version+1);
+                requestmentTreePoMapper.updateByExampleSelective(requestmentTreePo, example);
+                List<String> values=new ArrayList<String>();
+                for(int i=0;i<reqs.size();i++){
+                	values.add(reqs.get(i).getId());
+                }
+                fun.setVersion(Byte.parseByte(version+1+""));
+                fun.setFuncState(Constants.TreeStates.REQUESTMENT_COMFIRMED);
+                functionCriteria.andVersionEqualTo(Byte.parseByte("0"));
+                functionCriteria.andFuncIdIn(values);
+                functionInfoPoMapper.updateByExampleSelective(fun, funexample);
+                log.info("normalRequestmentComfirm==>更新需求树节点状态:正常确认");
+
+                //更新产品版本号,规则:原版本号+1
+                productServiceI.updateProductVersion(productId);
+            }
+            
+
+
+            rtn.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+        }
+
+        log.info("normalRequestmentComfirm==>end");
+        return rtn;
+    }
+
+
+    /**
+     * 变更需求确认,根据产品编号查出需求树中所有节点状态为变更新增/变更修改的记录,
+     * 将这些记录的节点状态更新为变更确认.
+     *
+     * @param productId 产品编号
+     * @return RequestmentDto
+     * @author changer  2016-5-23
+     */
+    @Override
+    public RequestmentDto changeRequestmentComfirm(String productId,Integer version) {
+
+        log.info("changeRequestmentComfirm==>start");
+
+
+        RequestmentDto rtn = new RequestmentDto();
+
+
+
+        log.info("changeRequestmentComfirm==>productid=" + productId);
+        if (StringUtils.isEmpty(productId)) {
+            rtn.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+        } else {
+            RequestmentTreePoCriteria example = new RequestmentTreePoCriteria();
+            RequestmentTreePoCriteria.Criteria criteria = example.createCriteria();
+            FunctionInfoPoCriteria funexample = new FunctionInfoPoCriteria();
+            FunctionInfoPoCriteria.Criteria functionCriteria = funexample.createCriteria();
+            criteria.andTreeNodeIdEqualTo(productId);//查询条件   -产品编号-查出整棵树
+
+            criteria.andTreeNodeStateEqualTo(Constants.TreeStates.CHANGE_ADD);//状态:正常新增,正常修改
+            
+            List<RequestmentTreePo> reqs=requestmentTreePoMapper.selectByExample(example);
+            List<RequestmentTreePo> requestment=requestmentTreePoMapper.findfuncByState(productId);
+            reqs.addAll(requestment);
+            if(reqs != null && reqs.size()>0){
+                FunctionInfoPo fun = new FunctionInfoPo();
+                fun.setVersion(Byte.parseByte(version+1+""));
+                fun.setFuncState("66");
+                functionCriteria.andVersionEqualTo(Byte.parseByte("0"));
+                functionInfoPoMapper.updateByExampleSelective(fun, funexample);
+
+                RequestmentTreePo requestmentTreePo = new RequestmentTreePo();
+
+                requestmentTreePo.setTreeNodeId(productId);
+
+                requestmentTreePo.setTreeNodeState(Constants.TreeStates.REQUESTMENT_COMFIRMED);
+                requestmentTreePo.setTreeNodeVersion(version+1);
+                //更新需求树节点状态
+
+                requestmentTreePoMapper.updateByExampleSelective(requestmentTreePo, example);
+
+                List<String> values=new ArrayList<String>();
+                for(int i=0;i<reqs.size();i++){
+                    values.add(reqs.get(i).getId());
+                }
+                fun.setVersion(Byte.parseByte(version+1+""));
+                fun.setFuncState("66");
+                functionCriteria.andVersionEqualTo(Byte.parseByte("0"));
+                functionCriteria.andFuncIdIn(values);
+                functionInfoPoMapper.updateByExampleSelective(fun, funexample);
+                log.info("changeRequestmentComfirm==>更新需求树节点状态:变更确认");
+                FunctionInfoPoCriteria funexamples = new FunctionInfoPoCriteria();
+                FunctionInfoPoCriteria.Criteria functionCriterias = funexamples.createCriteria();
+                functionCriterias.andVersionLessThan(Byte.parseByte(version+1+""));
+                functionCriterias.andFuncIdIn(values);
+                functionInfoPoMapper.deleteByExample(funexamples);
+                //更新产品版本号,规则:原版本号+1
+                productServiceI.updateProductVersion(productId);
+            }
+
+
+            
+
+            rtn.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+        }
+
+        log.info("changeRequestmentComfirm==>end");
+        return rtn;
+    }
+
+	@Override
+	public String findModuleIdByName(String module_name, String id,String user,String time) {
+        RequestmentTreePoCriteria example = new RequestmentTreePoCriteria();
+        RequestmentTreePoCriteria.Criteria rc = example.createCriteria();
+        rc.andTreeNodeIdEqualTo(id);
+        rc.andTreeNodeNameEqualTo(module_name);
+        List<RequestmentTreePo> rts = requestmentTreePoMapper.selectByExample(example);
+        if(rts.size()!=0){
+        	return rts.get(0).getId();
+        }else{
+        	ModuleInfoPo module = new ModuleInfoPo();
+        	String module_id = SequenceManage.getSequence("");
+            module.setId(module_id);
+            module.setModuleName(module_name);
+            moduleInfoMapper.insert(module);
+        	return id;
+        }
+		
+	}
+
+	@Override
+	public List<Object> findRequestById(String tree01,String tree11,String tree66) {
+		List<Object> count = new ArrayList<Object>();
+		if(tree66==null || tree66.equals("")){
+			return count;
+		}
+		String[] name={"场景","功能","原型图","数据表"};
+		Integer ll=0;
+		Integer ly=0;
+		Integer yy=0;
+		for(int i=0;i<name.length;i++){ 
+			JSONObject a = JSON.parseObject(tree66); 
+			if(a.containsKey("children") == true){
+				JSONArray jsonArra= (JSONArray)a.get("children");
+				JSONObject b = jsonArra.getJSONObject(i);
+				if(b.containsKey("children") == true){
+					JSONArray jsonArrb= (JSONArray)b.get("children");
+					ll=jsonArrb.size();
+					JSONObject c = JSON.parseObject(tree01); 
+					if(c.containsKey("children") == true){
+						JSONArray jsonArrc= (JSONArray)c.get("children");
+						JSONObject d = jsonArrc.getJSONObject(i);
+						if(d.containsKey("children") == true){
+							JSONArray jsonArrd=(JSONArray)d.get("children");
+							ly=jsonArrd.size()-ll;
+						}
+					}
+					JSONObject e = JSON.parseObject(tree11);
+					if(e.containsKey("children") == true){
+						JSONArray jsonArre= (JSONArray)e.get("children");
+						JSONObject d = jsonArre.getJSONObject(i);
+						if(d.containsKey("children") == true){
+							JSONArray jsonArrd=(JSONArray)d.get("children");
+							yy=jsonArrd.size()-ll;
+						}
+					}
+				}
+		    }
+			String c="已确认"+name[i]+",未确认"+name[i]+",变更未确认"+name[i]+";"+ll+","+ly+","+yy;
+			count.add(c);
+		}
+		return count;
+	}
+
+	@Override
+	public List<RequestmentDto> findTreeNodepId(String pId,String type) {
+		RequestmentTreePoCriteria example = new RequestmentTreePoCriteria();
+        RequestmentTreePoCriteria.Criteria rc = example.createCriteria();
+        rc.andTreeNodeTypeEqualTo(type);
+        rc.andTreeNodeIdEqualTo(pId);
+        List<RequestmentTreePo> rts = requestmentTreePoMapper.selectByExample(example);
+        List<RequestmentDto> sd = BeanCopyUtils.populateTListbyDListBySpring(rts, RequestmentDto.class);
+		return sd;
+	}
+
+	@Override
+	public void newModel(String id) {
+		ObjectMapper objectMapper = new ObjectMapper();   
+		ObjectNode  modelObjectNode  =  objectMapper.createObjectNode();     
+		modelObjectNode.put(ModelDataJsonConstants.MODEL_NAME,  "标题");     
+		modelObjectNode.put(ModelDataJsonConstants.MODEL_REVISION, 1);     
+		modelObjectNode.put(ModelDataJsonConstants.MODEL_DESCRIPTION,     
+				org.apache.commons.lang3.StringUtils           
+				.defaultString("描述"));
+	    Model newModel = repositoryService.newModel();
+	    newModel.setMetaInfo(modelObjectNode.toString());   
+	    newModel.setName("标题");   
+	    newModel.setKey(id);
+	    newModel.setVersion(0);
+	    repositoryService.saveModel(newModel);    
+	    
+	    //保存二进制流程
+	    ObjectNode editorNode = objectMapper.createObjectNode();   
+	    editorNode.put("id", "canvas");    
+	    editorNode.put("resourceId", "canvas");
+	    ObjectNode stencilSetNode = objectMapper.createObjectNode(); 
+	    stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");    
+	    editorNode.put("stencilset", stencilSetNode);
+	    ArrayNode arrayNode = objectMapper.createArrayNode();
+	    editorNode.put("childShapes", arrayNode);  
+	    try {
+			repositoryService.addModelEditorSource(newModel.getId(), editorNode.toString().getBytes("utf-8"));
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	@Override
+	public   List<RequestmentDto> findAllTree(RequestmentDto reqDto) {
+		 RequestmentTreePoCriteria example = new RequestmentTreePoCriteria();
+	     RequestmentTreePoCriteria.Criteria rc = example.createCriteria();
+	     rc.andTreeNodeIdEqualTo(reqDto.getTreeNodeId());
+	     rc.andTreeNodeTypeEqualTo(reqDto.getTreeNodeType());
+	     if(reqDto.getTreeNodeName()!=null && reqDto.getTreeNodeName()!=""){
+	    	 rc.andTreeNodeNameLike(reqDto.getTreeNodeName());
+	     }
+	     List<RequestmentTreePo> rts = requestmentTreePoMapper.selectByExample(example);
+	     List<RequestmentDto> trees = BeanCopyUtils.populateTListbyDListBySpring(rts, RequestmentDto.class);
+	     return trees;
+		
+	}
+
+	@Override
+	public List<String> findTreeIdByPid(String id) {
+		RequestmentTreePo po = requestmentTreePoMapper.selectByPrimaryKey(id);
+		if(po!=null){
+		    return requestmentTreePoMapper.findTreeIdByPid(po.getTreeId());
+		}else{
+			return requestmentTreePoMapper.findTreeIdByPid(id);
+		}
+	}
+
+	@Override
+	public MasterDto addTreeNode(MasterDto masterDto) {
+		RequestmentTreePo po = BeanCopyUtils.populateTbyDBySpring(masterDto, RequestmentTreePo.class);
+		requestmentTreePoMapper.insert(po);
+		return masterDto;
+	}
+
+	@Override
+	public Integer addMasterTmp(String json, String id,String type) {
+		return requestmentTreePoMapper.addMasterTmp(json,id,type);
+	}
+
+	@Override
+	public String findJsonTreeById(String id,String type) {
+		return requestmentTreePoMapper.findJsonTreeById(id,type);
+	}
+
+	@Override
+	public Integer editTreeByProductId(String productId, String resulet,String state) {
+		return requestmentTreePoMapper.editTreeByProductId(productId,resulet,state);
+	}
+
+	@Override
+	public String EnterTree(String productId,String type,String time) {
+		List<Object> master = new ArrayList<Object>();
+		String tree;
+		String state;
+		ProductDto productDto=productServiceI.getProductById(productId);
+		Jedis client = JedisUtils.getJedis();
+		if(type.equals("2")){
+			state="01";
+			String change=client.get("CHANGE_NODE");
+			Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			master=Constants.CHANGE_NODE.get(productId);
+			tree=requestmentTreePoMapper.findJsonTreeById(productId,state);
+			requestmentTreePoMapper.updateTreeNodeState(productId,"11");			
+		}else{
+			state="11";
+			String change=client.get("NORMAL_NODE");
+			Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			master=Constants.NORMAL_NODE.get(productId);
+			tree=requestmentTreePoMapper.findJsonTreeById(productId,state);
+			requestmentTreePoMapper.updateTreeNodeState(productId,"01");
+		}
+		String bg=requestmentTreePoMapper.findJsonTreeById(productId,state);
+		if(bg==null){
+			tree=requestmentTreePoMapper.findJsonTreeById(productId,"01");
+			requestmentTreePoMapper.addMasterTmp(tree, productId, "11");
+			Constants.NORMAL_NODE.get(productId).clear();
+			String normal=client.get("NORMAL_NODE");
+			Map<String,List<Object>> JsonNormal=(Map<String,List<Object>>)JSON.parse(normal);
+			JsonNormal.put(productId, new ArrayList<Object>());
+			client.set("NORMAL_NODE", JSON.toJSONString(JsonNormal));
+//			client.set("NORMAL_NODE", JSON.toJSONString(new ArrayList<Object>()));
+			JSONObject a = JSON.parseObject(tree); 
+			JSONArray jsonArr = (JSONArray) a.get("children");
+			//后台功能工单
+			JSONObject b= (JSONObject)jsonArr.get(1);
+			if(b.containsKey("children") == false){
+			   b.put("children", new JSONArray());
+			}
+			JSONArray jsonArrs= (JSONArray)b.get("children");
+			for(int i=0;i<jsonArrs.size();i++){
+			   JSONObject c=(JSONObject)jsonArrs.get(i);
+			   if(c.containsKey("children") == false){
+				  c.put("children", new JSONArray());
+			   }
+			   JSONArray jsonArrc= (JSONArray)c.get("children");
+			   String gname=(String) c.get("text");
+			   for(int j=0;j<jsonArrc.size();j++){
+				   JSONObject d=(JSONObject)jsonArrc.get(j);
+				   TaskInfoPo task=new TaskInfoPo();
+				   task.setTaskId((String)d.get("id"));
+				   task.setTaskName(gname+"-"+d.get("text"));
+				   task.setTaskState("00");
+				   task.setTaskType("20");
+				   task.setProductId(productDto.getId());
+				   task.setProductName(productDto.getProductName());
+				   task.setTaskCreateTime(time);
+				   task.setTaskVersion(1);
+				   taskInfoPoMapper.insert(task);
+			   }
+			}
+			//前端工单
+			JSONObject e= (JSONObject)jsonArr.get(2);
+			if(e.containsKey("children") == false){
+			   e.put("children", new JSONArray());
+			}
+			JSONArray jsonArre= (JSONArray)e.get("children");
+			for(int i=0;i<jsonArre.size();i++){
+				JSONObject f=(JSONObject)jsonArre.get(i);
+				TaskInfoPo task=new TaskInfoPo();
+				task.setTaskId((String)f.get("id"));
+				task.setTaskName((String)f.get("text"));
+				task.setTaskState("00");
+			    task.setTaskType("10");
+				task.setProductId(productDto.getId());
+				task.setProductName(productDto.getProductName());
+				task.setTaskCreateTime(time);
+				task.setTaskVersion(1);
+			    taskInfoPoMapper.insert(task);
+			}
+			requestmentTreePoMapper.editTreeByProductId(productId,tree,state);
+//			Integer version=productDto.getProductVersion();
+//			productDto.setProductVersion(productDto.getProductVersion()+1);
+			productServiceI.updateProduct(productDto);
+//			requestmentTreePoMapper.insertMaster(tree,productId,version);
+			return tree;
+		}
+		for(int i=0;i<master.size();i++){
+			MasterDto masterDto = JSON.parseObject(master.get(i).toString(),MasterDto.class);
+			System.out.println(masterDto.getId()+","+masterDto.getTreeId());
+			if(masterDto.getId().equals(masterDto.getTreeId())){
+				tree=addEnterTreeByType(tree,masterDto,productDto,time);
+			}else{
+				tree=editEnterTreeByType(tree,masterDto,productDto,time);
+			}
+		}
+		if(type.equals("2")){
+			String normal=client.get("CHANGE_NODE");
+			Map<String,List<Object>> JsonNormal=(Map<String,List<Object>>)JSON.parse(normal);
+			JsonNormal.put(productId, new ArrayList<Object>());
+			client.set("CHANGE_NODE", JSON.toJSONString(JsonNormal));
+//			client.set("CHANGE_NODE", JSON.toJSONString(new ArrayList<Object>()));
+		}else{
+			String normal=client.get("NORMAL_NODE");
+			Map<String,List<Object>> JsonNormal=(Map<String,List<Object>>)JSON.parse(normal);
+			JsonNormal.put(productId, new ArrayList<Object>());
+			client.set("NORMAL_NODE", JSON.toJSONString(JsonNormal));
+//			client.set("NORMAL_NODE", JSON.toJSONString(new ArrayList<Object>()));
+		}
+		JedisUtils.returnResource(client);
+		requestmentTreePoMapper.editTreeByProductId(productId,tree,state);
+//		Integer version=productDto.getProductVersion();
+//		productDto.setProductVersion(productDto.getProductVersion()+1);
+//		productServiceI.updateProduct(productDto);
+//		requestmentTreePoMapper.insertMaster(tree,productId,version);
+		return tree;
+	}
+    
+	private String addEnterTreeByType(String tree,MasterDto masterDto,ProductDto productDto,String time){
+		JSONObject a = JSON.parseObject(tree); 
+		JSONArray jsonArr = (JSONArray) a.get("children");
+		if(masterDto.getTreeNodeType().equals("6")){//分组
+			 JSONObject b= (JSONObject)jsonArr.get(1);
+      	     if(b.containsKey("children") == false){
+ 				b.put("children", new JSONArray());
+ 			 }
+			 JSONArray jsonArrs= (JSONArray)b.get("children");
+			 jsonArrs.add(JSON.parseObject(JSON.toJSONString(masterDto)));
+		}
+		if(masterDto.getTreeNodeType().equals("7")){//功能
+			JSONObject b= (JSONObject)jsonArr.get(1);
+     	     if(b.containsKey("children") == false){
+				b.put("children", new JSONArray());
+			 }
+			JSONArray jsonArrs= (JSONArray)b.get("children");
+			for(int i=0;i<jsonArrs.size();i++){
+			   JSONObject c=(JSONObject)jsonArrs.get(i);
+			   String gname=(String) c.get("text");
+               if(c.get("id").equals(masterDto.getTreeNodeParent())){
+            	   if(c.containsKey("children") == false){
+       				  c.put("children", new JSONArray());
+       			   }
+            	   JSONArray jsonArrc= (JSONArray)c.get("children");
+            	   jsonArrc.add(JSON.parseObject(JSON.toJSONString(masterDto)));
+            	   TaskInfoPo task=new TaskInfoPo();
+   				   task.setTaskId(masterDto.getId());
+   				   task.setTaskName(gname+"-"+masterDto.getTreeNodeName());
+   				   task.setTaskState("00");
+   			       task.setTaskType("20");
+   				   task.setProductId(productDto.getId());
+   				   task.setProductName(productDto.getProductName());
+   				   task.setTaskCreateTime(time);
+//   			       task.setTaskVersion(productDto.getProductVersion());
+   			       taskInfoPoMapper.insert(task);
+               }
+			}
+		}
+		if(masterDto.getTreeNodeType().equals("8")){//场景
+			JSONObject b= (JSONObject)jsonArr.get(0);
+     	     if(b.containsKey("children") == false){
+				b.put("children", new JSONArray());
+			 }
+		    JSONArray jsonArrs= (JSONArray)b.get("children");
+		    jsonArrs.add(JSON.parseObject(JSON.toJSONString(masterDto)));
+		}
+		if(masterDto.getTreeNodeType().equals("9")){//表
+			JSONObject b= (JSONObject)jsonArr.get(3);
+			 if(b.containsKey("children") == false){
+				b.put("children", new JSONArray());
+			 }
+		    JSONArray jsonArrs= (JSONArray)b.get("children");
+		    jsonArrs.add(JSON.parseObject(JSON.toJSONString(masterDto)));
+		}
+		if(masterDto.getTreeNodeType().equals("10")){//字段
+			JSONObject b= (JSONObject)jsonArr.get(3);
+     	     if(b.containsKey("children") == false){
+				b.put("children", new JSONArray());
+			 }
+			JSONArray jsonArrs= (JSONArray)b.get("children");
+			for(int i=0;i<jsonArrs.size();i++){
+				JSONObject c=(JSONObject)jsonArrs.get(i);
+	      	     if(c.containsKey("children") == false){
+	  				c.put("children", new JSONArray());
+	  			 }
+				if(c.get("id").equals(masterDto.getTreeNodeParent())){
+					JSONArray jsonArrc= (JSONArray)c.get("children");
+					System.out.println(JSON.toJSONString(masterDto));
+	            	   jsonArrc.add(JSON.parseObject(JSON.toJSONString(masterDto)));
+				}
+			}
+		}
+		if(masterDto.getTreeNodeType().equals("12")){//原型图
+			JSONObject b= (JSONObject)jsonArr.get(2);
+            if(b.containsKey("children") == false){
+                b.put("children", new JSONArray());
+            }
+		    JSONArray jsonArrs= (JSONArray)b.get("children");
+		    jsonArrs.add(JSON.parseObject(JSON.toJSONString(masterDto)));
+		    TaskInfoPo task=new TaskInfoPo();
+			task.setTaskId(masterDto.getId());
+			task.setTaskName(masterDto.getTreeNodeName());
+			task.setTaskState("00");
+		    task.setTaskType("10");
+		    task.setProductId(productDto.getId());
+			task.setProductName(productDto.getProductName());
+			task.setTaskCreateTime(time);
+//			task.setTaskVersion(productDto.getProductVersion());
+		    taskInfoPoMapper.insert(task);
+		}
+		return JSON.toJSONString(a);
+	}
+	
+	private String editEnterTreeByType(String tree,MasterDto masterDto,ProductDto productDto,String time){
+		JSONObject a = JSON.parseObject(tree); 
+		JSONArray jsonArr = (JSONArray) a.get("children");
+		if(masterDto.getTreeNodeType().equals("6")){//分组
+			 JSONObject b= (JSONObject)jsonArr.get(1);
+			 if(b.containsKey("children") == false){
+				b.put("children", new JSONArray());
+			 }
+			 JSONArray jsonArrs= (JSONArray)b.get("children");
+			 for(int i=0;i<jsonArrs.size();i++){
+			    JSONObject c=(JSONObject)jsonArrs.get(i);
+				 if(c.containsKey("children") == false){
+						c.put("children", new JSONArray());
+					 }
+			    if(c.get("id").equals(masterDto.getTreeId())){
+			    	masterDto.setTreeId(masterDto.getId());
+			        jsonArrs.set(i, JSON.parseObject(JSON.toJSONString(masterDto)));
+			    }
+			 }
+		}
+		if(masterDto.getTreeNodeType().equals("7")){//功能
+			JSONObject b= (JSONObject)jsonArr.get(1);
+			 if(b.containsKey("children") == false){
+				b.put("children", new JSONArray());
+			 }
+			JSONArray jsonArrs= (JSONArray)b.get("children");
+			for(int i=0;i<jsonArrs.size();i++){
+			   JSONObject c=(JSONObject)jsonArrs.get(i);
+				if(c.containsKey("children") == false){
+					c.put("children", new JSONArray());
+				}
+				String gname = (String)c.get("text");
+			    JSONArray jsonArrc= (JSONArray)c.get("children");
+			    for(int j=0;j<jsonArrc.size();j++){
+				   JSONObject d=(JSONObject)jsonArrc.get(j);
+				   if(d.get("id").equals(masterDto.getTreeId())){
+				       masterDto.setTreeId(masterDto.getId());
+				       jsonArrc.set(j, JSON.parseObject(JSON.toJSONString(masterDto)));
+				       TaskInfoPo task=new TaskInfoPo();
+	   				   task.setTaskId(masterDto.getId());
+	   				   task.setTaskName(gname+"-"+masterDto.getTreeNodeName());
+	   				   task.setTaskState("00");
+	   			       task.setTaskType("20");
+	   				   task.setProductId(productDto.getId());
+	   				   task.setProductName(productDto.getProductName());
+	   				   task.setTaskCreateTime(time);
+//	   			       task.setTaskVersion(productDto.getProductVersion());
+	   			       taskInfoPoMapper.insert(task);
+				   }
+			   }
+			}
+		}
+		if(masterDto.getTreeNodeType().equals("8")){//场景
+			JSONObject b= (JSONObject)jsonArr.get(0);
+			 if(b.containsKey("children") == false){
+				b.put("children", new JSONArray());
+			 }
+			JSONArray jsonArrs= (JSONArray)b.get("children");
+			for(int i=0;i<jsonArrs.size();i++){
+			   JSONObject c=(JSONObject)jsonArrs.get(i);
+				 if(c.containsKey("children") == false){
+						c.put("children", new JSONArray());
+					 }
+			   if(c.get("id").equals(masterDto.getTreeId())){
+			      masterDto.setTreeId(masterDto.getId());
+			      jsonArrs.set(i, JSON.parseObject(JSON.toJSONString(masterDto)));
+			   }
+			}
+		}
+		if(masterDto.getTreeNodeType().equals("9")){//表
+			JSONObject b= (JSONObject)jsonArr.get(3);
+			 if(b.containsKey("children") == false){
+				b.put("children", new JSONArray());
+			 }
+			JSONArray jsonArrs= (JSONArray)b.get("children");
+			for(int i=0;i<jsonArrs.size();i++){
+			   JSONObject c=(JSONObject)jsonArrs.get(i);
+				if(c.containsKey("children") == false){
+					c.put("children", new JSONArray());
+				}
+			   if(c.get("id").equals(masterDto.getTreeId())){
+			      masterDto.setTreeId(masterDto.getId());
+			      jsonArrs.set(i, JSON.parseObject(JSON.toJSONString(masterDto)));
+			   }
+			}
+		}
+		if(masterDto.getTreeNodeType().equals("10")){//字段
+			JSONObject b= (JSONObject)jsonArr.get(3);
+			 if(b.containsKey("children") == false){
+				b.put("children", new JSONArray());
+			 }
+			JSONArray jsonArrs= (JSONArray)b.get("children");
+			for(int i=0;i<jsonArrs.size();i++){
+			   JSONObject c=(JSONObject)jsonArrs.get(i);
+				 if(c.containsKey("children") == false){
+						c.put("children", new JSONArray());
+					 }
+			   JSONArray jsonArrc= (JSONArray)c.get("children");
+			   for(int j=0;j<jsonArrc.size();j++){
+				   JSONObject d=(JSONObject)jsonArrc.get(j);
+				   if(d.get("id").equals(masterDto.getTreeId())){
+				       masterDto.setTreeId(masterDto.getId());
+				       jsonArrc.set(j, JSON.parseObject(JSON.toJSONString(masterDto)));
+				   }
+			   }
+			}
+		}
+		if(masterDto.getTreeNodeType().equals("12")){//原型图
+			JSONObject b= (JSONObject)jsonArr.get(2);
+			 if(b.containsKey("children") == false){
+				b.put("children", new JSONArray());
+			 }
+			JSONArray jsonArrs= (JSONArray)b.get("children");
+			for(int i=0;i<jsonArrs.size();i++){
+			   JSONObject c=(JSONObject)jsonArrs.get(i);
+				 if(c.containsKey("children") == false){
+						c.put("children", new JSONArray());
+					 }
+			   if(c.get("id").equals(masterDto.getTreeId())){
+			      masterDto.setTreeId(masterDto.getId());
+			      jsonArrs.set(i, JSON.parseObject(JSON.toJSONString(masterDto)));
+			       TaskInfoPo task=new TaskInfoPo();
+  				   task.setTaskId(masterDto.getId());
+  				   task.setTaskName(masterDto.getTreeNodeName());
+  				   task.setTaskState("00");
+  			       task.setTaskType("10");
+  				   task.setProductId(productDto.getId());
+  				   task.setProductName(productDto.getProductName());
+  				   task.setTaskCreateTime(time);
+//  			       task.setTaskVersion(productDto.getProductVersion());
+  			       taskInfoPoMapper.insert(task);
+			   }
+			}
+		}
+		return JSON.toJSONString(a);
+	}
+
+	@Override
+	public Integer findCountNotEnterByTreeId(String productId,String state) {
+		return requestmentTreePoMapper.findCountNotEnterByTreeId(productId,state);
+	}
+
+	@Override
+	public String findEnterTreeById(String productId,Integer version) {
+		
+		return requestmentTreePoMapper.findEnterTreeById(productId,version);
+	}
+
+}

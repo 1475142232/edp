@@ -1,0 +1,83 @@
+package com.edp.dao.domain;
+
+public class TableInfoPo {
+    private String id;
+
+    private String tableCnName;
+
+    private String tableEnName;
+
+    private String tableSpec;
+
+    private String tableCreateTime;
+
+    private String tableCreater;
+
+    private String tableModifiedTime;
+
+    private String tableModifiedPerson;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
+    }
+
+    public String getTableCnName() {
+        return tableCnName;
+    }
+
+    public void setTableCnName(String tableCnName) {
+        this.tableCnName = tableCnName == null ? null : tableCnName.trim();
+    }
+
+    public String getTableEnName() {
+        return tableEnName;
+    }
+
+    public void setTableEnName(String tableEnName) {
+        this.tableEnName = tableEnName == null ? null : tableEnName.trim();
+    }
+
+    public String getTableSpec() {
+        return tableSpec;
+    }
+
+    public void setTableSpec(String tableSpec) {
+        this.tableSpec = tableSpec == null ? null : tableSpec.trim();
+    }
+
+    public String getTableCreateTime() {
+        return tableCreateTime;
+    }
+
+    public void setTableCreateTime(String tableCreateTime) {
+        this.tableCreateTime = tableCreateTime == null ? null : tableCreateTime.trim();
+    }
+
+    public String getTableCreater() {
+        return tableCreater;
+    }
+
+    public void setTableCreater(String tableCreater) {
+        this.tableCreater = tableCreater == null ? null : tableCreater.trim();
+    }
+
+    public String getTableModifiedTime() {
+        return tableModifiedTime;
+    }
+
+    public void setTableModifiedTime(String tableModifiedTime) {
+        this.tableModifiedTime = tableModifiedTime == null ? null : tableModifiedTime.trim();
+    }
+
+    public String getTableModifiedPerson() {
+        return tableModifiedPerson;
+    }
+
+    public void setTableModifiedPerson(String tableModifiedPerson) {
+        this.tableModifiedPerson = tableModifiedPerson == null ? null : tableModifiedPerson.trim();
+    }
+}

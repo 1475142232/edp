@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.SceneInfoPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.SceneInfoPo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="scene_name" property="sceneName" jdbcType="VARCHAR" />
+    <result column="scene_spec" property="sceneSpec" jdbcType="VARCHAR" />
+    <result column="scene_type" property="sceneType" jdbcType="VARCHAR" />
+    <result column="scene_create_time" property="sceneCreateTime" jdbcType="VARCHAR" />
+    <result column="scene_creater" property="sceneCreater" jdbcType="VARCHAR" />
+    <result column="scene_modified_time" property="sceneModifiedTime" jdbcType="VARCHAR" />
+    <result column="scene_modified_person" property="sceneModifiedPerson" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, scene_name, scene_spec, scene_type, scene_create_time, scene_creater, scene_modified_time, 
+    scene_modified_person, version
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.SceneInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from scene_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from scene_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from scene_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.SceneInfoPoCriteria" >
+    delete from scene_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.SceneInfoPo" >
+    insert into scene_info (id, scene_name, scene_spec, 
+      scene_type, scene_create_time, scene_creater, 
+      scene_modified_time, scene_modified_person, 
+      version)
+    values (#{id,jdbcType=VARCHAR}, #{sceneName,jdbcType=VARCHAR}, #{sceneSpec,jdbcType=VARCHAR}, 
+      #{sceneType,jdbcType=VARCHAR}, #{sceneCreateTime,jdbcType=VARCHAR}, #{sceneCreater,jdbcType=VARCHAR}, 
+      #{sceneModifiedTime,jdbcType=VARCHAR}, #{sceneModifiedPerson,jdbcType=VARCHAR}, 
+      #{version,jdbcType=TINYINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.SceneInfoPo" >
+    insert into scene_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="sceneName != null" >
+        scene_name,
+      </if>
+      <if test="sceneSpec != null" >
+        scene_spec,
+      </if>
+      <if test="sceneType != null" >
+        scene_type,
+      </if>
+      <if test="sceneCreateTime != null" >
+        scene_create_time,
+      </if>
+      <if test="sceneCreater != null" >
+        scene_creater,
+      </if>
+      <if test="sceneModifiedTime != null" >
+        scene_modified_time,
+      </if>
+      <if test="sceneModifiedPerson != null" >
+        scene_modified_person,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneName != null" >
+        #{sceneName,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneSpec != null" >
+        #{sceneSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneType != null" >
+        #{sceneType,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneCreateTime != null" >
+        #{sceneCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneCreater != null" >
+        #{sceneCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneModifiedTime != null" >
+        #{sceneModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneModifiedPerson != null" >
+        #{sceneModifiedPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.SceneInfoPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from scene_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update scene_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sceneName != null" >
+        scene_name = #{record.sceneName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sceneSpec != null" >
+        scene_spec = #{record.sceneSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sceneType != null" >
+        scene_type = #{record.sceneType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sceneCreateTime != null" >
+        scene_create_time = #{record.sceneCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sceneCreater != null" >
+        scene_creater = #{record.sceneCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sceneModifiedTime != null" >
+        scene_modified_time = #{record.sceneModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sceneModifiedPerson != null" >
+        scene_modified_person = #{record.sceneModifiedPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.version != null" >
+        version = #{record.version,jdbcType=TINYINT},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update scene_info
+    set id = #{record.id,jdbcType=VARCHAR},
+      scene_name = #{record.sceneName,jdbcType=VARCHAR},
+      scene_spec = #{record.sceneSpec,jdbcType=VARCHAR},
+      scene_type = #{record.sceneType,jdbcType=VARCHAR},
+      scene_create_time = #{record.sceneCreateTime,jdbcType=VARCHAR},
+      scene_creater = #{record.sceneCreater,jdbcType=VARCHAR},
+      scene_modified_time = #{record.sceneModifiedTime,jdbcType=VARCHAR},
+      scene_modified_person = #{record.sceneModifiedPerson,jdbcType=VARCHAR},
+      version = #{record.version,jdbcType=TINYINT}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.SceneInfoPo" >
+    update scene_info
+    <set >
+      <if test="sceneName != null" >
+        scene_name = #{sceneName,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneSpec != null" >
+        scene_spec = #{sceneSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneType != null" >
+        scene_type = #{sceneType,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneCreateTime != null" >
+        scene_create_time = #{sceneCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneCreater != null" >
+        scene_creater = #{sceneCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneModifiedTime != null" >
+        scene_modified_time = #{sceneModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneModifiedPerson != null" >
+        scene_modified_person = #{sceneModifiedPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.SceneInfoPo" >
+    update scene_info
+    set scene_name = #{sceneName,jdbcType=VARCHAR},
+      scene_spec = #{sceneSpec,jdbcType=VARCHAR},
+      scene_type = #{sceneType,jdbcType=VARCHAR},
+      scene_create_time = #{sceneCreateTime,jdbcType=VARCHAR},
+      scene_creater = #{sceneCreater,jdbcType=VARCHAR},
+      scene_modified_time = #{sceneModifiedTime,jdbcType=VARCHAR},
+      scene_modified_person = #{sceneModifiedPerson,jdbcType=VARCHAR},
+      version = #{version,jdbcType=TINYINT}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="findSceneByFuncId" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.SceneInfoPo">
+      select * from scene_info where id in (select scene_id from func_control where func_id=#{funcId})
+  </select>
+  
+  <select id="findControlIdById" resultType="java.lang.String">
+       select control_id from func_control where scene_id=#{id}
+  </select>
+  
+  <select id="findFunctionIdById" resultType="java.lang.String">
+       select func_id from func_control where scene_id=#{id}
+  </select>
+  
+  <update id="updateScencById">
+     update func_control 
+     set scene_id = #{newId}
+     where scene_id = #{scene_id}
+  </update>
+</mapper>

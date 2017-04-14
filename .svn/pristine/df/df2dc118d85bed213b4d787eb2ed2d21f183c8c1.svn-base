@@ -1,0 +1,124 @@
+@charset "utf-8";
+/*=========================Reset_start==========================*/
+body,h1,h2,h3,h4,h5,h6,div,p,dl,dt,dd,ol,ul,li,form,table,th,td,a,
+img,span,strong,var,em,input,textarea,select,option{margin: 0; padding: 0;}
+html,body{font-family:"宋体","微软雅黑",Arail,Tabhoma; font-size: 12px;
+	text-align: left;}
+ul,ol{list-style: none;}
+img{border: 0;}
+input,select,textarea{outline:0;}
+table{border-collapse: collapse; border-spacing: 0;}
+th,strong,var,em{font-weight: normal; font-style: normal;}
+a{text-decoration: none;}
+a:hover{text-decoration:none;}
+a:link,a:visited,a:hover,a:active{text-decoration:none;}
+/*==========================Reset_End===========================*/
+body{background:url(../img/bg.jpg) repeat;}
+.content-box-zhu{
+	width:100%;
+	min-height:500px;
+	padding:40px 40px;
+	border-radius:8px;
+	background:#fff;
+	margin:0 auto;
+	-webkit-box-shadow:3px 3px 3px #CCCCCC; 
+	-moz-box-shadow:3px 3px 3px #CCCCCC;
+	box-shadow:3px 3px 3px #CCCCCC;
+	margin-bottom:100px;
+	margin-left:-30px;
+}
+.myrow{padding:20px 40px;}
+.addowner{
+	width:120px;
+	height:60px;
+	display:inline-block;
+	border-radius:4px;
+	-webkit-box-shadow: 3px 3px 3px #CCCCCC;  
+	-moz-box-shadow: 3px 3px 3px #CCCCCC;  
+	box-shadow: 3px 3px 3px #CCCCCC;margin:10px 20px}
+.addowner b{
+	width:50px;
+	height:60px;
+	padding-left:14px;
+	display:inline-block;
+	text-align:center;
+	line-height:60px;
+	font-size: 50px;
+	font-weight: bold;
+}
+.addowner span{
+	width:70px;
+	height:60px;
+	display:inline-block;
+	float:right;
+	font-size:16px;
+	text-align:center;
+	line-height:62px
+}
+.owners{
+	width:auto;
+	height:60px;
+	display:inline-block;
+	vertical-align:top;
+	border-radius:4px;
+	-webkit-box-shadow: 3px 3px 3px #CCCCCC;  
+	-moz-box-shadow: 3px 3px 3px #CCCCCC;  
+	box-shadow: 3px 3px 3px #CCCCCC;
+	margin:10px 20px;position:relative;
+}
+.people{
+	width:auto;
+	height:60px;
+	display:inline;
+	float:right
+}
+.people>a{
+	width:auto;
+	height: 30px;
+	display: block;
+	font-size:16px;
+	line-height:30px;
+	text-align: center;
+	margin:0px;
+	padding-right: 12px;
+	padding-left: 4px;
+}
+.owners>a:first-child{
+	position:absolute;
+	left:0px;
+	top:0px;
+	padding:4px;
+	display:none
+}
+#users{
+	margin-top:20px;
+	padding:0px 12px 20px 30px;
+}
+/*人员信息查看*/
+#ownersdetails{
+	border-top:1px solid #ccc;
+	border-left:1px solid #ccc;
+	position:absolute;
+	top:30px;
+	left:40px;
+	display:none;
+}
+#backlist{
+	width:100px;
+	height:100px;
+	display:inline-block;
+	float:right;
+	margin-top: -30px;
+	background:url(../img/u211.png);
+	background-repeat:no-repeat;
+	background-position:center;
+}
+.task-dateil-right{
+	height: 100px;
+    margin-top: 30px;
+}
+
+
+
+
+

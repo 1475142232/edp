@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>问题</title>
+		<link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+		<link rel="stylesheet" href="./src/problem-module/css/problem.css" />
+	</head>
+	<body>
+   		<!-- 我的任务 -->
+	   <div class="content-box-zhu">
+	   		<h4 class="g_tittle"><span style="float: left;" id="problem_title"></span><span class="problem_info" id="problem_user"></span><span class="problem_info" id="problem_time"></span><img id="problem_back" style="float:right;cursor: pointer;" src="./src/problem-module/img/u211.png"></h4>
+	   		<div class="g_detail" style="position:relative;">
+	   			<p id="problem_desc"></p>
+	   			<div class="g_footer">
+		   			<button class="btn btn-success" id="successOK">已解决</button>
+		   			<label>转移给：</label>
+		   			<select id="transfer_User" class="form-control">
+		   				<option>请选择</option>
+		   			</select>
+		   			<button class="btn" id="transferSubmit">提交</button>
+		   		</div>
+	   		</div>
+	   		<div class="g_reply">
+	   			<h4 style="float:left;color: #333;">回复：</h4>
+	   			<ul class="g_replyBar">
+	   			</ul>
+	   			<button class="btn btn-primary btn-lg" data-toggle="modal" style="margin:20px 0 0 35px;clear:both;display: block;" id="my_Relpy">
+					我要回复
+				</button>
+				<!-- 模态框（Modal） -->
+				<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+									&times;
+								</button>
+								<h4 class="modal-title" id="myModalLabel">
+									请输入你要回复的内容：
+								</h4>
+							</div>
+							<div class="modal-body">
+								<textarea rows="5" style="width:100%;" placeholder="回复内容" id="reply_Desc" class="form-control tab-login-input"></textarea>
+							</div>
+							<div class="modal-footer">
+								<span id="error" style="color:red;"></span>
+								<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+								</button>
+								<button type="button" class="btn btn-primary" id="reply_Submit">
+									提交
+								</button>
+							</div>
+						</div><!-- /.modal-content -->
+					</div><!-- /.modal -->
+				</div>
+	   		</div>	
+	   </div>
+	   
+	   <!-- 模态框（Modal） --> 
+       <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+	    <div class="modal-dialog"> 
+	        <div class="modal-content"> 
+	            <div class="modal-header"> 
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+	                <h4 class="modal-title" id="myModalLabel">提示信息</h4> 
+	            </div> 
+	            <div class="modal-body">您确认该问题已解决？</div> 
+	            <div class="modal-footer"> 
+	                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+	                <button type="button" class="btn btn-primary" id="up_Submit">确认</button>
+	            </div> 
+	        </div><!-- /.modal-content --> 
+	     </div><!-- /.modal --> 
+	  </div>
+	   
+	   <!-- 模态框（Modal） --> 
+       <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+	    <div class="modal-dialog"> 
+	        <div class="modal-content"> 
+	            <div class="modal-header"> 
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+	                <h4 class="modal-title" id="myModalLabel">提示信息</h4> 
+	            </div> 
+	            <div class="modal-body" id="modelInfo"></div> 
+	            <div class="modal-footer"> 
+	                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+	            </div> 
+	        </div><!-- /.modal-content --> 
+	     </div><!-- /.modal --> 
+	  </div>
+	  
+	  <script src="./src/jquery/jquery.min.js"></script>
+	  <script src="./src/kissy/jquery.form.js"></script>
+	  <script src="./src/bootstrapvalidator/vendor/bootstrap/js/bootstrap.min.js"></script>
+	</body>
+</html>

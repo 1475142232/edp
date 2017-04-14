@@ -1,0 +1,291 @@
+KISSY.add("homepage-module/src/homepage",function(S,IO, Cookie,ProjectList, TaskList ,Email,ResourceList,ShowTree,TaskList,DataTable){
+	function HomePage(){
+		var _this = this;
+		var cookie = new Cookie();
+		
+		this.init = function(){
+			var target = localStorage.getItem("target");
+			if(target === undefined || target === null || target === "" || target === "team"){
+				IO.get("views/team/teamcreat.html",null,function(){
+					$("#mainpage").html(arguments[0], true);
+					localStorage.setItem("target","team");
+					$("#navTop").hide();
+				});
+			}else if(target === "teamlink"){
+				_this.navQie(target);
+    			//“团队”跳转 -- 9.9增
+     			IO.get("views/resource/resource.html",null,function(){
+         			$("#mainpage").html(arguments[0], true);
+         			var teamId = cookie.getCookie("teamId");
+         			var resourcelist = new ResourceList();
+         			resourcelist.getresourcelist(teamId);
+             	});
+			}else if(target === "projectlink"){
+				_this.navQie(target);
+    			//“项目”跳转
+    			IO.get("views/team/projectlist.html",null,function(){
+         			$("#mainpage").html(arguments[0], true);
+         			var teamId = cookie.getCookie("teamId");
+         			var projectlist = new ProjectList();
+         			projectlist.getproductList(teamId);
+             	});
+			}else if(target === "myself"){
+				_this.navQie(target);
+				//“我自己”跳转
+	 			IO.get("views/myself/myself.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	         	});
+			}else if(target === "my_Database"){
+				_this.navQie(target);
+				//“数据库”跳转
+	 			IO.get("views/database/database_list.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	         	});
+			}else if(target === "my_message"){
+				_this.navQie(target);
+				//“站内信”跳转
+	 			IO.get("views/email/email.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	     			var email = new Email();
+	     			email.getEmail();
+	         	});
+			}else if(target === "problem"){
+				_this.navQie(target);
+				//“问题”跳转
+	 			IO.get("views/problem/problem_list.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	         	});
+			}else if(target === "showTree"){
+				_this.navQie(target);
+				IO.get("views/tree/showTree.html",null,function(){
+					$("#mainpage").html(arguments[0], true);
+		 			var showTree = new ShowTree();
+		 			showTree.init();
+				});
+			}else if(target === "tasklist"){
+				_this.navQie("projectlink");
+	 			//我的项目跳转
+	 			IO.get("views/tasklist/tasklist.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	     			var tasklist = new TaskList();
+	     			tasklist.init(localStorage.getItem("productId"));
+	         	});
+			}else if(target === "datatable"){
+				_this.navQie("my_Database");
+				var dataId = localStorage.getItem("dataId");
+				var dataName = localStorage.getItem("dataName");
+	 			//我的项目跳转
+	 			IO.get("views/database/datatable.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	     			var dataTable = new DataTable();
+	     			dataTable.init(dataId, dataName);
+	         	});
+			}else if(target === "scenelist"){
+				_this.navQie("myself");
+				//“场景”跳转
+	 			IO.get("views/scene/scene_list.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	         	});
+			}
+			//设置头部导航点击事件
+			_this.renderNavTop();
+			//获取团队列表
+			_this.getTeamListbyId();
+		}
+		
+		/**
+		 * 导航点击事件
+		 */
+		this.renderNavTop = function(){
+      		$("#teamlink").on("click",function(){
+    			_this.navQie(this.id);
+    			//“团队”跳转 -- 9.9增
+     			IO.get("views/resource/resource.html",null,function(){
+         			$("#mainpage").html(arguments[0], true);
+         			var teamId = cookie.getCookie("teamId");
+         			var resourcelist = new ResourceList();
+         			resourcelist.getresourcelist(teamId);
+         			
+         			localStorage.setItem("target","teamlink");
+             	});
+    		});
+      		
+      		$("#projectlink").on("click",function(){
+    			_this.navQie(this.id);
+    			//“项目”跳转
+    			IO.get("views/team/projectlist.html",null,function(){
+         			$("#mainpage").html(arguments[0], true);
+         			var teamId = cookie.getCookie("teamId");
+         			var projectlist = new ProjectList();
+         			projectlist.getproductList(teamId);
+         			
+         			localStorage.setItem("target","projectlink");
+             	});
+    		});
+      		
+			$("#myself").on("click",function(){
+				_this.navQie(this.id);
+				//“我自己”跳转
+	 			IO.get("views/myself/myself.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	     			
+	     			localStorage.setItem("target","myself");
+	         	});
+			});
+			
+			$("#my_Database").on("click",function(){
+				_this.navQie(this.id);
+				//“数据库”跳转
+	 			IO.get("views/database/database_list.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	     			localStorage.setItem("target","my_Database");
+	         	});
+			});
+			
+			$("#my_message").on("click",function(){
+				//“站内信”跳转
+	 			IO.get("views/email/email.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	     			var email = new Email();
+	     			email.getEmail();
+	     			
+	     			localStorage.setItem("target","my_message");
+	         	});
+			});
+			
+			$("#problem").on("click",function(){
+				_this.navQie(this.id);
+				//“问题”跳转
+	 			IO.get("views/problem/problem_list.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	     			
+	     			localStorage.setItem("target","problem");
+	         	});
+			});
+			
+			$("#showTree").on("click",function(){
+				_this.navQie(this.id);
+				IO.get("views/tree/showTree.html",null,function(){
+					$("#mainpage").html(arguments[0], true);
+		 			var showTree = new ShowTree();
+		 			showTree.init();
+		 			
+		 			localStorage.setItem("target","showTree");
+				});
+			});
+			
+			//退出提示
+			$("#signout").on("click",function(){
+				$("#signoutModal").modal("show");
+			});
+			//确认退出提交
+			$("#signout_Submit").on("click", function(){
+				_this.signout();
+			});
+		};
+		
+		/**
+		 * 团队列表
+		 */
+		this.getTeamListbyId = function(){
+			$("#teamSelect").html("");
+			//团队列表获取-----
+			$.ajax({
+	             type: "GET",
+	             url: "TeamController/getAllTream.action",
+	             async: true,
+	             dataType: "json",
+	             success: function(data){
+	            	 if(data !== null && data.length > 0){
+	            		 var teamId = cookie.getCookie("teamId");
+	            		 var teamList = "";
+	            		 for(var i=0; i<data.length; i++) {
+	            			 teamList += '<li id="team_'+ data[i].id +'"><a href="javascript:void(0);" class="nav-color-zhu">'+ data[i].teamName +'</a></li>';
+	            			 if(data[i].id == teamId){
+	            				 $("#team_Name").text(data[i].teamName);
+	            			 }
+	            		 }
+	            		 teamList += '<li class="add-team"><a href="javascript:void(0);">新建团队</a></li>';
+	            		 $("#teamSelect").html(teamList);
+	            		 $('.dropdown-toggle').dropdown();
+	            		 
+	            		 $("#teamSelect li").unbind("click");
+	            		 //团队获取Id
+	            		 $("#teamSelect li").on("click", function(){
+	            			 _this.navQie("projectlink");
+	            			 var teamIds = (this.id).split("_");
+	            			 if(teamIds.length > 1){
+	            				 $("#team_Name").text($(this).find('a').html());
+	            				 //团队跳转
+	            				 IO.get("views/team/projectlist.html",null,function(){
+	            					 $("#mainpage").html(arguments[0], true);
+	            					 var projectlist = new ProjectList();
+	            	         		 projectlist.getproductList(teamIds[1]);
+	            	         		 
+	            	         		 localStorage.setItem("target","projectlink");
+	            				 });
+	            			 }
+	            		 });
+	            		 
+	            		 $(".add-team").on("click", function(){
+	            			 IO.get("views/team/teamcreat.html",null,function(){
+            	  				$("#mainpage").html(arguments[0], true);
+            	  				$("#navTop").hide();
+            	  				localStorage.setItem("target","team");
+            	  	     	 });
+	            		 });
+	            	 }
+	              }
+	        });
+		};
+		
+		/**
+		 * 用户退出
+		 */
+		this.signout = function(){
+			$.ajax({
+                url: 'loginController/signout.action',
+                type: "post",
+                dataType: 'json',
+                cache: false,
+                async: false,
+                success: function (data) {
+	               	 if(data === "SUCCESS"){
+	               		 localStorage.setItem("target","");
+	               		 $("#signoutModal").modal("hide");
+	               		 window.location.href='./loginController/loginPage.action';
+	               	 }else{
+	               		 $("#signoutModal").modal("hide");
+	               		 $("#errorModal").modal("show");
+	               		 $("#errorInfo").text("退出失败，请联系管理员!");
+	               	 }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                }
+          });
+		};
+		
+		/**
+		 * 头部导航切换样式
+		 */
+		this.navQie = function(id){
+			$("#navTop").show();
+			var li = $("#navUl li.active");
+			if(li !== null && li !== undefined){
+				li.removeAttr("class");
+			}
+			$("#"+id).parent().attr("class","active");
+		}
+	};
+	
+	return HomePage;
+},{
+	requires : ['io','common-module/src/cookie',
+	            'teamcreat-module/src/projectlist',
+	            'tasklist-module/src/tasklist',
+	            'email-module/src/email',
+	            'resource-module/src/resource',
+	            'tree-module/src/showTree',
+	            'tasklist-module/src/tasklist',
+	            'database-module/src/datatable']
+});

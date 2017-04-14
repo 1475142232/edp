@@ -1,0 +1,37 @@
+package dome;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gson.Gson;
+
+import po.FenceInfoDto;
+import po.TaskInfoDto;
+
+public class fenceDome {
+
+	public static void main(String[] args) {
+		List<FenceInfoDto> fences=new ArrayList<FenceInfoDto>();
+		String[] name=new String[]{"立项任务","需求任务","设计任务","开发任务","测试任务"};
+		for(int i=0;i<5;i++){
+			FenceInfoDto fence=new FenceInfoDto();
+			fence.setId(i);
+			fence.setFenceName(name[i]);
+			fence.setFenceType("0"+(i+1));
+			List<TaskInfoDto> taskes=new ArrayList<TaskInfoDto>();
+			for(int j=0;j<5;j++){
+				TaskInfoDto task=new TaskInfoDto();
+				task.setId(Integer.parseInt((j+"")+(i+"")));
+				task.setProductName((j+"")+(i+"")+"工单");
+				task.setTaskState("01");
+				taskes.add(task);
+			}
+			fence.setChildren(taskes);
+			fences.add(fence);
+		}
+		Gson gson = new Gson();
+		System.out.println(gson.toJson(fences));
+
+	}
+
+}

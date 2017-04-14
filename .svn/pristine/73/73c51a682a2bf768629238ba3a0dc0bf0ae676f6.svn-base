@@ -1,0 +1,611 @@
+package com.edp.service.functionInfo;
+
+import com.alibaba.dubbo.common.utils.CollectionUtils;
+import com.alibaba.dubbo.common.utils.StringUtils;
+import com.edp.common.constant.Constants;
+import com.edp.common.constant.EDPCodeConstants;
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SqlFormatUtil;
+import com.edp.dao.domain.ColumnPicPo;
+import com.edp.dao.domain.ColumnPicPoCriteria;
+import com.edp.dao.domain.ControlPo;
+import com.edp.dao.domain.FunColumnPo;
+import com.edp.dao.domain.FunColumnPoCriteria;
+import com.edp.dao.domain.FunConTrolPo;
+import com.edp.dao.domain.FunctionInfoPo;
+import com.edp.dao.domain.FunctionInfoPoCriteria;
+import com.edp.dao.domain.SceneInfoPo;
+import com.edp.dao.domain.TableColunmPo;
+import com.edp.dao.domain.TableInfoPo;
+import com.edp.dao.mapper.ColumnPicPoMapper;
+import com.edp.dao.mapper.FunColumnPoMapper;
+import com.edp.dao.mapper.FunctionInfoPoMapper;
+import com.edp.dao.mapper.SceneInfoPoMapper;
+import com.edp.dao.mapper.TableInfoPoMapper;
+import com.edp.serviceI.dto.ColumnPicDto;
+import com.edp.serviceI.dto.ControlDto;
+import com.edp.serviceI.dto.CtableDto;
+import com.edp.serviceI.dto.FunColumnDto;
+import com.edp.serviceI.dto.FunctionInfoDto;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service(value = "functionInfoService")
+public class FunctionInfoServiceImpl implements FunctionInfoServiceI {
+
+    private static final Logger log = LoggerFactory.getLogger(FunctionInfoServiceImpl.class);
+    @Autowired
+    private FunctionInfoPoMapper functionInfoPoMapper;
+    @Autowired
+    private ColumnPicPoMapper columnPicPoMapper;
+    @Autowired
+    private TableInfoPoMapper tableInfoPoMapper;
+    @Autowired
+    private SceneInfoPoMapper sceneInfoPoMapper;
+    @Autowired
+    private FunColumnPoMapper funColumnPoMapper;
+
+    //查询所有功能
+    @Override
+    public FunctionInfoDto getAllFunctionInfo(FunctionInfoDto dto) {
+
+        FunctionInfoPoCriteria example = new FunctionInfoPoCriteria();
+        FunctionInfoPoCriteria.Criteria functionCriteria = example.createCriteria();
+        FunctionInfoDto rtn = new FunctionInfoDto();
+        if (null != dto.getId()) {//自增主键
+            functionCriteria.andIdEqualTo(dto.getId());
+        }
+        if (null !=dto.getFuncState()){
+        	functionCriteria.andFuncStateEqualTo(dto.getFuncState());
+        }
+        if (StringUtils.isNotEmpty(dto.getFuncId())) {
+            functionCriteria.andFuncIdEqualTo(dto.getFuncId());
+        }
+
+
+        if (dto.getVersion() != null) {
+            functionCriteria.andVersionEqualTo(dto.getVersion());
+        }
+
+        if (StringUtils.isNotEmpty(dto.getFuncState())) {
+            functionCriteria.andFuncStateEqualTo(dto.getFuncState());
+        }
+
+        if (null != dto.getFuncName() && !"".equals(dto.getFuncName())) {
+            functionCriteria.andFuncNameLike("%" + dto.getFuncName() + "%");
+        }
+        if (null != dto.getFuncEnName() && !"".equals(dto.getFuncEnName())) {
+            functionCriteria.andFuncEnNameLike("%" + dto.getFuncEnName() + "%");
+        }
+
+        //分页
+        String pagingStr = SqlFormatUtil.makeupOrderByAndLimit("id", SqlFormatUtil.ORDER_BY_DIRECTION_DESC, dto.getPageIndex(), dto.getLimit());
+        example.setOrderByClause(pagingStr);
+
+        try {
+            int count = functionInfoPoMapper.countByExample(example);
+            List<FunctionInfoPo> result = functionInfoPoMapper.selectByExample(example);
+            List<FunctionInfoDto> returnVal = BeanCopyUtils.populateTListbyDListBySpring(result, FunctionInfoDto.class);
+            rtn.setRows(returnVal);
+            rtn.setResults(count);
+            rtn.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+        } catch (Exception e) {
+            log.error("查询错误", e);
+            rtn.setReturnCode(EDPCodeConstants.ERROR_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+        }
+
+        return rtn;
+    }
+
+    //根据id去查询
+    @Override
+    public FunctionInfoDto getFunctionInfoDtoById(int id) {
+        try {
+            FunctionInfoPo result = functionInfoPoMapper.selectByPrimaryKey(id);
+            return BeanCopyUtils.populateTbyDBySpring(result, FunctionInfoDto.class);
+        } catch (Exception e) {
+            log.error("根据id查询失败");
+        }
+        return null;
+    }
+
+    @Override
+    public FunctionInfoDto getFunctionInfoListByFuncId(String functionId) {
+        log.info("getFunctionInfoListByFuncId==>start");
+        log.info("getFunctionInfoListByFuncId==>功能编号=" + functionId);
+
+        FunctionInfoDto rtn = new FunctionInfoDto();
+
+
+        if (StringUtils.isEmpty(functionId)) {
+            rtn.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+        } else {
+
+            FunctionInfoDto conditions = new FunctionInfoDto();
+
+            conditions.setFuncId(functionId);
+
+            rtn = this.getAllFunctionInfo(conditions);
+        }
+
+
+        log.info("getFunctionInfoListByFuncId==>end");
+        return rtn;
+    }
+
+    @Override
+    public FunctionInfoDto getFunctionInfoByFuncIdAndVersion(String functionId, int version) {
+        log.info("getFunctionInfoByFuncIdAndVersion==>start");
+        log.info("getFunctionInfoByFuncIdAndVersion==>功能编号=" + functionId + ",版本号=" + version);
+
+        FunctionInfoDto rtn = new FunctionInfoDto();
+
+
+        if (StringUtils.isEmpty(functionId) || version < 0) {
+            rtn.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+        } else {
+
+            FunctionInfoDto conditions = new FunctionInfoDto();
+
+            conditions.setFuncId(functionId);
+
+            conditions.setVersion((byte) version);
+
+            FunctionInfoDto result = new FunctionInfoDto();
+
+            result = this.getAllFunctionInfo(conditions);
+
+            if (result != null && result.getResults() > 0) {
+                List<FunctionInfoDto> functionInfos = result.getRows();
+                rtn = functionInfos.get(0);
+            }
+            rtn.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+        }
+
+        log.info("getFunctionInfoByFuncIdAndVersion==>end");
+        return rtn;
+    }
+
+    @Override
+    public FunctionInfoDto getTheLastFunctionInfoHasBeComfirmedByFunctionId(String functionId) {
+
+        log.info("getTheLastFunctionInfoHasBeComfirmedByFunctionId==>start");
+        log.info("getTheLastFunctionInfoHasBeComfirmedByFunctionId==>功能编号=" + functionId);
+
+        FunctionInfoPoCriteria example = new FunctionInfoPoCriteria();
+        FunctionInfoPoCriteria.Criteria functionCriteria = example.createCriteria();
+        FunctionInfoDto rtn = new FunctionInfoDto();
+
+
+        if (StringUtils.isEmpty(functionId)) {
+            rtn.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+        } else {
+
+            //根据功能编号查出所有已确认的需求,按id降序
+            functionCriteria.andFuncIdEqualTo(functionId);
+            List<String> values = new ArrayList<>();
+            values.add(Constants.TreeStates.CHANGE_COMFIRM);
+            values.add(Constants.TreeStates.NORMAL_COMFIRM);
+            functionCriteria.andFuncStateIn(values);
+
+            example.setOrderByClause("id desc");
+
+
+            List<FunctionInfoPo> result = functionInfoPoMapper.selectByExample(example);
+
+            if (CollectionUtils.isNotEmpty(result)) {
+                rtn = BeanCopyUtils.populateTbyDBySpring(result.get(0), rtn);//只取最新的一条
+            }
+
+            rtn.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+        }
+
+        log.info("getTheLastFunctionInfoHasBeComfirmedByFunctionId==>end");
+        return rtn;
+
+    }
+
+    @Override
+    public FunctionInfoDto getTheLastFunctionInfoHasBeComfirmedByFunctionIdAndVersion(String functionId, int version) {
+        log.info("getTheLastFunctionInfoHasBeComfirmedByFunctionIdAndVersion==>start");
+        log.info("getTheLastFunctionInfoHasBeComfirmedByFunctionIdAndVersion==>功能编号=" + functionId);
+
+        FunctionInfoPoCriteria example = new FunctionInfoPoCriteria();
+        FunctionInfoPoCriteria.Criteria functionCriteria = example.createCriteria();
+        FunctionInfoDto rtn = new FunctionInfoDto();
+
+
+        if (StringUtils.isEmpty(functionId)) {
+            rtn.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+        } else {
+
+            //根据功能编号查出所有已确认的需求,按id降序
+            functionCriteria.andFuncIdEqualTo(functionId);
+            List<String> values = new ArrayList<>();
+            values.add(Constants.TreeStates.CHANGE_COMFIRM);
+            values.add(Constants.TreeStates.NORMAL_COMFIRM);
+            functionCriteria.andFuncStateIn(values);
+
+
+            functionCriteria.andVersionLessThanOrEqualTo((byte) version);
+
+            example.setOrderByClause("id desc");
+
+
+            List<FunctionInfoPo> result = functionInfoPoMapper.selectByExample(example);
+
+            if (CollectionUtils.isNotEmpty(result)) {
+                rtn = BeanCopyUtils.populateTbyDBySpring(result.get(0), rtn);//只取最新的一条
+            }
+
+            rtn.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+        }
+
+        log.info("getTheLastFunctionInfoHasBeComfirmedByFunctionIdAndVersion==>end");
+        return rtn;
+    }
+
+    @Override
+    public FunctionInfoDto getTheUnComfirmedFunctionInfoByFunctionId(String functionId) {
+        log.info("getTheUnComfirmedFunctionInfoByFunctionId==>start");
+        log.info("getTheUnComfirmedFunctionInfoByFunctionId==>功能编号=" + functionId);
+
+        FunctionInfoPoCriteria example = new FunctionInfoPoCriteria();
+        FunctionInfoPoCriteria.Criteria functionCriteria = example.createCriteria();
+        FunctionInfoDto rtn = new FunctionInfoDto();
+
+
+        if (StringUtils.isEmpty(functionId)) {
+            rtn.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.INVALID_DATA_CODE);
+        } else {
+
+            functionCriteria.andFuncIdEqualTo(functionId);
+
+            List<String> values = new ArrayList<>();
+            values.add(Constants.TreeStates.CHANGE_COMFIRM);
+            values.add(Constants.TreeStates.NORMAL_COMFIRM);
+            functionCriteria.andFuncStateNotIn(values);
+
+            example.setOrderByClause("id desc");
+
+            List<FunctionInfoPo> result = functionInfoPoMapper.selectByExample(example);
+            if(CollectionUtils.isNotEmpty(result)){
+                rtn = BeanCopyUtils.populateTbyDBySpring(result.get(0),rtn);
+            }
+        }
+        rtn.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+        rtn.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+
+    log.info("getTheUnComfirmedFunctionInfoByFunctionId==>end");
+    return rtn;
+}
+
+    /**
+     *根据功能编号/版本号 查询最新的记录
+     * @param functionId 功能编号
+     * @param version 版本号
+     * @return
+     */
+    @Override
+    public FunctionInfoDto getFunctionInfo(String functionId, Integer version) {
+
+
+        log.info("getFunctionInfo==>start");
+        log.info("getFunctionInfo==>功能编号="+functionId+",版本号="+version);
+        FunctionInfoDto rtn = new FunctionInfoDto();
+
+        FunctionInfoPoCriteria example =  new FunctionInfoPoCriteria();
+        FunctionInfoPoCriteria.Criteria functionCriteria = example.createCriteria();
+
+        if(StringUtils.isEmpty(functionId)){
+            rtn.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+        }else{
+
+            functionCriteria.andFuncIdEqualTo(functionId);
+
+            if(version != null){
+                functionCriteria.andVersionEqualTo(version.byteValue());//小于等于当前版本号的记录
+            }
+
+
+            example.setOrderByClause("id desc");
+
+
+            List<FunctionInfoPo> result = functionInfoPoMapper.selectByExample(example);
+             
+
+            if(CollectionUtils.isNotEmpty(result)){//展示的时候只取最新的记录
+                rtn = BeanCopyUtils.populateTbyDBySpring(result.get(0),rtn);
+            }
+
+            rtn.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+        }
+        log.info("getFunctionInfo==>end");
+        return rtn;
+    }
+
+    @Override
+    public FunctionInfoDto deleteFunctionInfo(String functionId, Integer version) {
+
+        log.info("deleteFunctionInfo==>start");
+        log.info("deleteFunctionInfo==>功能编号="+functionId+", 版本号="+(version ==null?" ":version.byteValue()));
+
+        FunctionInfoDto rtn = new FunctionInfoDto();
+
+        FunctionInfoPoCriteria funexamples = new FunctionInfoPoCriteria();
+        FunctionInfoPoCriteria.Criteria functionCriterias = funexamples.createCriteria();
+        functionCriterias.andFuncIdEqualTo(functionId);
+        functionInfoPoMapper.deleteByExample(funexamples);
+
+        try{
+//        	version=this.findMaxVersionByFunId(functionId,"01");
+//            FunctionInfoDto last =  this.getFunctionInfo(functionId,version);
+
+//            if(last != null){
+//                int id = last.getId();
+//                this.delFunctionInfo(id);
+//            }
+            rtn.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+
+        }catch (Exception e ){
+            e.printStackTrace();
+            rtn.setReturnCode(EDPCodeConstants.ERROR_CODE);
+            rtn.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+        }
+
+
+
+
+
+        log.info("deleteFunctionInfo==>end");
+        return rtn;
+    }
+
+    //添加功能
+    @Override
+    public void addFunctionInfo(FunctionInfoDto dto) {
+        dto.setVersion(Byte.parseByte("0"));
+        FunctionInfoPo po = BeanCopyUtils.populateTbyDBySpring(dto, FunctionInfoPo.class);
+        functionInfoPoMapper.insertSelective(po);
+
+    }
+
+    //修改功能
+    @Override
+    public void updateFunctionInfo(FunctionInfoDto dto) {
+        FunctionInfoPo po = BeanCopyUtils.populateTbyDBySpring(dto, FunctionInfoPo.class);
+        functionInfoPoMapper.updateByPrimaryKeySelective(po);
+
+    }
+
+    //删除功能
+    @Override
+    public void delFunctionInfo(int id) {
+        functionInfoPoMapper.deleteByPrimaryKey(id);
+
+    }
+
+	@Override
+	public ControlDto findFcNameByCId(String control_id, String state) {
+		ControlPo po=functionInfoPoMapper.findFcNameByCId(control_id,state);
+		ControlDto dto=BeanCopyUtils.populateTbyDBySpring(po,ControlDto.class);
+		return dto;
+	}
+
+	@Override
+	public void deleFC(String control_id, String scene_id,String changeAdd) {
+		functionInfoPoMapper.deleFC(control_id,scene_id,changeAdd);
+		
+	}
+
+	@Override
+	public void addFcName(ControlDto dto) {
+		ControlPo po=BeanCopyUtils.populateTbyDBySpring(dto,ControlPo.class);
+		functionInfoPoMapper.addFcName(po);
+		
+	}
+
+	@Override
+	public void saveFuncColumn(String control_id, String table_id, String column_id,String funcId) {
+		functionInfoPoMapper.saveFuncColumn(control_id,table_id,column_id,funcId);
+		
+	}
+
+	@Override
+	public void addPicColumn(ColumnPicDto dto) {
+		ColumnPicPo po=BeanCopyUtils.populateTbyDBySpring(dto,ColumnPicPo.class);
+		columnPicPoMapper.insert(po);
+		
+	}
+
+	@Override
+	public List<ColumnPicDto> findPicColumn(String picId) {
+		ColumnPicPoCriteria example =  new ColumnPicPoCriteria();
+		ColumnPicPoCriteria.Criteria Criteria = example.createCriteria();
+		Criteria.andPicIdEqualTo(picId);
+		List<ColumnPicPo>  po= columnPicPoMapper.selectByExample(example);
+		List<ColumnPicDto> dto = BeanCopyUtils.populateTListbyDListBySpring(po, ColumnPicDto.class);
+		return dto;
+	}
+
+	@Override
+	public void delPicColumn(Integer id) {
+		columnPicPoMapper.deleteByPrimaryKey(id);
+		
+	}
+
+	@Override
+	public void addfuncPicById(Integer funcId,String funcPId) {
+		FunctionInfoPo function =new FunctionInfoPo();
+		function.setId(funcId);
+		function.setFuncPic(funcPId);
+		functionInfoPoMapper.updateByPrimaryKeySelective(function);
+	}
+
+	@Override
+	public String findSceneByColumnId(String columnId) {
+		String scene="影响：";
+		TableInfoPo tableInfoPo=tableInfoPoMapper.findSceneByColumnId(columnId);
+		if(tableInfoPo==null){
+			return "仅影响表";
+		}
+		scene+="     表："+tableInfoPo.getTableCnName();
+
+		List<FunctionInfoPo> functionInfoPo=functionInfoPoMapper.findSceneByTableId(tableInfoPo.getId());
+		for(int i=0;i<functionInfoPo.size();i++){
+			scene+="     功能："+functionInfoPo.get(i).getFuncName();
+			List<SceneInfoPo> sceneInfoPo=sceneInfoPoMapper.findSceneByFuncId(functionInfoPo.get(i).getFuncId());
+			for(int j=0;j<sceneInfoPo.size();j++){
+				scene+="     场景："+sceneInfoPo.get(j).getSceneName();
+			}
+			
+		}	
+		   return scene;
+	}
+
+	@Override
+	public String findSceneByTableId(String tableId) {
+		System.out.println(tableId);
+		String scene="影响：";
+		List<FunctionInfoPo> functionInfoPo=functionInfoPoMapper.findSceneByTableId(tableId);
+		for(int i=0;i<functionInfoPo.size();i++){
+			scene+="     功能："+functionInfoPo.get(i).getFuncName();
+			List<SceneInfoPo> sceneInfoPo=sceneInfoPoMapper.findSceneByFuncId(functionInfoPo.get(i).getFuncId());
+			for(int j=0;j<sceneInfoPo.size();j++){
+				scene+="     场景："+sceneInfoPo.get(j).getSceneName();
+			}
+			
+		}	
+		    if(functionInfoPo.size()!=0){
+			   return scene;
+			}else{
+			   return "无影响";	
+			}
+	}
+
+	@Override
+	public String findSceneByFuncId(String funcId) {
+		String scene="影响：";
+		List<SceneInfoPo> sceneInfoPo=sceneInfoPoMapper.findSceneByFuncId(funcId);
+		for(int j=0;j<sceneInfoPo.size();j++){
+			scene+="     场景："+sceneInfoPo.get(j).getSceneName();
+		}
+		if(sceneInfoPo.size()!=0){
+			   return scene;
+	    }else{
+			   return "无影响";	
+		}	
+	}
+
+	@Override
+	public String findFuncIdByChildren(String funcId) {
+		return functionInfoPoMapper.findFuncIdByChildren(funcId);
+	}
+
+	@Override
+	public List<String> findFunctionBySceneId(String id) {
+		// TODO Auto-generated method stub
+		return functionInfoPoMapper.findFunctionBySceneId(id);
+	}
+
+	@Override
+	public List<String> findTableByFuncId(String id) {
+		// TODO Auto-generated method stub
+		return functionInfoPoMapper.findTableByFuncId(id);
+	}
+
+	@Override
+	public List<String> findControlByFunId(String funId) {
+		// TODO Auto-generated method stub
+		return functionInfoPoMapper.findControlByFunId(funId);
+	}
+
+	@Override
+	public List<CtableDto> findTableColumnById(String control_id) {
+		List<TableColunmPo> po=functionInfoPoMapper.findTableColumnById(control_id);
+		List<CtableDto> dto = BeanCopyUtils.populateTListbyDListBySpring(po, CtableDto.class);
+		return dto;
+	}
+
+	@Override
+	public List<CtableDto> findColumnByTable(String control_id, String id) {
+		List<TableColunmPo> po=functionInfoPoMapper.findColumnByTable(control_id,id);
+		List<CtableDto> dto = BeanCopyUtils.populateTListbyDListBySpring(po, CtableDto.class);
+		return dto;
+	}
+
+	@Override
+	public List<String> findControlByFuncId(String id, String string) {
+		return functionInfoPoMapper.findControlByFuncId(id,string);
+	}
+
+	@Override
+	public void delFuncColumn(String control_id,String func_id) {
+		functionInfoPoMapper.delFuncColumn(control_id,func_id);
+		
+	}
+
+	@Override
+	public Integer findMaxVersionByFunId(String funcId,String state) {
+		// TODO Auto-generated method stub
+		return functionInfoPoMapper.findMaxVersionByFunId(funcId,state);
+	}
+
+	@Override
+	public Integer findMinVersionByFunId(String funcId, String state) {
+		return functionInfoPoMapper.findMinVersionByFunId(funcId,state);
+	}
+
+	@Override
+	public Integer updateFunctionInfoById(String oldId, String id) {
+		return functionInfoPoMapper.updateFunctionInfoById(oldId,id);
+	}
+
+	@Override
+	public List<FunColumnDto> selectFunColumn(FunColumnDto funcol) {
+		FunColumnPoCriteria example = new FunColumnPoCriteria();
+		FunColumnPoCriteria.Criteria func = example.createCriteria();
+		if(funcol.getFuncId()!=null && funcol.getFuncId()!=""){
+			func.andFuncIdEqualTo(funcol.getFuncId());
+		}
+		if(funcol.getTableId()!=null && funcol.getTableId()!=""){
+			func.andTableIdEqualTo(funcol.getTableId());
+		}
+		if(funcol.getColumnId()!=null && funcol.getColumnId()!=""){
+			func.andColumnIdEqualTo(funcol.getColumnId());
+		}
+		List<FunColumnPo> po=funColumnPoMapper.selectByExample(example);
+		return BeanCopyUtils.populateTListbyDListBySpring(po, FunColumnDto.class);
+	}
+
+	@Override
+	public Integer insertFunColumn(FunColumnDto funColumnDto) {
+		FunColumnPo po = BeanCopyUtils.populateTbyDBySpring(funColumnDto, FunColumnPo.class);
+		return funColumnPoMapper.insert(po);
+	}
+
+	@Override
+	public List<String> findControlByPicId(String taskId) {
+		return funColumnPoMapper.findControlByPicId(taskId);
+	}	
+
+}

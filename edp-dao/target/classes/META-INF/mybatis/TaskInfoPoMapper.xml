@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.TaskInfoPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.TaskInfoPo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="task_id" property="taskId" jdbcType="VARCHAR" />
+    <result column="task_name" property="taskName" jdbcType="VARCHAR" />
+    <result column="task_receive_time" property="taskReceiveTime" jdbcType="VARCHAR" />
+    <result column="task_start_time" property="taskStartTime" jdbcType="VARCHAR" />
+    <result column="task_spec" property="taskSpec" jdbcType="VARCHAR" />
+    <result column="task_done_time" property="taskDoneTime" jdbcType="VARCHAR" />
+    <result column="task_state" property="taskState" jdbcType="CHAR" />
+    <result column="task_owner" property="taskOwner" jdbcType="VARCHAR" />
+    <result column="task_eval_time" property="taskEvalTime" jdbcType="INTEGER" />
+    <result column="task_real_time" property="taskRealTime" jdbcType="INTEGER" />
+    <result column="task_create_time" property="taskCreateTime" jdbcType="VARCHAR" />
+    <result column="task_last_modified_time" property="taskLastModifiedTime" jdbcType="VARCHAR" />
+    <result column="task_type" property="taskType" jdbcType="CHAR" />
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+    <result column="product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="task_progress" property="taskProgress" jdbcType="INTEGER" />
+    <result column="task_version" property="taskVersion" jdbcType="INTEGER" />
+    <result column="svn_version" property="svnVersion" jdbcType="INTEGER" />
+    <result column="fence_id" property="fenceId" jdbcType="VARCHAR" />
+    <result column="real_time" property="realTime" jdbcType="VARCHAR" />
+    <result column="r3" property="r3" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, task_id, task_name, task_receive_time, task_start_time, task_spec, task_done_time, 
+    task_state, task_owner, task_eval_time, task_real_time, task_create_time, task_last_modified_time, 
+    task_type, product_id, product_name, task_progress, task_version, svn_version, fence_id, 
+    real_time, r3
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.TaskInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from task_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from task_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from task_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.TaskInfoPoCriteria" >
+    delete from task_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.TaskInfoPo" >
+    insert into task_info (id, task_id, task_name, 
+      task_receive_time, task_start_time, task_spec, 
+      task_done_time, task_state, task_owner, 
+      task_eval_time, task_real_time, task_create_time, 
+      task_last_modified_time, task_type, product_id, 
+      product_name, task_progress, task_version, 
+      svn_version, fence_id, real_time, 
+      r3)
+    values (#{id,jdbcType=VARCHAR}, #{taskId,jdbcType=VARCHAR}, #{taskName,jdbcType=VARCHAR}, 
+      #{taskReceiveTime,jdbcType=VARCHAR}, #{taskStartTime,jdbcType=VARCHAR}, #{taskSpec,jdbcType=VARCHAR}, 
+      #{taskDoneTime,jdbcType=VARCHAR}, #{taskState,jdbcType=CHAR}, #{taskOwner,jdbcType=VARCHAR}, 
+      #{taskEvalTime,jdbcType=INTEGER}, #{taskRealTime,jdbcType=INTEGER}, #{taskCreateTime,jdbcType=VARCHAR}, 
+      #{taskLastModifiedTime,jdbcType=VARCHAR}, #{taskType,jdbcType=CHAR}, #{productId,jdbcType=VARCHAR}, 
+      #{productName,jdbcType=VARCHAR}, #{taskProgress,jdbcType=INTEGER}, #{taskVersion,jdbcType=INTEGER}, 
+      #{svnVersion,jdbcType=INTEGER}, #{fenceId,jdbcType=VARCHAR}, #{realTime,jdbcType=VARCHAR}, 
+      #{r3,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.TaskInfoPo" >
+    insert into task_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="taskId != null" >
+        task_id,
+      </if>
+      <if test="taskName != null" >
+        task_name,
+      </if>
+      <if test="taskReceiveTime != null" >
+        task_receive_time,
+      </if>
+      <if test="taskStartTime != null" >
+        task_start_time,
+      </if>
+      <if test="taskSpec != null" >
+        task_spec,
+      </if>
+      <if test="taskDoneTime != null" >
+        task_done_time,
+      </if>
+      <if test="taskState != null" >
+        task_state,
+      </if>
+      <if test="taskOwner != null" >
+        task_owner,
+      </if>
+      <if test="taskEvalTime != null" >
+        task_eval_time,
+      </if>
+      <if test="taskRealTime != null" >
+        task_real_time,
+      </if>
+      <if test="taskCreateTime != null" >
+        task_create_time,
+      </if>
+      <if test="taskLastModifiedTime != null" >
+        task_last_modified_time,
+      </if>
+      <if test="taskType != null" >
+        task_type,
+      </if>
+      <if test="productId != null" >
+        product_id,
+      </if>
+      <if test="productName != null" >
+        product_name,
+      </if>
+      <if test="taskProgress != null" >
+        task_progress,
+      </if>
+      <if test="taskVersion != null" >
+        task_version,
+      </if>
+      <if test="svnVersion != null" >
+        svn_version,
+      </if>
+      <if test="fenceId != null" >
+        fence_id,
+      </if>
+      <if test="realTime != null" >
+        real_time,
+      </if>
+      <if test="r3 != null" >
+        r3,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="taskId != null" >
+        #{taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="taskName != null" >
+        #{taskName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskReceiveTime != null" >
+        #{taskReceiveTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskStartTime != null" >
+        #{taskStartTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskSpec != null" >
+        #{taskSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="taskDoneTime != null" >
+        #{taskDoneTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskState != null" >
+        #{taskState,jdbcType=CHAR},
+      </if>
+      <if test="taskOwner != null" >
+        #{taskOwner,jdbcType=VARCHAR},
+      </if>
+      <if test="taskEvalTime != null" >
+        #{taskEvalTime,jdbcType=INTEGER},
+      </if>
+      <if test="taskRealTime != null" >
+        #{taskRealTime,jdbcType=INTEGER},
+      </if>
+      <if test="taskCreateTime != null" >
+        #{taskCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskLastModifiedTime != null" >
+        #{taskLastModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskType != null" >
+        #{taskType,jdbcType=CHAR},
+      </if>
+      <if test="productId != null" >
+        #{productId,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null" >
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskProgress != null" >
+        #{taskProgress,jdbcType=INTEGER},
+      </if>
+      <if test="taskVersion != null" >
+        #{taskVersion,jdbcType=INTEGER},
+      </if>
+      <if test="svnVersion != null" >
+        #{svnVersion,jdbcType=INTEGER},
+      </if>
+      <if test="fenceId != null" >
+        #{fenceId,jdbcType=VARCHAR},
+      </if>
+      <if test="realTime != null" >
+        #{realTime,jdbcType=VARCHAR},
+      </if>
+      <if test="r3 != null" >
+        #{r3,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.TaskInfoPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from task_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update task_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskId != null" >
+        task_id = #{record.taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskName != null" >
+        task_name = #{record.taskName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskReceiveTime != null" >
+        task_receive_time = #{record.taskReceiveTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskStartTime != null" >
+        task_start_time = #{record.taskStartTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskSpec != null" >
+        task_spec = #{record.taskSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskDoneTime != null" >
+        task_done_time = #{record.taskDoneTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskState != null" >
+        task_state = #{record.taskState,jdbcType=CHAR},
+      </if>
+      <if test="record.taskOwner != null" >
+        task_owner = #{record.taskOwner,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskEvalTime != null" >
+        task_eval_time = #{record.taskEvalTime,jdbcType=INTEGER},
+      </if>
+      <if test="record.taskRealTime != null" >
+        task_real_time = #{record.taskRealTime,jdbcType=INTEGER},
+      </if>
+      <if test="record.taskCreateTime != null" >
+        task_create_time = #{record.taskCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskLastModifiedTime != null" >
+        task_last_modified_time = #{record.taskLastModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskType != null" >
+        task_type = #{record.taskType,jdbcType=CHAR},
+      </if>
+      <if test="record.productId != null" >
+        product_id = #{record.productId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productName != null" >
+        product_name = #{record.productName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskProgress != null" >
+        task_progress = #{record.taskProgress,jdbcType=INTEGER},
+      </if>
+      <if test="record.taskVersion != null" >
+        task_version = #{record.taskVersion,jdbcType=INTEGER},
+      </if>
+      <if test="record.svnVersion != null" >
+        svn_version = #{record.svnVersion,jdbcType=INTEGER},
+      </if>
+      <if test="record.fenceId != null" >
+        fence_id = #{record.fenceId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.realTime != null" >
+        real_time = #{record.realTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.r3 != null" >
+        r3 = #{record.r3,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update task_info
+    set id = #{record.id,jdbcType=VARCHAR},
+      task_id = #{record.taskId,jdbcType=VARCHAR},
+      task_name = #{record.taskName,jdbcType=VARCHAR},
+      task_receive_time = #{record.taskReceiveTime,jdbcType=VARCHAR},
+      task_start_time = #{record.taskStartTime,jdbcType=VARCHAR},
+      task_spec = #{record.taskSpec,jdbcType=VARCHAR},
+      task_done_time = #{record.taskDoneTime,jdbcType=VARCHAR},
+      task_state = #{record.taskState,jdbcType=CHAR},
+      task_owner = #{record.taskOwner,jdbcType=VARCHAR},
+      task_eval_time = #{record.taskEvalTime,jdbcType=INTEGER},
+      task_real_time = #{record.taskRealTime,jdbcType=INTEGER},
+      task_create_time = #{record.taskCreateTime,jdbcType=VARCHAR},
+      task_last_modified_time = #{record.taskLastModifiedTime,jdbcType=VARCHAR},
+      task_type = #{record.taskType,jdbcType=CHAR},
+      product_id = #{record.productId,jdbcType=VARCHAR},
+      product_name = #{record.productName,jdbcType=VARCHAR},
+      task_progress = #{record.taskProgress,jdbcType=INTEGER},
+      task_version = #{record.taskVersion,jdbcType=INTEGER},
+      svn_version = #{record.svnVersion,jdbcType=INTEGER},
+      fence_id = #{record.fenceId,jdbcType=VARCHAR},
+      real_time = #{record.realTime,jdbcType=VARCHAR},
+      r3 = #{record.r3,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.TaskInfoPo" >
+    update task_info
+    <set >
+      <if test="taskId != null" >
+        task_id = #{taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="taskName != null" >
+        task_name = #{taskName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskReceiveTime != null" >
+        task_receive_time = #{taskReceiveTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskStartTime != null" >
+        task_start_time = #{taskStartTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskSpec != null" >
+        task_spec = #{taskSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="taskDoneTime != null" >
+        task_done_time = #{taskDoneTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskState != null" >
+        task_state = #{taskState,jdbcType=CHAR},
+      </if>
+      <if test="taskOwner != null" >
+        task_owner = #{taskOwner,jdbcType=VARCHAR},
+      </if>
+      <if test="taskEvalTime != null" >
+        task_eval_time = #{taskEvalTime,jdbcType=INTEGER},
+      </if>
+      <if test="taskRealTime != null" >
+        task_real_time = #{taskRealTime,jdbcType=INTEGER},
+      </if>
+      <if test="taskCreateTime != null" >
+        task_create_time = #{taskCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskLastModifiedTime != null" >
+        task_last_modified_time = #{taskLastModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="taskType != null" >
+        task_type = #{taskType,jdbcType=CHAR},
+      </if>
+      <if test="productId != null" >
+        product_id = #{productId,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null" >
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskProgress != null" >
+        task_progress = #{taskProgress,jdbcType=INTEGER},
+      </if>
+      <if test="taskVersion != null" >
+        task_version = #{taskVersion,jdbcType=INTEGER},
+      </if>
+      <if test="svnVersion != null" >
+        svn_version = #{svnVersion,jdbcType=INTEGER},
+      </if>
+      <if test="fenceId != null" >
+        fence_id = #{fenceId,jdbcType=VARCHAR},
+      </if>
+      <if test="realTime != null" >
+        real_time = #{realTime,jdbcType=VARCHAR},
+      </if>
+      <if test="r3 != null" >
+        r3 = #{r3,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.TaskInfoPo" >
+    update task_info
+    set task_id = #{taskId,jdbcType=VARCHAR},
+      task_name = #{taskName,jdbcType=VARCHAR},
+      task_receive_time = #{taskReceiveTime,jdbcType=VARCHAR},
+      task_start_time = #{taskStartTime,jdbcType=VARCHAR},
+      task_spec = #{taskSpec,jdbcType=VARCHAR},
+      task_done_time = #{taskDoneTime,jdbcType=VARCHAR},
+      task_state = #{taskState,jdbcType=CHAR},
+      task_owner = #{taskOwner,jdbcType=VARCHAR},
+      task_eval_time = #{taskEvalTime,jdbcType=INTEGER},
+      task_real_time = #{taskRealTime,jdbcType=INTEGER},
+      task_create_time = #{taskCreateTime,jdbcType=VARCHAR},
+      task_last_modified_time = #{taskLastModifiedTime,jdbcType=VARCHAR},
+      task_type = #{taskType,jdbcType=CHAR},
+      product_id = #{productId,jdbcType=VARCHAR},
+      product_name = #{productName,jdbcType=VARCHAR},
+      task_progress = #{taskProgress,jdbcType=INTEGER},
+      task_version = #{taskVersion,jdbcType=INTEGER},
+      svn_version = #{svnVersion,jdbcType=INTEGER},
+      fence_id = #{fenceId,jdbcType=VARCHAR},
+      real_time = #{realTime,jdbcType=VARCHAR},
+      r3 = #{r3,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="findTaskInfoByDate" resultMap="BaseResultMap">
+      select   *   from   task_info   
+      where  ( 
+           Date(str_to_date(#{date}, '%m/%d/%Y')) 
+           between Date(str_to_date(task_start_time, '%m/%d/%Y')) 
+           and (Date(str_to_date(task_done_time, '%m/%d/%Y')))
+      )
+      and task_state in (${state})
+      and task_owner = #{user_id}
+  </select>
+  
+  <select id="findTaskInfoByProductIdAndDate" resultMap="BaseResultMap">
+      select   *   from   task_info   
+      where  ( 
+           Date(str_to_date(#{date}, '%m/%d/%Y')) 
+           between Date(str_to_date(task_start_time, '%m/%d/%Y')) 
+           and (Date(str_to_date(task_done_time, '%m/%d/%Y')))
+      ) 
+      and task_state in (${state})
+      and product_id = #{product_id}
+  </select>
+  
+  <select id="findFunctionIdByScene" resultType="java.lang.String">
+      select function_id from scene_function sf 
+      left join task_info t on t.id=sf.function_id
+      where sf.scene_id in (${scene_id}) and t.task_state = "00"
+  </select>
+  
+</mapper>

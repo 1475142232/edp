@@ -1,0 +1,133 @@
+KISSY.add('usermanage-module/src/modifypassword',function(S,Node, Event,IO,Overlay,AlertDialog) {
+     function ModifyPassword() {
+    	var _this = this,
+    	$ = Node.all,
+    	returnVal = true,
+    	alertDialog = new AlertDialog();
+    	
+	    this.renderInformation = function() {
+	    	_this.dialogPassword();
+	    };
+	    this.dialogPassword = function() {
+	        var dialog = new Overlay.Dialog({
+	            width:500,
+	            height:370,
+	            elCls : 'custom-dialog',
+	            //配置DOM容器的编号
+	            contentId:'editPassword',
+	            buttons : []
+	          });
+	        dialog.show();
+	    };
+	    
+	    this.checkPassValidate = function() {
+	    	var beforePassword = $("#beforePassWord").val();
+	    	IO({
+	    		url:"passwordController/comparePassword.action",
+	    		type:"post",
+	    		async : false,
+	    		data:{'password':beforePassword},
+	    		success:function(databack){
+	    			if(databack!==null && databack!==undefined){
+			    		if (databack == "1") {
+			    			returnVal = true;
+			    		} else {
+			    			returnVal = false;
+			    		}
+			    	}
+	    		}
+	    	});
+	    	return returnVal;
+	    };
+	    
+    	Event.on("#beforePassWord", 'blur', function() {
+    		var beforePassword = $("#beforePassWord").val();
+    		if (beforePassword.length < 6 || beforePassword.length > 20) {
+    			Node.all("#beforePassWordAlter").remove();
+    			$("#beforePassWord").parent().append(newErrorMsg("beforePassWordAlter",'原密码长度只能为6到20位'));
+    			$("#beforePassWord").val('');
+    			return;
+    		} else if (!_this.checkPassValidate()) {
+    			Node.all("#beforePassWordAlter").remove();
+    			$("#beforePassWord").parent().append(newErrorMsg("beforePassWordAlter",'原密码和登录密码不一致'));
+    			$("#beforePassWord").val('');
+    			return;
+    		}
+    	});
+    	
+    	Event.on("#beforePassWord", 'keydown', function(){
+    		Node.all("#beforePassWordAlter").remove();
+    	});
+    	
+    	Event.on("#newPassWord", 'blur', function() {
+    		var newPassword = $("#newPassWord").val();
+    		var beforePassword = $("#beforePassWord").val();
+    		if (newPassword.length < 6 || newPassword.length > 20) {
+    			Node.all("#newPassWordAlter").remove();
+    			$("#newPassWord").parent().append(newErrorMsg("newPassWordAlter",'新密码长度只能为6到20位'));
+    			$("#newPassWord").val('');
+    			return;
+    		} else if (newPassWord === beforePassword) {
+    			Node.all("#newPassWordAlter").remove();
+    			$("#newPassWord").parent().append(newErrorMsg("newPassWordAlter",'新密码不能和原密码相同'));
+    			$("#newPassWord").val('');
+    			return;
+    		}
+    	});
+    	Event.on("#newPassWord", 'keydown', function(){
+    		Node.all("#newPassWordAlter").remove();
+    	});
+    	Event.on("#repeatPassWord", 'blur', function() {
+    		var newPassword = $("#newPassWord").val();
+    		var repeatPassword = $("#repeatPassWord").val();
+    		if (repeatPassword !== newPassword) {
+    			Node.all("#repeatPassWordAlter").remove();
+    			$("#repeatPassWord").parent().append(newErrorMsg("repeatPassWordAlter",'重复密码和新密码必须相同'));
+    			$("#repeatPassWord").val('');
+    			return;
+    		}
+    	});
+    	Event.on("#repeatPassWord", 'keydown', function(){
+    		Node.all("#repeatPassWordAlter").remove();
+    	});
+    	Event.on("#btnOk", 'click', function() {
+    		var newPassword = $("#newPassWord").val();
+    		var repeatPassword = $("#repeatPassWord").val();
+    		var beforePassword = $("#beforePassWord").val();
+    		if (beforePassword === null || beforePassword === "") {
+    			Node.all("#beforePassWordAlter").remove();
+    			$("#beforePassWord").parent().append(newErrorMsg("beforePassWordAlter",'原密码不能为空'));
+    			return;
+    		}
+    		if (newPassword === null || newPassword === "") {
+    			Node.all("#newPassWordAlter").remove();
+    			$("#newPassWord").parent().append(newErrorMsg("newPassWordAlter",'新密码不能为空'));
+    			return;
+    		}
+    		if (repeatPassword === null || repeatPassword === "") {
+    			Node.all("#repeatPassWordAlter").remove();
+    			$("#repeatPassWord").parent().append(newErrorMsg("repeatPassWordAlter",'重复密码不能为空'));
+    			return;
+    		}
+    		if(!returnVal)return;
+    		IO({
+	    		url:"passwordController/updatePwd.action",
+	    		type:"post",
+	    		async : false,
+	    		data:{'password':newPassword},
+	    		success:function(databack){
+	    			if(databack!==undefined){
+		    			Node.all(".bui-ext-mask,.bui-dialog").hide();
+			    	}
+	    		}
+	    	});
+    	});
+     }; 
+    return ModifyPassword;
+}, {
+	requires : ['node', 
+	            'event', 
+	            'io',
+	            'bui/overlay',
+	            'common-module/src/alertDialog']
+});

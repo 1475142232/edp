@@ -1,0 +1,464 @@
+package com.edp.admin.scene;
+
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.http.HttpSession;
+
+import com.edp.admin.common.BaseController;
+import com.edp.admin.login.UserInfoBean;
+import com.edp.common.constant.Constants;
+import com.edp.common.jedis.JedisUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import org.activiti.editor.constants.ModelDataJsonConstants;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.serviceI.dto.ControlDto;
+import com.edp.serviceI.dto.FunConTrolDto;
+import com.edp.serviceI.dto.MasterDto;
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.dto.SceneInfoDto;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import com.edp.serviceI.product.ProductServiceI;
+import com.edp.serviceI.sceneinfo.SceneInfoServiceI;
+import com.edp.serviceI.tree.TreeServiceI;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
+
+import redis.clients.jedis.Jedis;
+@Controller
+@RequestMapping("sceneController")
+public class SceneController extends BaseController{
+	@Autowired
+	private SceneInfoServiceI sceneInfoService;
+	@Autowired
+	private TreeServiceI treeServiceI;
+	@Autowired
+	private ProductServiceI productService;
+	@Autowired
+	private FunctionInfoServiceI functionInfoServiceI;
+	@Autowired   
+	private RepositoryService repositoryService;  
+	
+	
+	
+private static final Logger LOGGER = LoggerFactory.getLogger(SceneController.class);
+
+	private Gson gson = new Gson();
+	
+	@RequestMapping(value = "/scenelist.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String getAllScenes(SceneInfoDto dto){
+		SceneInfoDto allScenes = sceneInfoService.getAllScenes(dto);
+		return gson.toJson(allScenes);
+	}
+	//根据id查询商品
+	@RequestMapping(value = "/getsceneById.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String selectSceneById(String Id){
+		SceneInfoDto sceneById = sceneInfoService.getSceneById(Id);
+		return gson.toJson(sceneById);
+	}
+	
+	//添加商品
+//	@RequestMapping(value = "/addscene.action" , method = { RequestMethod.GET,RequestMethod.POST })
+//	@ResponseBody
+//	public String addscene(String SceneName,String ParentId,String opType, HttpSession session){
+//		String[] names=SceneName.split("\r\n");//根据回车截取字符串("\n")
+//		SceneInfoDto dto=new SceneInfoDto();//新建承载类
+//		//获取系统时间
+//	    Date today = new Date();
+//	    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//	    //获取session中的用户信息
+//		UserInfoBean userInfoBean=(UserInfoBean)session.getAttribute("userInfoBean");
+//		ProductDto  productDto=productService.getProductById((String)session.getAttribute("productId"));  
+//		List<MasterDto> master=new ArrayList<MasterDto>();
+//		for(int i=0;i<names.length;i++){
+//			String id=SequenceManage.getSequence("");
+//			dto.setId(id);
+//			dto.setSceneCreateTime(sdf.format(today));
+//			dto.setSceneCreater(userInfoBean.getUsername());
+//			dto.setSceneName(names[i]);
+//			sceneInfoService.addScene(dto);
+//			MasterDto masterDto=new MasterDto();
+//			masterDto.setId(id);
+//			masterDto.setTreeNodeName(names[i]);
+//			masterDto.setTreeNodeType("8");		
+//			masterDto.setTreeNodeId(productDto.getId());
+//			masterDto.setText(names[i]);
+//			String state="";
+//			Jedis client = JedisUtils.getJedis();
+//			if("2".equals(opType)){
+//				String change=client.get("CHANGE_NODE");
+//				Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+//				masterDto.setTreeNodeState(Constants.TreeStates.CHANGE_ADD);
+//				state=Constants.TreeStates.CHANGE_ADD;
+//				Constants.CHANGE_NODE.get(productDto.getId()).add(masterDto);
+//				Map<String,List<Object>> JsonChange=Constants.CHANGE_NODE;
+//				client.set("CHANGE_NODE", gson.toJson(JsonChange));
+//				
+//			}else{
+//				String change=client.get("NORMAL_NODE");
+//				Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+//				masterDto.setTreeNodeState(Constants.TreeStates.NORMAL_ADD);
+//				state=Constants.TreeStates.NORMAL_ADD;
+//				Constants.NORMAL_NODE.get(productDto.getId()).add(masterDto);
+//				Map<String,List<Object>> JsonNormal=Constants.NORMAL_NODE;
+//				client.set("NORMAL_NODE", gson.toJson(JsonNormal));
+//			}
+//			JedisUtils.returnResource(client);
+//			treeServiceI.addTreeNode(masterDto);
+//			String tree=treeServiceI.findJsonTreeById(productDto.getId(),state);
+//			master.add(masterDto);
+//			treeServiceI.newModel(id);		
+//			JSONObject a = JSON.parseObject(tree); 
+//			JSONArray jsonArr = (JSONArray) a.get("children");
+//			JSONObject b= (JSONObject)jsonArr.get(0);
+//			if(b.containsKey("children") == false){
+//				b.put("children", new JSONArray());
+//			}
+//			JSONArray jsonArrs= (JSONArray)b.get("children");
+//			jsonArrs.add(JSON.parseObject(gson.toJson(masterDto)));
+//			treeServiceI.editTreeByProductId(productDto.getId(),a.toString(),state);
+//		}
+//		return gson.toJson(master);
+//	}
+	//修改商品
+	@RequestMapping(value = "/updatescene.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+//	public String updateScene(SceneInfoDto dto,String opType, HttpSession session){
+//		//获取系统时间
+//	    Date today = new Date();
+//	    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//		//获取session中的用户信息
+//		UserInfoBean userInfoBean=(UserInfoBean)session.getAttribute("userInfoBean");
+//		SceneInfoDto sceneById = sceneInfoService.getSceneById(dto.getId());	
+//	    RequestmentDto requestmentDto=treeServiceI.findTreeNodeById(dto.getId());
+//	    ProductDto  productDto=productService.getProductById((String)session.getAttribute("productId"));
+//	    String state="";
+//		if(requestmentDto.getTreeNodeState().equals("66")){
+//			String oldId=requestmentDto.getId();
+//			String id=SequenceManage.getSequence("");
+//			sceneById.setId(id);
+//	        sceneById.setSceneCreater(userInfoBean.getUsername());
+//	        sceneById.setSceneCreateTime(sdf.format(today));
+//		    sceneById.setSceneName(dto.getSceneName());
+//		    sceneById.setSceneSpec(dto.getSceneSpec());
+//		    sceneInfoService.addScene(sceneById);
+//		    requestmentDto.setId(id);
+//		    requestmentDto.setTreeNodeCreateperson(userInfoBean.getUsername());
+//		    requestmentDto.setTreeNodeCreatetime(sdf.format(today));
+//		    requestmentDto.setTreeNodeName(dto.getSceneName());
+//		    requestmentDto.setTreeNodeDesc(dto.getSceneSpec());
+//			MasterDto po = BeanCopyUtils.populateTbyDBySpring(requestmentDto, MasterDto.class);
+//			Jedis client = JedisUtils.getJedis();
+//		    if("2".equals(opType)){
+//				String change=client.get("CHANGE_NODE");
+//				Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+//		    	requestmentDto.setTreeNodeState(Constants.TreeStates.CHANGE_ADD);
+//		    	state=Constants.TreeStates.CHANGE_ADD;
+//				Constants.CHANGE_NODE.get(productDto.getId()).add(po);
+//				Map<String,List<Object>> JsonChange=Constants.CHANGE_NODE;
+//				client.set("CHANGE_NODE", gson.toJson(JsonChange));				
+//			}else{
+//				String change=client.get("NORMAL_NODE");
+//				Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+//				requestmentDto.setTreeNodeState(Constants.TreeStates.NORMAL_ADD);
+//				state=Constants.TreeStates.NORMAL_ADD;
+//				Constants.NORMAL_NODE.get(productDto.getId()).add(po);
+//				Map<String,List<Object>> JsonNormal=Constants.NORMAL_NODE;
+//				client.set("NORMAL_NODE", gson.toJson(JsonNormal));
+//			}
+//		    JedisUtils.returnResource(client);
+//		    treeServiceI.addTreeNode(requestmentDto, productDto.getId());	
+//		    FunConTrolDto func=new FunConTrolDto();
+//		    func.setSceneId(oldId);
+//		    List<FunConTrolDto> funcolumn=sceneInfoService.selectFunControl(func);
+//		    for(int i=0;i<funcolumn.size();i++){
+//		    	funcolumn.get(i).setId(null);
+//		    	funcolumn.get(i).setSceneId(id);
+//		    	sceneInfoService.insertFunConTrol(funcolumn.get(i));
+//		    }
+//		    List<String> Func=functionInfoServiceI.findFunctionBySceneId(oldId);
+//		    Map<String,String> ids=new HashMap<String,String>();
+//			for(int j=0;j<Func.size();j++){
+//				List<String> control_id=functionInfoServiceI.findControlByFuncId(oldId,Func.get(j));
+//				ControlDto controlDto=new ControlDto();
+//				controlDto.setControl_id(control_id.get(0));
+//				ids.put(control_id.get(0), Func.get(j));
+//				controlDto.setFunc_id( Func.get(j));
+//				controlDto.setScene_id(id);
+//				controlDto.setFc_state("01");
+//				functionInfoServiceI.addFcName(controlDto);
+//			}
+//			copyModel(oldId,id,ids);
+//		}else{
+//			dto.setSceneModifiedPerson(userInfoBean.getUsername());
+//			dto.setSceneModifiedTime(sdf.format(today));
+//			sceneInfoService.updateScene(dto);		
+//			requestmentDto.setTreeNodeName(dto.getSceneName());
+//			requestmentDto.setTreeNodeDesc(dto.getSceneSpec());
+//			requestmentDto.setTreeNodeModifiedtime(sdf.format(today));
+//			requestmentDto.setTreeId(requestmentDto.getId());
+//			treeServiceI.editTreeNode(requestmentDto);
+//			state=requestmentDto.getTreeNodeState();
+//			List<Object> object;
+//			Jedis client = JedisUtils.getJedis();
+//			if("2".equals(opType)){
+//				String change=client.get("CHANGE_NODE");
+//				Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+//				object=Constants.CHANGE_NODE.get(productDto.getId());
+//			}else{			
+//				String change=client.get("NORMAL_NODE");
+//				Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+//				object=Constants.NORMAL_NODE.get(productDto.getId());		
+//			}		
+//            for(int i=0;i<object.size();i++){
+//            	MasterDto masterDto=JSON.parseObject(object.get(i).toString(),MasterDto.class);
+//            	if(masterDto.getId().equals(requestmentDto.getId())){
+//            		MasterDto po = BeanCopyUtils.populateTbyDBySpring(requestmentDto, MasterDto.class);
+//            		object.set(i, po);
+//            		break;
+//            	}
+//            }	
+//			if("2".equals(opType)){
+//				String change=client.get("CHANGE_NODE");
+//				Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+//			}else{
+//				String change=client.get("NORMAL_NODE");
+//				Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+//			}
+//			JedisUtils.returnResource(client);
+//		}
+//		MasterDto master=BeanCopyUtils.populateTbyDBySpring(requestmentDto,MasterDto.class);
+//		String tree=treeServiceI.findJsonTreeById(productDto.getId(),state);
+//		JSONObject a = JSON.parseObject(tree); 
+//		JSONArray jsonArr = (JSONArray) a.get("children");
+//		JSONObject b= (JSONObject)jsonArr.get(0);
+//		JSONArray jsonArrs= (JSONArray)b.get("children");
+//		for(int i=0;i<jsonArrs.size();i++){
+//			JSONObject json=(JSONObject)jsonArrs.get(i);
+//			if(json.get("id").equals(dto.getId())){
+//			    jsonArrs.set(i, JSON.parseObject(gson.toJson(master)));
+//			    break;
+//			}
+//		}
+//		treeServiceI.editTreeByProductId(productDto.getId(),a.toString(),state);
+//		//预存
+//		return gson.toJson(master);
+//	}
+	//删除商品
+//	@RequestMapping(value = "/delscene.action" , method = { RequestMethod.GET,RequestMethod.POST })
+//	public String delScene(String Id, HttpSession session){
+//		//获取系统时间
+//	    Date today = new Date();
+//	    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//		//获取session中的用户信息
+//		UserInfoBean userInfoBean=(UserInfoBean)session.getAttribute("userInfoBean");
+//		RequestmentDto requestmentDto=treeServiceI.findTreeNodeById(Id);
+//		if(requestmentDto.getTreeNodeState().equals("66")){
+//			  requestmentDto.setId(SequenceManage.getSequence(""));
+//			  requestmentDto.setTreeNodeVersion(0);
+//			  requestmentDto.setTreeNodeState("33");
+//			  requestmentDto.setTreeNodeCreateperson(userInfoBean.getUsername());
+//			  requestmentDto.setTreeNodeCreatetime(sdf.format(today));
+//			  treeServiceI.addTreeNode(requestmentDto, (String)session.getAttribute("productId"));
+//		}else{
+//			requestmentDto.setTreeNodeState("33");
+//			treeServiceI.editTreeNode(requestmentDto);
+//		}		
+//		return gson.toJson("1");
+//	}
+	
+	 /**
+		 * 调整流程编辑页面并查询回显流程
+		 * @param id
+		 * @param request
+		 * @param response
+		 */
+		public void copyModel(String id, String newId,Map<String,String> ids) {  
+			try {    
+				//查询model信息
+				List<Model> modelList = repositoryService.createModelQuery().modelKey(id).list();
+				Model modelData = null;
+				Integer num = 0;
+				for (int i = 0; i < modelList.size(); i++) {
+					if(num < modelList.get(i).getVersion()){
+						num = modelList.get(i).getVersion();
+					}
+				}
+				for (int i = 0; i < modelList.size(); i++) {
+					if(modelList.get(i).getVersion() == num){
+						modelData = modelList.get(i);
+					}
+				}
+				if(modelData != null){
+					JsonNode editorNode = new ObjectMapper().readTree(repositoryService.getModelEditorSource(modelData.getId())); 
+					byte[] bytes = repositoryService.getModelEditorSourceExtra(modelData.getId());
+					//创建新的流程模型
+					Model newModel = repositoryService.newModel();
+					newModel.setCategory(modelData.getCategory());
+					newModel.setDeploymentId(modelData.getDeploymentId());
+					newModel.setKey(newId);
+					newModel.setMetaInfo(modelData.getMetaInfo());
+					newModel.setName(modelData.getName());
+					newModel.setTenantId(modelData.getTenantId());
+					newModel.setVersion(0);
+					repositoryService.saveModel(newModel);    
+					
+					//拼接新的xml文件
+					String json_xml = "{";
+					int count = 0;
+					for (Iterator iterator = editorNode.fields(); iterator.hasNext();) {
+						Entry<String, JsonNode> entry = (Entry<String, JsonNode>) iterator.next();
+						if(entry.getKey().equals("childShapes")){
+							json_xml += ",\"" + entry.getKey() + "\":";
+							String childShapes = "[";
+							ArrayNode arrayNode = (ArrayNode) entry.getValue();
+							for (int i = 0; i < arrayNode.size(); i++) {
+								boolean bool = false;
+								JsonNode node = arrayNode.get(i);
+								if(i == 0){
+									childShapes += "{";
+								}else{
+									childShapes += ",{";
+								}
+								int count2 = 0;
+								for (Iterator<?> iterator2 = node.fields(); iterator2.hasNext();) {
+									Entry<String, JsonNode> entry2 = (Entry<String, JsonNode>) iterator2.next();
+									String value = entry2.getValue().toString();
+									for (String key : ids.keySet()){
+										//判断是否是需要修改的节点
+										if(value.equals("\""+ key +"\"") && entry2.getKey().equals("resourceId")){
+											bool = true;
+										}
+										if(bool && entry2.getKey().equals("properties")){
+											String properties = "{";
+											JsonNode node2 = entry2.getValue();
+											JsonNode func = node2.findValue("belongtofunction");
+											JsonNode table = node2.findValue("belongtotable");
+											int count3 = 0;
+											if(func != null){ //替换为新的关联功能
+												properties += "\"belongtofunction\":{";
+												properties += "\"belongFunction\":" + func.findValue("belongFunction").toString();
+												properties += ",\"id\":\"" + ids.get(key)+"\"";
+												properties += ",\"type\": 0";
+												properties += "}";
+												count3++;
+											}else if(table != null){ //替换为新的关联数据库表
+												properties += "\"belongtotable\":{";
+												properties += "\"belongtable\":" + table.findValue("belongtable").toString();
+												properties += ",\"id\":" + ids.get(key);
+//											properties += ",\"type\": 0";
+												properties += "}";
+												count3++;
+											}
+											for (Iterator iterator3 = node2.fields(); iterator3.hasNext();) {
+												Entry<String, JsonNode> entry3 = (Entry<String, JsonNode>) iterator3.next();
+												if(!entry3.getKey().equals("belongtofunction") && !entry3.getKey().equals("belongtotable")){
+													if(count3 == 0){
+														properties += "\""+entry3.getKey()+"\":" + entry3.getValue();
+													}else{
+														properties += ",\""+entry3.getKey()+"\":" + entry3.getValue();
+													}
+													count3++;
+												}
+											}
+											properties += "}";
+											childShapes += ",\"" + entry2.getKey() + "\":" + properties;
+										}else{
+											if(count2 == 0){
+												childShapes += "\""+ entry2.getKey() + "\":" + entry2.getValue();
+											}else{
+												childShapes += ",\"" + entry2.getKey() + "\":" + entry2.getValue();
+											}
+										}
+									}
+									count2++;
+								}
+								childShapes += "}";
+							}
+							childShapes += "]";
+							json_xml += childShapes;
+						}else{
+							if(count == 0){
+								json_xml += "\"" + entry.getKey() + "\":" + entry.getValue();
+							}else{
+								json_xml += ",\""+ entry.getKey() + "\":" + entry.getValue();
+							}
+						}
+						count++;
+					}
+					json_xml += "}";
+					repositoryService.addModelEditorSource(newModel.getId(), json_xml.getBytes("utf-8"));
+					repositoryService.addModelEditorSourceExtra(newModel.getId(), bytes);
+				}else{
+					defModel(newId);
+				}
+			      
+			} catch (Exception e) {    
+				e.getStackTrace();
+			}   
+		} 
+		/**
+		 * 创建默认的流程图
+		 */
+		public void defModel(String key){
+			try {
+				ObjectMapper objectMapper = new ObjectMapper();   
+				ObjectNode  modelObjectNode  =  objectMapper.createObjectNode();     
+				modelObjectNode.put(ModelDataJsonConstants.MODEL_NAME,  "标题");     
+				modelObjectNode.put(ModelDataJsonConstants.MODEL_REVISION, 1);     
+				modelObjectNode.put(ModelDataJsonConstants.MODEL_DESCRIPTION,     
+						org.apache.commons.lang3.StringUtils           
+						.defaultString("描述"));
+				//创建流程模型
+				Model newModel = repositoryService.newModel();
+				newModel.setMetaInfo(modelObjectNode.toString());   
+				newModel.setName("标题");   
+				newModel.setKey(key);
+				newModel.setVersion(0);
+				repositoryService.saveModel(newModel);    
+				
+				//保存二进制流程
+				ObjectNode editorNode = objectMapper.createObjectNode();   
+				editorNode.put("id", "canvas");    
+				editorNode.put("resourceId", "canvas");
+				ObjectNode stencilSetNode = objectMapper.createObjectNode(); 
+				stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");    
+				editorNode.put("stencilset", stencilSetNode);
+				ArrayNode arrayNode = objectMapper.createArrayNode();
+				editorNode.put("childShapes", arrayNode);  
+			
+				repositoryService.addModelEditorSource(newModel.getId(), editorNode.toString().getBytes("utf-8"));
+				
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+}

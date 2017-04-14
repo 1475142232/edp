@@ -1,0 +1,24 @@
+/**
+ * 包配置config.js，规范模块声明，同时便于跑测试引包模块。或可为测试环节单独配置config_testOnly.js
+ * 
+ */
+KISSY.config({
+	'packages':{
+		'common-module':{
+			debug:true,
+			tag:'20160830',
+			base:'./src',
+			combine:false
+		},'systemlogin-module':{
+			debug:true,
+			tag:'20160830',
+			base:'.././src',
+			combine:false
+		},'teamcreat-module':{
+			debug:true,
+			tag:'20160830',
+			base:'./src',
+			combine:false
+		}
+	}
+});

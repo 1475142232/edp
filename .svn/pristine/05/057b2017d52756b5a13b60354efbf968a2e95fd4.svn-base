@@ -1,0 +1,161 @@
+KISSY.add("myself-module/src/myself",function(S){
+	function Myself(){
+		var _this = this;
+		
+		this.init = function(){
+			_this.getUserInfo();
+			_this.getUserTask();
+		};
+		
+		/*
+		 * 获取用户的个人信息
+		 */
+		this.getUserInfo = function(){
+			$.ajax({
+	             type: "post",
+	             url: "userController/getUser.action",
+	             dataType: "json",
+	             success: function(data){
+	            	 if(data !== null){
+	            		 $("#info_UserId").text(data.id);
+	            		 $("#info_UserName").text(data.userName);
+	            		 $("#info_UserMail").text(data.userMail);
+	            	 }else{
+	            		 $('#modelInfo').text("查询失败，请联系管理员!");
+	            		 $('#myModal').modal('show');
+	            	 }
+	             },
+	             error: function(errorTwon){
+	            	 
+	             }
+	        });
+		};
+		
+		/*
+		 * 获取用户所有任务
+		 */
+		this.getUserTask = function(){
+			$("#noList").html('');
+			$("#yesList").html('');
+			$("#approveList").html('');
+			$.ajax({
+	             type: "post",
+	             url: "TaskInfoController/findTaskInfoByUserId.action",
+	             dataType: "json",
+	             success: function(data){
+	            	 if(data !== null && data.length > 0){
+	            		 //未完成的任务
+	            		 if(data[0] !== null && data[0].length > 0){
+	            			 var taskHtml = '<div class="task-list-info">'
+	            				 +'<div class="task-list-info-name">'
+	            				 +'<input type="radio" name="task" style="float:left;" id="'+ data[0].id +'" />'
+	            				 +'<span class="info-taskname">'+ data[0].taskName +'</span>'
+	            				 +'<span class="info-tasktime">交付时间：</span>'
+	            				 +'<span class="info-tasktime">'+ data[0].task_done_time +'</span>'
+	            				 +'</div>'
+	            				 +'<div class="task-list-info-desc">'
+	            				 + data[0].taskSpec
+	            				 +'</div>'
+	            				 +'</div>';
+	            			 $("#noList").append(html);
+	            			 //统计未完成的任务
+	            			 $("no_task").text(data[0].length);
+	            		}else{
+	            			$("#noList").html('<div class="task-list-info">暂无相关任务。<div>');
+	            		}
+	            		//已完成的任务
+	            		if(data[1] !== null && data[1].length > 0){
+	            			var taskHtml = '<div class="task-list-info">'
+	            				 +'<div class="task-list-info-name">'
+	            				 +'<input type="radio" name="task" style="float:left;" id="'+ data[1].id +'" />'
+	            				 +'<span class="info-taskname">'+ data[1].taskName +'</span>'
+	            				 +'<span class="info-tasktime">交付时间：</span>'
+	            				 +'<span class="info-tasktime">'+ data[1].task_done_time +'</span>'
+	            				 +'</div>'
+	            				 +'<div class="task-list-info-desc">'
+	            				 + data[1].taskSpec
+	            				 +'</div>'
+	            				 +'</div>';
+	            			$("#yesList").html(taskHtml);
+	            			//统计已完成的任务
+	            			$("yes_task").text(data[1].length);
+	            		}else{
+	            			$("#yesList").html('<div class="task-list-info">暂无相关任务。<div>');
+	            		}
+	            		//审核的任务
+	            		if(data[2] !== null && data[2].length > 0){
+	            			var taskHtml = '<div class="task-list-info">'
+	            				 +'<div class="task-list-info-name">'
+	            				 +'<input type="radio" name="task" style="float:left;" id="'+ data[2].id +'" />'
+	            				 +'<span class="info-taskname">'+ data[2].taskName +'</span>'
+	            				 +'<span class="info-tasktime">交付时间：</span>'
+	            				 +'<span class="info-tasktime">'+ data[2].task_done_time +'</span>'
+	            				 +'</div>'
+	            				 +'<div class="task-list-info-desc">'
+	            				 + data[2].taskSpec
+	            				 +'</div>'
+	            				 +'</div>';
+	            			$("#approveList").html(taskHtml);
+	            			//统计审核的任务
+	            			$("approve_task").text(data[2].length);
+	            		}else{
+	            			$("#approveList").html('<div class="task-list-info">暂无相关任务。<div>');
+	            		}
+	            	 }else{
+	            		 $("#noList").html('<div class="task-list-info">暂无相关任务。<div>');
+	            		 $("#yesList").html('<div class="task-list-info">暂无相关任务。<div>');
+	            		 $("#approveList").html('<div class="task-list-info">暂无相关任务。<div>');
+	            		 $('#modelInfo').text("查询失败，请联系管理员!");
+	            		 $('#myModal').modal('show');
+	            	 }
+	             },
+	             error: function(errorTwon){
+	            	 
+	             }
+	        });
+		};
+		
+		/*
+		 * 修改个人信息
+		 */
+		this.updateUserInfo = function(){
+			
+		};
+		
+		/*
+		 * 跳转到项目日历
+		 */
+		this.targetProCalendar = function(){
+			
+		};
+		
+		/*
+		 * 跳转到编辑页面
+		 */
+		this.targetActiviti = function(){
+			
+		};
+		
+		/*
+		 * 获取任务详情
+		 */
+		this.getTaskDetail = function(){
+			var id = document.getElementsByName("task");
+			$.ajax({
+	             type: "post",
+	             url: "",
+	             dataType: "json",
+	             success: function(data){
+	            	 
+	             },
+	             error: function(errorTwon){
+	            	 
+	             }
+	        });
+		};
+	};
+	
+	return Myself;
+},{
+	requires : []
+});

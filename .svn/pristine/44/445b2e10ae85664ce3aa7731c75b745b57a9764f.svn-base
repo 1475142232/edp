@@ -1,0 +1,285 @@
+package com.edp.admin.columnInfoController;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import com.edp.common.constant.Constants;
+import com.edp.common.jedis.JedisUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.edp.admin.common.BaseController;
+import com.edp.admin.login.UserInfoBean;
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.serviceI.columnInfo.ColumnInfoServiceI;
+import com.edp.serviceI.columnRuleRef.ColumnRuleRefServiceI;
+import com.edp.serviceI.dto.ColumnInfoDto;
+import com.edp.serviceI.dto.ColumnRuleRefDto;
+import com.edp.serviceI.dto.FunColumnDto;
+import com.edp.serviceI.dto.MasterDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.dto.RuleInfoDto;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import com.edp.serviceI.ruleinfo.RuleInfoServiceI;
+import com.edp.serviceI.tree.TreeServiceI;
+import com.google.gson.Gson;
+
+import redis.clients.jedis.Jedis;
+
+
+@Controller
+@RequestMapping("columnInfoController")
+public class ColumnInfoController extends BaseController{
+	@Autowired
+	private ColumnInfoServiceI columnInfoServiceI;
+	@Autowired
+	private TreeServiceI treeServiceI;
+	@Autowired
+	private ColumnRuleRefServiceI columnRuleRefServiceI;
+	@Autowired
+	private RuleInfoServiceI ruleInfoService;
+    @Autowired
+    private FunctionInfoServiceI functionInfoServiceI;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ColumnInfoController.class);
+	private Gson gson = new Gson();
+
+	/**
+	 *
+	 * @param dto
+	 * @param ParentId
+	 * @param opType 操作类型   1.正常操作,2.变更操作  modify by changer 2016-5-23
+	 * @param session
+	 * @return
+	 */
+	//添加属性
+	@RequestMapping(value = "/addColumnInfo.action" , method = {RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String addColumnInfo(ColumnInfoDto dto,String ParentId,String opType, HttpSession session){
+		//获取系统时间
+		Date today = new Date();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		//获取session中的用户信息
+		UserInfoBean userInfoBean=(UserInfoBean)session.getAttribute("userInfoBean");
+		String treeNodeState="";
+		String id=SequenceManage.getSequence("");
+		dto.setId(id);
+		dto.setColumnCreater(userInfoBean.getUsername());
+		dto.setColumnCreateTime(sdf.format(today));
+		columnInfoServiceI.addColumnInfo(dto);
+		MasterDto cDto=new MasterDto();//创建要插入的新节点的承载类
+		cDto.setId(id);
+		cDto.setTreeNodeType("10");
+		cDto.setTreeNodeName(dto.getColumnCnName());
+        cDto.setText(dto.getColumnCnName());
+        cDto.setTreeNodeParent(ParentId);
+        cDto.setTreeNodeId((String)session.getAttribute("productId"));
+        cDto.setTreeId(id);
+		Jedis client = JedisUtils.getJedis();
+		if("2".equals(opType)){
+			String change=client.get("CHANGE_NODE");
+			Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			treeNodeState=Constants.TreeStates.CHANGE_ADD;
+			cDto.setTreeNodeState(Constants.TreeStates.CHANGE_ADD);
+			Constants.CHANGE_NODE.get((String)session.getAttribute("productId")).add(cDto);
+			Map<String,List<Object>> JsonChange=Constants.CHANGE_NODE;
+			client.set("CHANGE_NODE", gson.toJson(JsonChange));
+		}else{
+			String change=client.get("NORMAL_NODE");
+			Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			treeNodeState=Constants.TreeStates.NORMAL_ADD;
+			cDto.setTreeNodeState(Constants.TreeStates.NORMAL_ADD);
+			Constants.NORMAL_NODE.get((String)session.getAttribute("productId")).add(cDto);
+			Map<String,List<Object>> JsonNormal=Constants.NORMAL_NODE;
+			client.set("NORMAL_NODE", gson.toJson(JsonNormal));
+		}
+		JedisUtils.returnResource(client);
+        treeServiceI.addTreeNode(cDto);
+        List<MasterDto> tDtos=new ArrayList<MasterDto>();		
+		String tree=treeServiceI.findJsonTreeById((String)session.getAttribute("productId"),treeNodeState);
+		JSONObject a = JSON.parseObject(tree); 
+		JSONArray jsonArr = (JSONArray) a.get("children");
+		JSONObject b= (JSONObject)jsonArr.get(3);
+		JSONArray jsonArrs= (JSONArray)b.get("children");
+        for(int i=0;i<jsonArrs.size();i++){
+        	JSONObject c = (JSONObject)jsonArrs.get(i);
+        	if(c.get("id").equals(ParentId)){
+        		JSONArray jsonArrc=(JSONArray)c.get("children");
+        		jsonArrc.add(JSON.parseObject(gson.toJson(cDto)));
+        		break;
+        	}
+        }		
+		treeServiceI.editTreeByProductId((String)session.getAttribute("productId"),a.toString(),treeNodeState);
+		tDtos.add(cDto);
+		return gson.toJson(tDtos);
+	}
+
+	//根据id获取
+	@RequestMapping(value = "/getColumnInfoDtoById.action" , method = {RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String  getColumnInfoDtoById(String id) {
+		ColumnInfoDto columnInfoDtoById = columnInfoServiceI.getColumnInfoDtoById(id);
+		ColumnRuleRefDto CRdto=new ColumnRuleRefDto();
+		CRdto.setColumnId(columnInfoDtoById.getId());
+		ColumnRuleRefDto getAllColumnRuleRef = columnRuleRefServiceI.getAllColumnRuleRef(CRdto);
+		List<ColumnRuleRefDto> crd=getAllColumnRuleRef.getRows();
+		for(int j=0;j<crd.size();j++){
+			RuleInfoDto ruleById=ruleInfoService.getRuleById(crd.get(j).getRuleId());
+			crd.get(j).setRuleName(ruleById.getRuleName());
+		}
+		columnInfoDtoById.setCrrd(crd);
+
+		return gson.toJson(columnInfoDtoById);
+
+
+	}
+	
+	//查询所有
+	@RequestMapping(value = "/getAllColumnInfoDto.action" , method = {RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String getAllColumnInfoDto(ColumnInfoDto dto){
+		ColumnInfoDto getAllColumnInfoDto = columnInfoServiceI.getAllColumnInfo(dto);
+		List<ColumnInfoDto> cid=getAllColumnInfoDto.getRows();
+		for(int i=0;i<cid.size();i++){
+			ColumnRuleRefDto CRdto=new ColumnRuleRefDto();
+			CRdto.setColumnId(cid.get(i).getId());
+			ColumnRuleRefDto getAllColumnRuleRef = columnRuleRefServiceI.getAllColumnRuleRef(CRdto);
+			List<ColumnRuleRefDto> crd=getAllColumnRuleRef.getRows();
+			for(int j=0;j<crd.size();j++){
+				RuleInfoDto ruleById=ruleInfoService.getRuleById(crd.get(j).getColumnId());
+				crd.get(j).setRuleName(ruleById.getRuleName());
+			}
+			cid.get(i).setCrrd(crd);
+		}
+		return gson.toJson(getAllColumnInfoDto);
+		
+		
+	}
+	
+	//修改
+	@RequestMapping(value = "/updateColumnInfo.action" , method = {RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String  updateColumnInfo(ColumnInfoDto dto, String type,HttpSession session){
+		//获取系统时间
+		Date today = new Date();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		//获取session中的用户信息
+		UserInfoBean userInfoBean=(UserInfoBean)session.getAttribute("userInfoBean");	
+		RequestmentDto requestmentDto=treeServiceI.findTreeNodeById(dto.getId());
+		String state="";
+		String col=dto.getId();
+		if(requestmentDto.getTreeNodeState().equals("66")){
+			String oldId=dto.getId();
+			String id=SequenceManage.getSequence("");
+			dto.setId(id);
+			dto.setColumnCreater(userInfoBean.getUsername());
+			dto.setColumnCreateTime(sdf.format(today));
+			columnInfoServiceI.addColumnInfo(dto);
+			requestmentDto.setTreeId(requestmentDto.getId());
+			requestmentDto.setId(id);
+		    requestmentDto.setTreeNodeCreateperson(userInfoBean.getUsername());
+			requestmentDto.setTreeNodeCreatetime(sdf.format(today));
+			requestmentDto.setTreeNodeName(dto.getColumnCnName());
+			state=requestmentDto.getTreeNodeState();
+			MasterDto po = BeanCopyUtils.populateTbyDBySpring(requestmentDto, MasterDto.class);
+			Jedis client = JedisUtils.getJedis();
+			if("2".equals(type)){
+				String change=client.get("CHANGE_NODE");
+				Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+				Constants.CHANGE_NODE.get((String)session.getAttribute("productId")).add(po);
+				state=Constants.TreeStates.CHANGE_ADD;
+				Map<String,List<Object>> JsonChange=Constants.CHANGE_NODE;
+				client.set("CHANGE_NODE", gson.toJson(JsonChange));
+			}else{
+				String change=client.get("NORMAL_NODE");
+				Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+				Constants.NORMAL_NODE.get((String)session.getAttribute("productId")).add(po);
+				 state=Constants.TreeStates.NORMAL_ADD;
+				Map<String,List<Object>> JsonNormal=Constants.NORMAL_NODE;
+				client.set("NORMAL_NODE", gson.toJson(JsonNormal));
+			}	
+			JedisUtils.returnResource(client);
+			treeServiceI.addTreeNode(requestmentDto, (String)session.getAttribute("productId"));		
+			FunColumnDto funcol=new FunColumnDto();
+			funcol.setColumnId(oldId);
+			List<FunColumnDto> funcolumn=functionInfoServiceI.selectFunColumn(funcol);
+		    for(int i=0;i<funcolumn.size();i++){
+		    	funcolumn.get(i).setId(null);
+		    	funcolumn.get(i).setColumnId(id);
+		    	functionInfoServiceI.insertFunColumn(funcolumn.get(i));
+		    }	    
+		}else{
+			dto.setColumnModifiedPerson(userInfoBean.getUsername());
+			dto.setColumnModifiedTime(sdf.format(today));
+			columnInfoServiceI.updateColumnInfo(dto);
+			requestmentDto.setId(dto.getId());
+		    requestmentDto.setTreeNodeCreateperson(userInfoBean.getUsername());
+			requestmentDto.setTreeNodeCreatetime(sdf.format(today));
+			requestmentDto.setTreeNodeName(dto.getColumnCnName());
+			requestmentDto.setTreeId(dto.getId());
+			treeServiceI.editTreeNode(requestmentDto);
+			state=requestmentDto.getTreeNodeState();
+			Jedis client = JedisUtils.getJedis();
+			if("2".equals(type)){
+			    requestmentDto.setTreeNodeState(Constants.TreeStates.CHANGE_ADD);
+				state=Constants.TreeStates.CHANGE_ADD;
+			}else{
+				 requestmentDto.setTreeNodeState(Constants.TreeStates.NORMAL_ADD);
+				 state=Constants.TreeStates.NORMAL_ADD;
+			}
+	
+		}
+		String tree=treeServiceI.findJsonTreeById((String)session.getAttribute("productId"),state);
+		JSONObject a = JSON.parseObject(tree); 
+		JSONArray jsonArr = (JSONArray) a.get("children");
+		JSONObject b= (JSONObject)jsonArr.get(3);
+		JSONArray jsonArrs= (JSONArray)b.get("children");
+        for(int i=0;i<jsonArrs.size();i++){
+        	JSONObject c = (JSONObject)jsonArrs.get(i);
+        	JSONArray jsonArrc= (JSONArray) c.get("children");
+        	for(int j=0;j<jsonArrc.size();j++){
+        		JSONObject d= (JSONObject)jsonArrc.get(j);
+        		if(d.get("id").equals(col)){
+        			jsonArrc.set(j, JSON.parseObject(gson.toJson(requestmentDto)));
+        			break;
+        		}
+        	}
+        }		
+		treeServiceI.editTreeByProductId((String)session.getAttribute("productId"),a.toString(),state);
+		
+		return gson.toJson(requestmentDto);
+	}
+	
+	@RequestMapping(value = "/delColumnInfo.action" , method = {RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	//删除
+	public String delColumnInfo(String id){
+		ColumnRuleRefDto dto=new ColumnRuleRefDto();
+		dto.setColumnId(id);
+		columnRuleRefServiceI.delColumnRuleRefByColumnId(dto);
+		columnInfoServiceI.delColumnInfo(id);
+		return null;
+	}
+
+}
+
+
+
+
+
+
+

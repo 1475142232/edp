@@ -1,0 +1,4 @@
+
+<span ng-if="!property.noValue">{{property.value.belongtable}}</span>
+<span ng-if="!property.noValue" style="display: none">{{property.value.id}}</span>
+<span ng-if="property.noValue" translate>PROPERTY.BELONGTABLE.EMPTY</span>

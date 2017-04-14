@@ -1,0 +1,96 @@
+package com.edp.service.tableinfo;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SqlFormatUtil;
+import com.edp.dao.domain.TableInfoPo;
+import com.edp.dao.domain.TableInfoPoCriteria;
+import com.edp.dao.mapper.TableInfoPoMapper;
+import com.edp.service.moduleinfo.ModuleInfoServiceImpl;
+import com.edp.serviceI.dto.TableInfoDto;
+import com.edp.serviceI.tableinfo.TableInfoServiceI;
+/**
+ * 
+ * @author wu_jianxing(吴建行)
+ * 时间：2016.4.22
+ */
+@Service("tableServiceI")
+public class TableInfoServiceImpl implements TableInfoServiceI {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ModuleInfoServiceImpl.class);
+	@Autowired
+	private TableInfoPoMapper tableInfoPoMapper;
+	public TableInfoDto getAllTables(TableInfoDto dto) {
+		TableInfoPoCriteria example = new TableInfoPoCriteria();
+		TableInfoPoCriteria.Criteria tableCriteria = example.createCriteria();
+		if (null != dto.getId() && !"".equals(dto.getId())) {
+			String[] ids=dto.getId().split(",");
+			List<String> Ids=new ArrayList<String>();
+			for(int i=0;i<ids.length;i++){
+				Ids.add(ids[i]);
+			}
+			tableCriteria.andIdIn(Ids);
+		}else{
+			return new TableInfoDto();
+		}
+		if (null != dto.getTableCnName() && !"".equals(dto.getTableCnName())) {
+			tableCriteria.andTableCnNameLike("%"+dto.getTableCnName()+"%");
+		}
+		String pagingStr = SqlFormatUtil.makeupOrderByAndLimit("id", SqlFormatUtil.ORDER_BY_DIRECTION_DESC,
+				dto.getPageIndex(), dto.getLimit());
+		example.setOrderByClause(pagingStr);
+		try {
+			int count = tableInfoPoMapper.countByExample(example);
+			List<TableInfoPo> result = tableInfoPoMapper.selectByExample(example);
+			List<TableInfoDto> returnVal = BeanCopyUtils.populateTListbyDListBySpring(result, TableInfoDto.class);
+			TableInfoDto returnDto = new TableInfoDto();
+			returnDto.setRows(returnVal);
+			returnDto.setResults(count);
+			return returnDto;
+		} catch (Exception e) {
+			LOGGER.error("查询全部产品错误！", e);
+		}
+		return null;
+	}
+
+	public TableInfoDto getTableById(String Id) {
+		try {
+			TableInfoPo result = tableInfoPoMapper.selectByPrimaryKey(Id);
+			return BeanCopyUtils.populateTbyDBySpring(result, TableInfoDto.class);
+		} catch (Exception e) {
+			LOGGER.error("根据用户id查询表错误！", e);
+		}
+		return null;
+	}
+
+	public void addTable(TableInfoDto dto) {
+		TableInfoPo po = BeanCopyUtils.populateTbyDBySpring(dto, TableInfoPo.class);
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	String format = sdf.format(new Date());
+    	po.setTableCreateTime(format);
+    	tableInfoPoMapper.insertSelective(po);
+	}
+
+	public void updateTable(TableInfoDto dto) {
+		TableInfoPo po = BeanCopyUtils.populateTbyDBySpring(dto, TableInfoPo.class);
+		tableInfoPoMapper.updateByPrimaryKeySelective(po);
+	}
+	// 删除表功能
+	public void delTable(String Id) {
+		tableInfoPoMapper.deleteByPrimaryKey(Id);
+	}
+
+	@Override
+	public String findcolumnIdByTable(String id, String name) {
+		// TODO Auto-generated method stub
+		return tableInfoPoMapper.findcolumnIdByTable(id,name);
+	}
+}

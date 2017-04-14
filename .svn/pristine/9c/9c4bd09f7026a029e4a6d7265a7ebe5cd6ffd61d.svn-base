@@ -1,0 +1,76 @@
+package com.edp.service;
+
+import javax.annotation.Resource;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.product.ProductServiceI;
+/**
+ * 
+ * @author wu_jianhang
+ *  时间：2.16.4.18
+ */
+
+public class ProductServiceTest extends JunitTestBase{
+	@Resource
+	private ProductServiceI productServiceI;
+	
+	
+	
+	//添加商品测试
+	@Test
+	public void addProductsTest(){
+		ProductDto dto=new ProductDto();
+		dto.setId("1");
+		dto.setProductName("中未能");
+		dto.setProductType("1");
+		dto.setProductOwner("xiaomi");
+		dto.setProductDesc("very nice");
+		dto.setProductVersion(0);
+		dto.setProductOrg("1");
+		productServiceI.addProduct(dto);
+		//Assert.assertNotEquals("getAllProductsTest fail", 0,result.getResults().intValue());
+	}
+
+	//产品版本更新测试
+	@Test
+	public void testUpdateProductVersion(){
+		this.addProductsTest();
+		Boolean state = productServiceI.updateProductVersion("1");
+
+		Assert.assertEquals("更新版本号失败",true,state);
+	}
+
+
+	//产品列表查询
+	@Test
+	public void getAllProductsTest(){
+		ProductDto dto = new ProductDto();
+		dto.setId("");
+		ProductDto result = productServiceI.getAllProducts(dto);
+		Assert.assertNotEquals("getAllProductsTest fail", 1,result.getResults().intValue());
+	}
+	
+
+	//修改商品信息
+	@Test
+	public void updateProduct(){
+		ProductDto dto=new ProductDto();
+		dto.setProductName("中未能");
+		dto.setProductOwner("xiaomi");
+		dto.setProductDesc("very nice");
+		productServiceI.updateProduct(dto);
+	}
+	
+	//删除商品测试
+	@Test
+	public void delProductsTest(){
+		ProductDto dto=new ProductDto();
+		dto.setId("1");
+		productServiceI.delProduct("1");
+	}
+
+
+}

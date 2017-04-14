@@ -1,0 +1,4 @@
+KISSY.use(['homepage-module/entry-module'],function(S,CreateHomePage){
+	CreateHomePage();//run homepage-module
+});
+

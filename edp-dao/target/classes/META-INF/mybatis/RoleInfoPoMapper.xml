@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.RoleInfoPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.RoleInfoPo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
+    <result column="role_spec" property="roleSpec" jdbcType="VARCHAR" />
+    <result column="role_dept" property="roleDept" jdbcType="VARCHAR" />
+    <result column="role_type" property="roleType" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, role_name, role_spec, role_dept, role_type
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.RoleInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from role_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from role_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from role_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.RoleInfoPoCriteria" >
+    delete from role_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.RoleInfoPo" >
+    insert into role_info (id, role_name, role_spec, 
+      role_dept, role_type)
+    values (#{id,jdbcType=INTEGER}, #{roleName,jdbcType=VARCHAR}, #{roleSpec,jdbcType=VARCHAR}, 
+      #{roleDept,jdbcType=VARCHAR}, #{roleType,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.RoleInfoPo" >
+    insert into role_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="roleName != null" >
+        role_name,
+      </if>
+      <if test="roleSpec != null" >
+        role_spec,
+      </if>
+      <if test="roleDept != null" >
+        role_dept,
+      </if>
+      <if test="roleType != null" >
+        role_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="roleName != null" >
+        #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="roleSpec != null" >
+        #{roleSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="roleDept != null" >
+        #{roleDept,jdbcType=VARCHAR},
+      </if>
+      <if test="roleType != null" >
+        #{roleType,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.RoleInfoPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from role_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update role_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.roleName != null" >
+        role_name = #{record.roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.roleSpec != null" >
+        role_spec = #{record.roleSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="record.roleDept != null" >
+        role_dept = #{record.roleDept,jdbcType=VARCHAR},
+      </if>
+      <if test="record.roleType != null" >
+        role_type = #{record.roleType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update role_info
+    set id = #{record.id,jdbcType=INTEGER},
+      role_name = #{record.roleName,jdbcType=VARCHAR},
+      role_spec = #{record.roleSpec,jdbcType=VARCHAR},
+      role_dept = #{record.roleDept,jdbcType=VARCHAR},
+      role_type = #{record.roleType,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.RoleInfoPo" >
+    update role_info
+    <set >
+      <if test="roleName != null" >
+        role_name = #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="roleSpec != null" >
+        role_spec = #{roleSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="roleDept != null" >
+        role_dept = #{roleDept,jdbcType=VARCHAR},
+      </if>
+      <if test="roleType != null" >
+        role_type = #{roleType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.RoleInfoPo" >
+    update role_info
+    set role_name = #{roleName,jdbcType=VARCHAR},
+      role_spec = #{roleSpec,jdbcType=VARCHAR},
+      role_dept = #{roleDept,jdbcType=VARCHAR},
+      role_type = #{roleType,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+    <delete id="deleteByUserId" parameterType="java.lang.Integer" >
+     delete from user_role
+    where role_id = #{role_id}
+  </delete>
+  
+  <insert id="addUserInfo" parameterType="java.lang.Integer">
+      insert into user_role (role_id,user_id)
+      values (#{role_id},#{user_id})
+  </insert>
+  
+  <select id="findRoleByUserId" resultType="java.lang.Integer">
+      select menu_id from role_menu where role_id in (select role_id from user_role where user_id=#{user_id})
+  </select>
+  
+  <select id="findRoleTypeByUserId" resultType="java.lang.String">
+      select role_type from role_info where id in (select role_id from user_role where user_id=#{user_id} group by role_id )
+  </select>
+</mapper>

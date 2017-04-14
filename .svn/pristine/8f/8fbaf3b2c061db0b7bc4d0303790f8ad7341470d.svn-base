@@ -1,0 +1,273 @@
+package com.edp.dao.domain;
+
+public class PlanTasksPO {
+    private Integer id;
+
+    private String taskId;
+
+    private String taskName;
+
+    private String taskReceiveTime;
+
+    private String taskStartTime;
+
+    private String taskDoneTime;
+
+    private String taskState;
+
+    private String taskOwner;
+
+    private Integer taskEvalTime;
+
+    private Integer taskRealTime;
+
+    private String taskCreateTime;
+
+    private String taskCreateUser;
+
+    private String taskLastModifiedTime;
+
+    private String taskLastModifyor;
+
+    private String taskType;
+
+    private String productId;
+
+    private String productName;
+
+    private Integer taskProgress;
+
+    private Integer taskVersion;
+
+    private Integer svnVersion;
+
+    private String taskComplexity;
+
+    private Integer taskPriority;
+
+    private String planId;
+
+    private String r1;
+
+    private String r2;
+
+    private String r3;
+
+    private String taskSpec;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId == null ? null : taskId.trim();
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName == null ? null : taskName.trim();
+    }
+
+    public String getTaskReceiveTime() {
+        return taskReceiveTime;
+    }
+
+    public void setTaskReceiveTime(String taskReceiveTime) {
+        this.taskReceiveTime = taskReceiveTime == null ? null : taskReceiveTime.trim();
+    }
+
+    public String getTaskStartTime() {
+        return taskStartTime;
+    }
+
+    public void setTaskStartTime(String taskStartTime) {
+        this.taskStartTime = taskStartTime == null ? null : taskStartTime.trim();
+    }
+
+    public String getTaskDoneTime() {
+        return taskDoneTime;
+    }
+
+    public void setTaskDoneTime(String taskDoneTime) {
+        this.taskDoneTime = taskDoneTime == null ? null : taskDoneTime.trim();
+    }
+
+    public String getTaskState() {
+        return taskState;
+    }
+
+    public void setTaskState(String taskState) {
+        this.taskState = taskState == null ? null : taskState.trim();
+    }
+
+    public String getTaskOwner() {
+        return taskOwner;
+    }
+
+    public void setTaskOwner(String taskOwner) {
+        this.taskOwner = taskOwner == null ? null : taskOwner.trim();
+    }
+
+    public Integer getTaskEvalTime() {
+        return taskEvalTime;
+    }
+
+    public void setTaskEvalTime(Integer taskEvalTime) {
+        this.taskEvalTime = taskEvalTime;
+    }
+
+    public Integer getTaskRealTime() {
+        return taskRealTime;
+    }
+
+    public void setTaskRealTime(Integer taskRealTime) {
+        this.taskRealTime = taskRealTime;
+    }
+
+    public String getTaskCreateTime() {
+        return taskCreateTime;
+    }
+
+    public void setTaskCreateTime(String taskCreateTime) {
+        this.taskCreateTime = taskCreateTime == null ? null : taskCreateTime.trim();
+    }
+
+    public String getTaskCreateUser() {
+        return taskCreateUser;
+    }
+
+    public void setTaskCreateUser(String taskCreateUser) {
+        this.taskCreateUser = taskCreateUser == null ? null : taskCreateUser.trim();
+    }
+
+    public String getTaskLastModifiedTime() {
+        return taskLastModifiedTime;
+    }
+
+    public void setTaskLastModifiedTime(String taskLastModifiedTime) {
+        this.taskLastModifiedTime = taskLastModifiedTime == null ? null : taskLastModifiedTime.trim();
+    }
+
+    public String getTaskLastModifyor() {
+        return taskLastModifyor;
+    }
+
+    public void setTaskLastModifyor(String taskLastModifyor) {
+        this.taskLastModifyor = taskLastModifyor == null ? null : taskLastModifyor.trim();
+    }
+
+    public String getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(String taskType) {
+        this.taskType = taskType == null ? null : taskType.trim();
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId == null ? null : productId.trim();
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName == null ? null : productName.trim();
+    }
+
+    public Integer getTaskProgress() {
+        return taskProgress;
+    }
+
+    public void setTaskProgress(Integer taskProgress) {
+        this.taskProgress = taskProgress;
+    }
+
+    public Integer getTaskVersion() {
+        return taskVersion;
+    }
+
+    public void setTaskVersion(Integer taskVersion) {
+        this.taskVersion = taskVersion;
+    }
+
+    public Integer getSvnVersion() {
+        return svnVersion;
+    }
+
+    public void setSvnVersion(Integer svnVersion) {
+        this.svnVersion = svnVersion;
+    }
+
+    public String getTaskComplexity() {
+        return taskComplexity;
+    }
+
+    public void setTaskComplexity(String taskComplexity) {
+        this.taskComplexity = taskComplexity == null ? null : taskComplexity.trim();
+    }
+
+    public Integer getTaskPriority() {
+        return taskPriority;
+    }
+
+    public void setTaskPriority(Integer taskPriority) {
+        this.taskPriority = taskPriority;
+    }
+
+    public String getPlanId() {
+        return planId;
+    }
+
+    public void setPlanId(String planId) {
+        this.planId = planId == null ? null : planId.trim();
+    }
+
+    public String getR1() {
+        return r1;
+    }
+
+    public void setR1(String r1) {
+        this.r1 = r1 == null ? null : r1.trim();
+    }
+
+    public String getR2() {
+        return r2;
+    }
+
+    public void setR2(String r2) {
+        this.r2 = r2 == null ? null : r2.trim();
+    }
+
+    public String getR3() {
+        return r3;
+    }
+
+    public void setR3(String r3) {
+        this.r3 = r3 == null ? null : r3.trim();
+    }
+
+    public String getTaskSpec() {
+        return taskSpec;
+    }
+
+    public void setTaskSpec(String taskSpec) {
+        this.taskSpec = taskSpec == null ? null : taskSpec.trim();
+    }
+}

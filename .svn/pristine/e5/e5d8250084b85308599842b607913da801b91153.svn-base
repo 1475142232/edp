@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="./src/database-module/css/index.css" />
+		<link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+		<link rel="stylesheet" href="./src/bootstrap-table/bootstrap-table.css">
+		<link href="./src/bootstrapvalidator/dist/css/bootstrapValidator.css" rel="stylesheet" type="text/css" />
+	</head>
+	<body>
+	<!-- 项目列表内容部分 -->
+    <div class="content-box-zhu">
+	   		<div class="table-parent-title">
+	   			<span id="base_name"></span>
+	   		</div>
+	   		<div class="table-heng">&nbsp;</div>
+	   		<div class="table-operation">
+	   			<div class="table-add-del">
+	   				<a href="javascript:void(0);" class="add_table" id="add_table">新建表</a>
+	   				<a href="javascript:void(0);" class="edit_table" id="edit_table">修改表</a>
+	   				<a href="javascript:void(0);" class="del_table" id="del_table">删除表</a>
+	   			</div>
+	   			<div class="list">
+	   				<table class="list_table">
+	   				   <tr>
+	   				     <td class="list-left list-title">表列表</td>
+	   				     <td class="list-right list-title">字段列表</td>
+	   				   </tr>
+	   				   <tr>
+	   				     <td class="list-left table-list">
+	   				     
+	   				     </td>
+	   				     <td class="list-right field-list">
+	   				     	
+	   				     </td>
+	   				   </tr>
+	   				</table>
+	   				
+<!-- 	   				<ul> -->
+<!-- 	   					<li class="list-left list-title">表列表</li> -->
+<!-- 	   					<li class="list-right list-title">字段列表</li> -->
+<!-- 	   					<li class="list-left table-list"> -->
+<!-- 	   						<a>用户表</a> -->
+<!-- 	   						<a>角色表</a> -->
+<!-- 	   						<a>权限表</a> -->
+<!-- 	   						<a>产品表</a> -->
+<!-- 	   					</li> -->
+<!-- 	   					<li class="list-right field-list"> -->
+	   						
+	   						
+<!-- 	   					</li> -->
+<!-- 	   				</ul> -->
+	   			</div>
+	   		</div>
+	   </div>
+	   
+       <!-- 模态框（Modal） --> 
+       <div class="modal fade" id="tableSaveModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+	      <div class="modal-dialog"> 
+	        <div class="modal-content"> 
+		            <div class="modal-header"> 
+		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+		                <h4 class="modal-title" id="myModalLabel">编辑数据库</h4> 
+		            </div> 
+		            <div class="modal-body container-fluid " style="height:200px;">
+			          	<form id="tableSave_Form"> 
+			                <div class="row">
+								<div class="form-group col-md-12" style="margin-bottom: 25px;margin-left: 20px;">
+								   <div class="form-label">
+										<label for="tableName">表名称： </label>
+								   </div>
+						        	<input type="hidden" id="sava_id" name="id">
+						        	<input type="hidden" id="dataId" name="dataId">
+									<input type="text" name="tableName" id="tableName" class="form-control tab-login-input data-index"  required="required" 
+														placeholder="表名称" style="width:60%"/>
+			            		</div>
+			            		<div class="form-group col-md-12" style="margin-bottom: 25px;margin-left: 20px;">
+			            			<div class="form-label abs">
+										<label for="tableDesc">表描述： </label>
+									</div>
+									<textarea id="tableDesc" name="tableDesc" rows="" cols="2" class="form-control data-index" style="width:60%;margin-left: 118px;"></textarea>
+			            		</div>
+			                </div>
+		           		</form>
+		            </div> 
+		            <div class="modal-footer"> 
+		            	<span id="error" style="color: red;margin-right: 10px;"></span>
+		                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+		                <button type="button" class="btn btn-primary" id="save_Data">保存</button>
+		            </div> 
+	        </div><!-- /.modal-content --> 
+	      </div><!-- /.modal --> 
+	   </div>
+	   
+	   <!-- 模态框（Modal） --> 
+       <div class="modal fade" id="fieldSaveModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+	      <div class="modal-dialog"> 
+	        <div class="modal-content"> 
+		            <div class="modal-header"> 
+		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+		                <h4 class="modal-title" id="myFModalLabel"></h4> 
+		            </div> 
+		            <div class="modal-body container-fluid " style="height:450px;">
+			          	<form id="fieldSave_Form"> 
+			                <div class="row">
+								<div class="form-group col-md-12" style="margin-bottom: 25px;margin-left: 20px;">
+								   <div class="form-label">
+										<label for="columnName">字段名称： </label>
+								   </div>
+						        	<input type="hidden" id="sava_field_id" name="id">
+						        	<input type="hidden" id="tableId" name="tableId">
+									<input type="text" name="columnName" id="columnName" class="form-control tab-login-input data-index"  required="required" 
+														placeholder="表名称" style="width:60%"/>
+			            		</div>
+			            		<div class="form-group col-md-12" style="margin-bottom: 25px;margin-left: 20px;">
+								   <div class="form-label">
+										<label for="columnType">数据类型： </label>
+								   </div>
+									<input type="text" name="columnType" id="columnType" class="form-control tab-login-input data-index"  required="required" 
+														placeholder="数据类型" style="width:60%"/>
+			            		</div>
+			            		<div class="form-group col-md-12" style="margin-bottom: 25px;margin-left: 20px;">
+								   <div class="form-label">
+										<label for="columnLength">数据长度： </label>
+								   </div>
+									<input type="text" name="columnLength" id="columnLength" class="form-control tab-login-input data-index"  required="required" 
+														placeholder="数据长度" style="width:60%"/>
+			            		</div>
+			            		<div class="form-group col-md-12" style="margin-bottom: 25px;margin-left: 20px;">
+								   <div class="form-label">
+										<label for="columnRequired">是否必填： </label>
+								   </div>
+									<input type="checkbox" name="columnRequired" id="columnRequired" checked="false"/>
+			            		</div>
+			            		<div class="form-group col-md-12" style="margin-bottom: 25px;margin-left: 20px;">
+								   <div class="form-label">
+										<label for="columnKey">是否主键： </label>
+								   </div>
+									<input type="checkbox" name="columnKey" id="columnKey" checked="false"/>
+			            		</div>
+			            		<div class="form-group col-md-12" style="margin-bottom: 25px;margin-left: 20px;">
+			            			<div class="form-label abs">
+										<label for="columnDesc">表描述： </label>
+									</div>
+									<textarea id="columnDesc" name="columnDesc" rows="" cols="2" class="form-control data-index" style="width:60%;margin-left: 118px;"></textarea>
+			            		</div>
+			                </div>
+		           		</form>
+		            </div> 
+		            <div class="modal-footer"> 
+		            	<span id="fError" style="color: red;margin-right: 10px;"></span>
+		                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+		                <button type="button" class="btn btn-primary" id="save_Field">保存</button>
+		            </div> 
+	        </div><!-- /.modal-content --> 
+	      </div><!-- /.modal --> 
+	   </div>
+	   
+	   	<!-- 模态框（Modal） --> 
+   	   <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+	      <div class="modal-dialog"> 
+	        <div class="modal-content"> 
+	            <div class="modal-header"> 
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+	                <h4 class="modal-title">提示信息</h4> 
+	            </div> 
+	            <div class="modal-body" id="delInfo">
+	                	
+	            </div> 
+	            <div class="modal-footer"> 
+	                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	                <button type="button" class="btn btn-primary" data-dismiss="modal" id="del_Data">确定</button>
+	            </div> 
+	        </div><!-- /.modal-content --> 
+	    </div><!-- /.modal --> 
+	  </div>
+	   
+	   	<!-- 模态框（Modal） --> 
+ 	   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+	      <div class="modal-dialog"> 
+	        <div class="modal-content"> 
+	            <div class="modal-header"> 
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+	                <h4 class="modal-title">提示信息</h4> 
+	            </div> 
+	            <div class="modal-body" id="modelInfo"></div> 
+	            <div class="modal-footer"> 
+	                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+	            </div> 
+	        </div><!-- /.modal-content --> 
+	      </div><!-- /.modal --> 
+		</div>
+		
+	   <script src="./src/tasklist-module/src/bootstrap.min.js"></script>
+	   <script src="./src/bootstrap-table/bootstrap-table.js"></script>
+	   <script src="./src/bootstrapvalidator/dist/js/bootstrapValidator.js"></script>
+	</body>
+</html>

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.FunColumnPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.FunColumnPo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="column_id" property="columnId" jdbcType="CHAR" />
+    <result column="table_id" property="tableId" jdbcType="CHAR" />
+    <result column="control_id" property="controlId" jdbcType="CHAR" />
+    <result column="func_id" property="funcId" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, column_id, table_id, control_id, func_id
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.FunColumnPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from func_column
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from func_column
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from func_column
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.FunColumnPoCriteria" >
+    delete from func_column
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.FunColumnPo" >
+    insert into func_column (id, column_id, table_id, 
+      control_id, func_id)
+    values (#{id,jdbcType=INTEGER}, #{columnId,jdbcType=CHAR}, #{tableId,jdbcType=CHAR}, 
+      #{controlId,jdbcType=CHAR}, #{funcId,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.FunColumnPo" >
+    insert into func_column
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="columnId != null" >
+        column_id,
+      </if>
+      <if test="tableId != null" >
+        table_id,
+      </if>
+      <if test="controlId != null" >
+        control_id,
+      </if>
+      <if test="funcId != null" >
+        func_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="columnId != null" >
+        #{columnId,jdbcType=CHAR},
+      </if>
+      <if test="tableId != null" >
+        #{tableId,jdbcType=CHAR},
+      </if>
+      <if test="controlId != null" >
+        #{controlId,jdbcType=CHAR},
+      </if>
+      <if test="funcId != null" >
+        #{funcId,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.FunColumnPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from func_column
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update func_column
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.columnId != null" >
+        column_id = #{record.columnId,jdbcType=CHAR},
+      </if>
+      <if test="record.tableId != null" >
+        table_id = #{record.tableId,jdbcType=CHAR},
+      </if>
+      <if test="record.controlId != null" >
+        control_id = #{record.controlId,jdbcType=CHAR},
+      </if>
+      <if test="record.funcId != null" >
+        func_id = #{record.funcId,jdbcType=CHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update func_column
+    set id = #{record.id,jdbcType=INTEGER},
+      column_id = #{record.columnId,jdbcType=CHAR},
+      table_id = #{record.tableId,jdbcType=CHAR},
+      control_id = #{record.controlId,jdbcType=CHAR},
+      func_id = #{record.funcId,jdbcType=CHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.FunColumnPo" >
+    update func_column
+    <set >
+      <if test="columnId != null" >
+        column_id = #{columnId,jdbcType=CHAR},
+      </if>
+      <if test="tableId != null" >
+        table_id = #{tableId,jdbcType=CHAR},
+      </if>
+      <if test="controlId != null" >
+        control_id = #{controlId,jdbcType=CHAR},
+      </if>
+      <if test="funcId != null" >
+        func_id = #{funcId,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.FunColumnPo" >
+    update func_column
+    set column_id = #{columnId,jdbcType=CHAR},
+      table_id = #{tableId,jdbcType=CHAR},
+      control_id = #{controlId,jdbcType=CHAR},
+      func_id = #{funcId,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="findControlByPicId" resultType="java.lang.String">
+      select func_id from function_info where func_pic=#{func_pic}
+  </select>
+</mapper>

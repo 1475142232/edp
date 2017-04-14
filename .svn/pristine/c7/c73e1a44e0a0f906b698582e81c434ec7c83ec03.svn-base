@@ -1,0 +1,578 @@
+package com.edp.admin.stencil;
+
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.http.HttpSession;
+
+import com.edp.common.constant.Constants;
+
+import org.activiti.editor.constants.ModelDataJsonConstants;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.edp.admin.common.BaseController;
+import com.edp.admin.login.UserInfoBean;
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.serviceI.columnInfo.ColumnInfoServiceI;
+import com.edp.serviceI.dto.ColumnInfoDto;
+import com.edp.serviceI.dto.ControlDto;
+import com.edp.serviceI.dto.CtableDto;
+import com.edp.serviceI.dto.FunctionInfoDto;
+import com.edp.serviceI.dto.ModuleInfoDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.dto.SceneInfoDto;
+import com.edp.serviceI.dto.StencilDto;
+import com.edp.serviceI.dto.TableInfoDto;
+import com.edp.serviceI.dto.TreeDto;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import com.edp.serviceI.moduleinfo.ModuleInfoServiceI;
+import com.edp.serviceI.sceneinfo.SceneInfoServiceI;
+import com.edp.serviceI.stencil.StencilServiceI;
+import com.edp.serviceI.tableinfo.TableInfoServiceI;
+import com.edp.serviceI.tree.TreeServiceI;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
+
+@Controller
+@RequestMapping("stencilController")
+public class StencilController extends BaseController{
+	
+	@Autowired
+	private StencilServiceI stencilServiceI;
+	@Autowired
+	private TreeServiceI treeServiceI;
+	@Autowired
+	private ModuleInfoServiceI moduleInfoService;
+	@Autowired
+	private SceneInfoServiceI sceneInfoService;
+	@Autowired
+	private TableInfoServiceI tableInfoService;
+	@Autowired
+	private FunctionInfoServiceI functionInfoServiceI;
+	@Autowired
+	private ColumnInfoServiceI columnInfoServiceI;
+	 @Autowired   private RepositoryService repositoryService;  
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(StencilController.class);	
+	
+	private Gson gson = new Gson();
+	/**
+	 * @author zhang_cancan
+	 * @time 2016/5/6
+	 */
+	@RequestMapping(value = "/findTreeById.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String findTreeById(String id){
+		StencilDto tree=stencilServiceI.findTreeById(id);
+		return gson.toJson(tree);
+	}
+	
+	/**
+	 * @author zhang_cancan
+	 * @time 2016/5/7
+	 */
+	@RequestMapping(value = "/findAllStencil.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String findAllStencil(){
+		List<TreeDto> tree=stencilServiceI.findAllStencil();
+		return gson.toJson(tree);
+	}
+	
+	/**
+	 * @author zhang_cancan
+	 * @time 2016/5/9
+	 */
+	@RequestMapping(value = "/addTreeByStencil.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String addTreeByStencil(String id,String stencil,String name,String opType, HttpSession session){
+        Date today = new Date();
+	    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		//获取session中的用户信息
+	    StencilDto tree=stencilServiceI.findTreeById(stencil);
+	    tree.setTreeNodeName(name);
+		UserInfoBean userInfoBean=(UserInfoBean)session.getAttribute("userInfoBean");
+		String version = String.valueOf(session.getAttribute("version"));
+		RequestmentDto cDto=addTreeNode(tree,userInfoBean.getUsername(),sdf.format(today),id,id,opType,version);
+		return gson.toJson(cDto);
+	}
+	
+	private RequestmentDto addTreeNode(StencilDto tree,String userName,String time,String pId,String NodeId,String opType,String version){
+		RequestmentDto cDto=new RequestmentDto();
+		String id=SequenceManage.getSequence("");
+
+		cDto.setId(id);
+		cDto.setTreeNodeCreateperson(userName);
+		cDto.setTreeNodeCreatetime(time);
+		cDto.setTreeNodeName(tree.getTreeNodeName());
+		cDto.setTreeNodeLevels(tree.getTreeNodeLevels());
+	    cDto.setTreeNodeIfLeaf(tree.getTreeNodeIfLeaf());
+		cDto.setTreeNodeType(tree.getTreeNodeType());
+		cDto.setTreeNodeParent(pId);	
+		cDto.setTreeNodeId(NodeId);
+		if("2".equals(opType)){
+			cDto.setTreeNodeState(Constants.TreeStates.CHANGE_ADD);
+		}else{
+			cDto.setTreeNodeState(Constants.TreeStates.NORMAL_ADD);
+		}
+
+        if(tree.getTreeNodeType().equals("6")){
+			ModuleInfoDto module=new ModuleInfoDto();//创建插入模块表的承载类
+			module.setId(id);
+			module.setModuleCreater(userName);
+			module.setModuleCreatetime(time);
+			module.setModuleName(tree.getTreeNodeName());
+			moduleInfoService.addModule(module);
+		}else if(tree.getTreeNodeType().equals("7")){
+			SceneInfoDto dto=new SceneInfoDto();//新建承载类
+			dto.setId(id);
+			dto.setSceneCreateTime(time);
+			dto.setSceneCreater(userName);
+			dto.setSceneName(tree.getTreeNodeName());
+			dto.setVersion(Byte.parseByte(version));
+			sceneInfoService.addScene(dto);
+		}else if(tree.getTreeNodeType().equals("8")){
+			TableInfoDto dto = new TableInfoDto();
+	        dto.setId(id);
+			dto.setTableCnName(tree.getTreeNodeName());
+			dto.setTableCreater(userName);
+			dto.setTableCreateTime(time);
+			tableInfoService.addTable(dto);
+		}else if(tree.getTreeNodeType().equals("9")){
+			FunctionInfoDto dto = new FunctionInfoDto();
+			dto.setFuncId(id);
+			dto.setFuncName(tree.getTreeNodeName());
+			dto.setFuncCreater(userName);
+			dto.setFuncCreateTime(time);
+			dto.setVersion(Byte.parseByte(version));
+			functionInfoServiceI.addFunctionInfo(dto);
+		}else if(tree.getTreeNodeType().equals("10")){
+			ColumnInfoDto dto= new ColumnInfoDto();
+			dto.setId(id);
+			dto.setColumnCnName(tree.getTreeNodeName());
+			dto.setColumnCreater(userName);
+			dto.setColumnType("04");
+			dto.setColumnCreateTime(time);
+			columnInfoServiceI.addColumnInfo(dto);
+		}
+		treeServiceI.addTreeNode(cDto,NodeId);	
+		if(tree.getChildren()!=null){
+		    for(int i=0;i<tree.getChildren().size();i++){
+			   addTreeNode(tree.getChildren().get(i),userName,time,id,NodeId,opType,version);
+		    }
+		}
+		return cDto;
+	}
+	
+	/**
+	 * @author zhang_cancan
+	 * @time 2016/6/24
+	 */
+	@RequestMapping(value = "/addTree.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String addTree(String pId,String Ids,String id, HttpSession session){
+		if(Ids.equals("") || Ids==null){
+			return gson.toJson("");
+		}
+		String[] ids=Ids.split(",");
+		for(int i=0;i<ids.length;i++){
+			StencilDto tree=stencilServiceI.findTreeById(ids[i]);
+			if(tree.getTreeNodeType().equals("8")){
+				addScene(tree,pId,session);
+			}else if(tree.getTreeNodeType().equals("7")){
+				String newId=SequenceManage.getSequence("");
+				addFunction(tree,pId,newId,session);
+			}else if(tree.getTreeNodeType().equals("9")){
+				addTable(tree,pId,session);
+			}
+		}
+		return gson.toJson("");
+	}
+
+	private void addTable(StencilDto tree,String pId,HttpSession session){
+		//获取系统时间
+	    Date today = new Date();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		UserInfoBean userInfoBean=(UserInfoBean)session.getAttribute("userInfoBean");
+		String yon=stencilServiceI.findtreeNodeParentById(pId,tree.getId());
+		if(("".equals(yon))||(yon=="")||(yon==null)){
+		String newId=SequenceManage.getSequence("");
+		RequestmentDto reqDto=BeanCopyUtils.populateTbyDBySpring(tree,RequestmentDto.class);
+		reqDto.setId(newId);
+		List<RequestmentDto> p=treeServiceI.findTreeNodepId(pId,"4");
+		reqDto.setTreeNodeParent(p.get(0).getId());
+		reqDto.setTreeNodeCreatetime(sdf.format(today));
+		reqDto.setTreeNodeCreateperson(userInfoBean.getUsername());
+		treeServiceI.addTreeNode(reqDto, pId);
+		TableInfoDto dto = new TableInfoDto();
+        dto.setId(newId);
+		dto.setTableCnName(reqDto.getTreeNodeName());
+		dto.setTableCreater(userInfoBean.getUsername());
+		dto.setTableCreateTime(sdf.format(today));
+		tableInfoService.addTable(dto);
+		stencilServiceI.addTreeNode(pId,tree.getId(),newId);
+		for(int j=0;j<tree.getChildren().size();j++){
+			RequestmentDto rDto=BeanCopyUtils.populateTbyDBySpring(tree.getChildren().get(j),RequestmentDto.class);
+			String newCId=SequenceManage.getSequence("");
+			rDto.setId(newCId);
+			rDto.setTreeNodeParent(newId);
+			rDto.setTreeNodeCreatetime(sdf.format(today));
+			rDto.setTreeNodeCreateperson(userInfoBean.getUsername());
+			treeServiceI.addTreeNode(rDto, pId);
+			ColumnInfoDto cdto=new ColumnInfoDto();
+			cdto.setId(newCId);
+			cdto.setColumnCnName(tree.getChildren().get(j).getTreeNodeName());
+			cdto.setColumnEnName(tree.getChildren().get(j).getTreeNodeName());
+			cdto.setColumnCreater(userInfoBean.getUsername());
+			cdto.setColumnCreateTime(sdf.format(today));
+			cdto.setColumnType("04");
+			columnInfoServiceI.addColumnInfo(cdto);
+			stencilServiceI.addTreeNode(pId,tree.getChildren().get(j).getId(),newCId);
+		}
+		}
+	}
+    private void addScene(StencilDto tree,String pId, HttpSession session){
+    	//获取系统时间
+	    Date today = new Date();
+	    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    //获取session中的用户信息
+		UserInfoBean userInfoBean=(UserInfoBean)session.getAttribute("userInfoBean");
+    	String newId=stencilServiceI.findtreeNodeParentById(pId,tree.getId());
+
+    	if(("".equals(newId))||(newId=="")||(newId==null)){
+    	newId=SequenceManage.getSequence("");
+		RequestmentDto reqDto=BeanCopyUtils.populateTbyDBySpring(tree,RequestmentDto.class);
+		reqDto.setId(newId);
+		List<RequestmentDto> p=treeServiceI.findTreeNodepId(pId,"3");
+		reqDto.setTreeNodeParent(p.get(0).getId());
+		reqDto.setTreeNodeCreatetime(sdf.format(today));
+		reqDto.setTreeNodeCreateperson(userInfoBean.getUsername());
+		treeServiceI.addTreeNode(reqDto, pId);
+		SceneInfoDto dto=new SceneInfoDto();//新建承载类
+		dto.setId(newId);
+		dto.setSceneCreateTime(sdf.format(today));
+		dto.setSceneCreater(userInfoBean.getUsername());
+		dto.setSceneName(reqDto.getTreeNodeName());
+		sceneInfoService.addScene(dto);
+		List<String> Func=functionInfoServiceI.findFunctionBySceneId(tree.getId());
+		stencilServiceI.addTreeNode(pId,tree.getId(),newId);
+		Map<String,String> ids=new HashMap<String,String>();
+		for(int j=0;j<Func.size();j++){
+			 String id=SequenceManage.getSequence("");
+			 StencilDto function=stencilServiceI.findTreeById(Func.get(j));
+			 id=addFunction(function,pId,id,session);
+			 List<String> control_id=functionInfoServiceI.findControlByFuncId(tree.getId(),Func.get(j));
+			 ControlDto controlDto=new ControlDto();
+			 controlDto.setControl_id(control_id.get(0));
+			 RequestmentDto requestmentDto=treeServiceI.findTreeNodeById(id);
+			 ids.put(control_id.get(0), requestmentDto.getTreeNodeParent());
+			 controlDto.setFunc_id(requestmentDto.getTreeNodeParent());
+			 controlDto.setScene_id(newId);
+			 controlDto.setFc_state("01");
+			 functionInfoServiceI.addFcName(controlDto);
+		}
+		copyModel(tree.getId(),newId,ids);
+    	}
+    }
+    
+    private String addFunction(StencilDto tree,String pId, String newId,HttpSession session){
+    	//鑾峰彇绯荤粺鏃堕棿
+        Date today = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //鑾峰彇session涓殑鐢ㄦ埛淇℃伅
+        UserInfoBean userInfoBean = (UserInfoBean) session.getAttribute("userInfoBean");
+    	List<RequestmentDto> p=treeServiceI.findTreeNodepId(pId,"6");
+		StencilDto pTree=stencilServiceI.findTreeById(tree.getTreeNodeParent());
+		boolean ToF=false;
+		RequestmentDto ToFId=new RequestmentDto();
+		for(int j=0;j<p.size();j++){
+			if(p.get(j).getTreeNodeName().equals(pTree.getTreeNodeName())){
+				ToF=true;
+				ToFId=p.get(j);
+			}
+		}
+		if(ToF){
+			String yon=stencilServiceI.findtreeNodeParentById(pId,tree.getId());
+			if(("".equals(yon))||(yon=="")||(yon==null)){
+			RequestmentDto reqDto=BeanCopyUtils.populateTbyDBySpring(tree,RequestmentDto.class);
+			reqDto.setId(newId);
+			reqDto.setTreeNodeParent(ToFId.getId());
+			reqDto.setTreeNodeCreatetime(sdf.format(today));
+			reqDto.setTreeNodeCreateperson(userInfoBean.getUsername());
+			treeServiceI.addTreeNode(reqDto, pId);
+			String rId=SequenceManage.getSequence("");
+			RequestmentDto rdto=new RequestmentDto();
+			rdto.setId(rId);
+			rdto.setTreeNodeName("功能流程图");
+			rdto.setTreeNodeType("11");
+			rdto.setTreeNodeState("01");
+			rdto.setTreeNodeParent(newId);
+			rdto.setTreeNodeIfLeaf("1");
+			rdto.setTreeNodeLevels(4);
+			rdto.setTreeNodeCreatetime(sdf.format(today));
+			rdto.setTreeNodeCreateperson(userInfoBean.getUsername());
+			treeServiceI.addTreeNode(rdto, pId);
+			FunctionInfoDto dto = new FunctionInfoDto();
+            dto.setFuncId(newId);
+            dto.setFuncName(reqDto.getTreeNodeName());
+            dto.setFuncCreater(userInfoBean.getUsername());
+            dto.setFuncCreateTime(sdf.format(today));
+            dto.setFuncState(Constants.TreeStates.NORMAL_ADD);
+            functionInfoServiceI.addFunctionInfo(dto);
+            stencilServiceI.addTreeNode(pId,tree.getId(),newId);
+            stencilServiceI.addTreeNode(pId,tree.getChildren().get(0).getId(),rId);
+			List<String> tableIds=functionInfoServiceI.findTableByFuncId(tree.getId());
+			for(String tableId:tableIds){
+				StencilDto TableTree=stencilServiceI.findTreeById(tableId);
+				addTable(TableTree,pId,session);
+			}
+            Map<String,String> ids=addFunctionPic(tree.getId(),pId);
+ 			copyModel(tree.getChildren().get(0).getId(),rId,ids);
+			return rId;
+			}else{
+				return yon;
+			}
+		}else{
+			String nId=SequenceManage.getSequence("");
+			RequestmentDto reqDto=BeanCopyUtils.populateTbyDBySpring(pTree,RequestmentDto.class);
+			reqDto.setId(newId);
+			List<RequestmentDto> ppp=treeServiceI.findTreeNodepId(pId,"5");
+			reqDto.setTreeNodeParent(ppp.get(0).getId());
+			reqDto.setTreeNodeCreatetime(sdf.format(today));
+			reqDto.setTreeNodeCreateperson(userInfoBean.getUsername());
+			treeServiceI.addTreeNode(reqDto, pId);
+			return addFunction(tree,pId,nId,session);
+		}
+    }
+	
+	private Map<String,String> addFunctionPic(String funId,String pId){
+		Map<String,String> ids=new HashMap<String,String>();
+		List<String> controlIds=functionInfoServiceI.findControlByFunId(funId);
+		String func_id=stencilServiceI.findtreeNodeParentById(pId, funId);
+        for(String control_id:controlIds){
+        	List<CtableDto> ctdtos=stencilServiceI.findTableById(control_id,funId);//根据控件Id 和 方法id找到表
+        	for(int i=0;i<ctdtos.size();i++){    		
+        		List<CtableDto> ctable=stencilServiceI.findColumnById(control_id,ctdtos.get(i).getId());
+        		String TableId=stencilServiceI.findtreeNodeParentById(pId, ctdtos.get(i).getId());
+        		for(int j=0;j<ctable.size();j++){
+        			String column_id=stencilServiceI.findtreeNodeParentById(pId, ctable.get(j).getId());
+        			ctable.get(j).setId(column_id);
+        			functionInfoServiceI.saveFuncColumn(control_id,TableId,column_id,func_id);
+        		}
+        		ctdtos.get(i).setId(TableId);
+        		ctdtos.get(i).setChildren(ctable);
+        	}
+        	ids.put(control_id, gson.toJson(ctdtos));
+        }		
+		return ids;		
+	}
+	private void addTreeBypId(String treeNodeParent, String pId, String id,List<String> treeId){
+		StencilDto tree=stencilServiceI.findTreeById(treeNodeParent);
+		if((stencilServiceI.findCountById(pId,tree.getTreeNodeParent())!=0) && tree.getTreeNodeParent()!=id){
+			treeId.add(tree.getId());
+			addTreeBypId(tree.getTreeNodeParent(),pId,id,treeId);
+		}else{
+			String tnp=stencilServiceI.findtreeNodeParentById(pId,tree.getTreeNodeParent());
+			String newId=SequenceManage.getSequence("");
+			RequestmentDto reqDto=BeanCopyUtils.populateTbyDBySpring(tree,RequestmentDto.class);
+			reqDto.setId(newId);
+			reqDto.setTreeNodeParent(tnp);
+			treeServiceI.addTreeNode(reqDto, pId);
+			stencilServiceI.addTreeNode(pId,tree.getId(),newId);
+			if(treeId.size()!=0){
+				treeId.remove(treeId.size()-1);
+				addTreeBypId(treeId.get(treeId.size()-1),pId,id,treeId);
+			}else{
+				return;
+			}
+		}
+	}
+	
+	
+	 /**
+		 * 调整流程编辑页面并查询回显流程
+		 * @param id
+		 * @param request
+		 * @param response
+		 */
+		public void copyModel(String id, String newId,Map<String,String> ids) {  
+			try {    
+				//查询model信息
+				List<Model> modelList = repositoryService.createModelQuery().modelKey(id).list();
+				Model modelData = null;
+				Integer num = 0;
+				for (int i = 0; i < modelList.size(); i++) {
+					if(num < modelList.get(i).getVersion()){
+						num = modelList.get(i).getVersion();
+					}
+				}
+				for (int i = 0; i < modelList.size(); i++) {
+					if(modelList.get(i).getVersion() == num){
+						modelData = modelList.get(i);
+					}
+				}
+				if(modelData != null){
+					JsonNode editorNode = new ObjectMapper().readTree(repositoryService.getModelEditorSource(modelData.getId())); 
+					byte[] bytes = repositoryService.getModelEditorSourceExtra(modelData.getId());
+					//创建新的流程模型
+					Model newModel = repositoryService.newModel();
+					newModel.setCategory(modelData.getCategory());
+					newModel.setDeploymentId(modelData.getDeploymentId());
+					newModel.setKey(newId);
+					newModel.setMetaInfo(modelData.getMetaInfo());
+					newModel.setName(modelData.getName());
+					newModel.setTenantId(modelData.getTenantId());
+					newModel.setVersion(0);
+					repositoryService.saveModel(newModel);    
+					
+					//拼接新的xml文件
+					String json_xml = "{";
+					int count = 0;
+					for (Iterator iterator = editorNode.fields(); iterator.hasNext();) {
+						Entry<String, JsonNode> entry = (Entry<String, JsonNode>) iterator.next();
+						if(entry.getKey().equals("childShapes")){
+							json_xml += ",\"" + entry.getKey() + "\":";
+							String childShapes = "[";
+							ArrayNode arrayNode = (ArrayNode) entry.getValue();
+							for (int i = 0; i < arrayNode.size(); i++) {
+								boolean bool = false;
+								JsonNode node = arrayNode.get(i);
+								if(i == 0){
+									childShapes += "{";
+								}else{
+									childShapes += ",{";
+								}
+								int count2 = 0;
+								for (Iterator<?> iterator2 = node.fields(); iterator2.hasNext();) {
+									Entry<String, JsonNode> entry2 = (Entry<String, JsonNode>) iterator2.next();
+									String value = entry2.getValue().toString();
+									for (String key : ids.keySet()){
+										//判断是否是需要修改的节点
+										if(value.equals("\""+ key +"\"") && entry2.getKey().equals("resourceId")){
+											bool = true;
+										}
+										if(bool && entry2.getKey().equals("properties")){
+											String properties = "{";
+											JsonNode node2 = entry2.getValue();
+											JsonNode func = node2.findValue("belongtofunction");
+											JsonNode table = node2.findValue("belongtotable");
+											int count3 = 0;
+											if(func != null){ //替换为新的关联功能
+												properties += "\"belongtofunction\":{";
+												properties += "\"belongFunction\":" + func.findValue("belongFunction").toString();
+												properties += ",\"id\":\"" + ids.get(key)+"\"";
+												properties += ",\"type\": 0";
+												properties += "}";
+												count3++;
+											}else if(table != null){ //替换为新的关联数据库表
+												properties += "\"belongtotable\":{";
+												properties += "\"belongtable\":" + table.findValue("belongtable").toString();
+												properties += ",\"id\":" + ids.get(key);
+//											properties += ",\"type\": 0";
+												properties += "}";
+												count3++;
+											}
+											for (Iterator iterator3 = node2.fields(); iterator3.hasNext();) {
+												Entry<String, JsonNode> entry3 = (Entry<String, JsonNode>) iterator3.next();
+												if(!entry3.getKey().equals("belongtofunction") && !entry3.getKey().equals("belongtotable")){
+													if(count3 == 0){
+														properties += "\""+entry3.getKey()+"\":" + entry3.getValue();
+													}else{
+														properties += ",\""+entry3.getKey()+"\":" + entry3.getValue();
+													}
+													count3++;
+												}
+											}
+											properties += "}";
+											childShapes += ",\"" + entry2.getKey() + "\":" + properties;
+										}else{
+											if(count2 == 0){
+												childShapes += "\""+ entry2.getKey() + "\":" + entry2.getValue();
+											}else{
+												childShapes += ",\"" + entry2.getKey() + "\":" + entry2.getValue();
+											}
+										}
+									}
+									count2++;
+								}
+								childShapes += "}";
+							}
+							childShapes += "]";
+							json_xml += childShapes;
+						}else{
+							if(count == 0){
+								json_xml += "\"" + entry.getKey() + "\":" + entry.getValue();
+							}else{
+								json_xml += ",\""+ entry.getKey() + "\":" + entry.getValue();
+							}
+						}
+						count++;
+					}
+					json_xml += "}";
+					repositoryService.addModelEditorSource(newModel.getId(), json_xml.getBytes("utf-8"));
+					repositoryService.addModelEditorSourceExtra(newModel.getId(), bytes);
+				}else{
+					defModel(newId);
+				}
+			      
+			} catch (Exception e) {    
+				e.getStackTrace();
+			}   
+		} 
+		
+		/**
+		 * 创建默认的流程图
+		 */
+		public void defModel(String key){
+			try {
+				ObjectMapper objectMapper = new ObjectMapper();   
+				ObjectNode  modelObjectNode  =  objectMapper.createObjectNode();     
+				modelObjectNode.put(ModelDataJsonConstants.MODEL_NAME,  "标题");     
+				modelObjectNode.put(ModelDataJsonConstants.MODEL_REVISION, 1);     
+				modelObjectNode.put(ModelDataJsonConstants.MODEL_DESCRIPTION,     
+						org.apache.commons.lang3.StringUtils           
+						.defaultString("描述"));
+				//创建流程模型
+				Model newModel = repositoryService.newModel();
+				newModel.setMetaInfo(modelObjectNode.toString());   
+				newModel.setName("标题");   
+				newModel.setKey(key);
+				newModel.setVersion(0);
+				repositoryService.saveModel(newModel);    
+				
+				//保存二进制流程
+				ObjectNode editorNode = objectMapper.createObjectNode();   
+				editorNode.put("id", "canvas");    
+				editorNode.put("resourceId", "canvas");
+				ObjectNode stencilSetNode = objectMapper.createObjectNode(); 
+				stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");    
+				editorNode.put("stencilset", stencilSetNode);
+				ArrayNode arrayNode = objectMapper.createArrayNode();
+				editorNode.put("childShapes", arrayNode);  
+			
+				repositoryService.addModelEditorSource(newModel.getId(), editorNode.toString().getBytes("utf-8"));
+				
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+}

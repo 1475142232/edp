@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.DataInfoPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.DataInfoPo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="data_name" property="dataName" jdbcType="VARCHAR" />
+    <result column="data_desc" property="dataDesc" jdbcType="VARCHAR" />
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+    <result column="data_state" property="dataState" jdbcType="VARCHAR" />
+    <result column="data_creat" property="dataCreat" jdbcType="VARCHAR" />
+    <result column="data_creattime" property="dataCreattime" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, data_name, data_desc, product_id, data_state, data_creat, data_creattime
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.DataInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from data_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from data_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from data_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.DataInfoPoCriteria" >
+    delete from data_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.DataInfoPo" >
+    insert into data_info (id, data_name, data_desc, 
+      product_id, data_state, data_creat, 
+      data_creattime)
+    values (#{id,jdbcType=INTEGER}, #{dataName,jdbcType=VARCHAR}, #{dataDesc,jdbcType=VARCHAR}, 
+      #{productId,jdbcType=VARCHAR}, #{dataState,jdbcType=VARCHAR}, #{dataCreat,jdbcType=VARCHAR}, 
+      #{dataCreattime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.DataInfoPo" >
+    insert into data_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="dataName != null" >
+        data_name,
+      </if>
+      <if test="dataDesc != null" >
+        data_desc,
+      </if>
+      <if test="productId != null" >
+        product_id,
+      </if>
+      <if test="dataState != null" >
+        data_state,
+      </if>
+      <if test="dataCreat != null" >
+        data_creat,
+      </if>
+      <if test="dataCreattime != null" >
+        data_creattime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="dataName != null" >
+        #{dataName,jdbcType=VARCHAR},
+      </if>
+      <if test="dataDesc != null" >
+        #{dataDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null" >
+        #{productId,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null" >
+        #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="dataCreat != null" >
+        #{dataCreat,jdbcType=VARCHAR},
+      </if>
+      <if test="dataCreattime != null" >
+        #{dataCreattime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.DataInfoPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from data_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update data_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.dataName != null" >
+        data_name = #{record.dataName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dataDesc != null" >
+        data_desc = #{record.dataDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productId != null" >
+        product_id = #{record.productId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dataState != null" >
+        data_state = #{record.dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dataCreat != null" >
+        data_creat = #{record.dataCreat,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dataCreattime != null" >
+        data_creattime = #{record.dataCreattime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update data_info
+    set id = #{record.id,jdbcType=INTEGER},
+      data_name = #{record.dataName,jdbcType=VARCHAR},
+      data_desc = #{record.dataDesc,jdbcType=VARCHAR},
+      product_id = #{record.productId,jdbcType=VARCHAR},
+      data_state = #{record.dataState,jdbcType=VARCHAR},
+      data_creat = #{record.dataCreat,jdbcType=VARCHAR},
+      data_creattime = #{record.dataCreattime,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.DataInfoPo" >
+    update data_info
+    <set >
+      <if test="dataName != null" >
+        data_name = #{dataName,jdbcType=VARCHAR},
+      </if>
+      <if test="dataDesc != null" >
+        data_desc = #{dataDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null" >
+        product_id = #{productId,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null" >
+        data_state = #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="dataCreat != null" >
+        data_creat = #{dataCreat,jdbcType=VARCHAR},
+      </if>
+      <if test="dataCreattime != null" >
+        data_creattime = #{dataCreattime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.DataInfoPo" >
+    update data_info
+    set data_name = #{dataName,jdbcType=VARCHAR},
+      data_desc = #{dataDesc,jdbcType=VARCHAR},
+      product_id = #{productId,jdbcType=VARCHAR},
+      data_state = #{dataState,jdbcType=VARCHAR},
+      data_creat = #{dataCreat,jdbcType=VARCHAR},
+      data_creattime = #{dataCreattime,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="findAllData" resultMap="BaseResultMap">
+        select * from data_info d 
+        left join product_user pu on pu.product_id=d.product_id
+        where pu.user_id=#{user_id} and pu.team_id=#{team_id} and d.data_state!="00";
+  </select>
+</mapper>

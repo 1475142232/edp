@@ -1,0 +1,8 @@
+#Dubbo Config Replace
+dubbo.registry.address.filter=zookeeper://localhost:2181
+#Logback xml Config
+#This Configuration is used for logback.xml
+#set the log file location
+logback.file.filter=logs
+#set the log level: "dev" for debug/"ops" for production
+logback.mode.filter=dev

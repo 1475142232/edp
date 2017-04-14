@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.ReplyInfoPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.ReplyInfoPo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="reply_desc" property="replyDesc" jdbcType="VARCHAR" />
+    <result column="problem_id" property="problemId" jdbcType="INTEGER" />
+    <result column="reply_time" property="replyTime" jdbcType="VARCHAR" />
+    <result column="reply_user_id" property="replyUserId" jdbcType="VARCHAR" />
+    <result column="reply_user_name" property="replyUserName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, reply_desc, problem_id, reply_time, reply_user_id, reply_user_name
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.ReplyInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from reply_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from reply_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from reply_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.ReplyInfoPoCriteria" >
+    delete from reply_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.ReplyInfoPo" >
+    insert into reply_info (id, reply_desc, problem_id, 
+      reply_time, reply_user_id, reply_user_name
+      )
+    values (#{id,jdbcType=INTEGER}, #{replyDesc,jdbcType=VARCHAR}, #{problemId,jdbcType=INTEGER}, 
+      #{replyTime,jdbcType=VARCHAR}, #{replyUserId,jdbcType=VARCHAR}, #{replyUserName,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.ReplyInfoPo" >
+    insert into reply_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="replyDesc != null" >
+        reply_desc,
+      </if>
+      <if test="problemId != null" >
+        problem_id,
+      </if>
+      <if test="replyTime != null" >
+        reply_time,
+      </if>
+      <if test="replyUserId != null" >
+        reply_user_id,
+      </if>
+      <if test="replyUserName != null" >
+        reply_user_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="replyDesc != null" >
+        #{replyDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="problemId != null" >
+        #{problemId,jdbcType=INTEGER},
+      </if>
+      <if test="replyTime != null" >
+        #{replyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="replyUserId != null" >
+        #{replyUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="replyUserName != null" >
+        #{replyUserName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.ReplyInfoPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from reply_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update reply_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.replyDesc != null" >
+        reply_desc = #{record.replyDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.problemId != null" >
+        problem_id = #{record.problemId,jdbcType=INTEGER},
+      </if>
+      <if test="record.replyTime != null" >
+        reply_time = #{record.replyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.replyUserId != null" >
+        reply_user_id = #{record.replyUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.replyUserName != null" >
+        reply_user_name = #{record.replyUserName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update reply_info
+    set id = #{record.id,jdbcType=INTEGER},
+      reply_desc = #{record.replyDesc,jdbcType=VARCHAR},
+      problem_id = #{record.problemId,jdbcType=INTEGER},
+      reply_time = #{record.replyTime,jdbcType=VARCHAR},
+      reply_user_id = #{record.replyUserId,jdbcType=VARCHAR},
+      reply_user_name = #{record.replyUserName,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.ReplyInfoPo" >
+    update reply_info
+    <set >
+      <if test="replyDesc != null" >
+        reply_desc = #{replyDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="problemId != null" >
+        problem_id = #{problemId,jdbcType=INTEGER},
+      </if>
+      <if test="replyTime != null" >
+        reply_time = #{replyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="replyUserId != null" >
+        reply_user_id = #{replyUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="replyUserName != null" >
+        reply_user_name = #{replyUserName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.ReplyInfoPo" >
+    update reply_info
+    set reply_desc = #{replyDesc,jdbcType=VARCHAR},
+      problem_id = #{problemId,jdbcType=INTEGER},
+      reply_time = #{replyTime,jdbcType=VARCHAR},
+      reply_user_id = #{replyUserId,jdbcType=VARCHAR},
+      reply_user_name = #{replyUserName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

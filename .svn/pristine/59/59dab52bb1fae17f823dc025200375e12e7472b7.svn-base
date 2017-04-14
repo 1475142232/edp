@@ -1,0 +1,259 @@
+KISSY.add("prototype-module/src/prototype",function(S,IO, Cookie){
+	function prototypeList(){
+		var _this = this;
+		var cookie = new Cookie();
+		var _teamId = "";
+		var _productId = "";
+		this.init = function(){
+			_this.dataValidator();
+			_this.getPrototypeList();
+			$("#submitok").click(function(){
+				$('#submitprototype').bootstrapValidator('validate');
+				if($('#submitprototype').data('bootstrapValidator').isValid()){
+			       _this.savePic();
+				}
+			})
+			
+		}
+		//获取原型图列表
+		this.getPrototypeList = function(productId){
+			var productId = cookie.getCookie("productId");
+			_productId = productId;
+			var id = cookie.getCookie("id");
+			_id = id;
+			_this.getUserRole();//获取登陆权限==3
+			_this.getProductById(productId);//获取项目详情
+			if(userRole === "3"){
+				$("#projectList").html('<a href="javascript:;" id="addProject">+</a>');
+			}else{
+				$("#projectList").html('<a href="javascript:;" id="addProject" style="display:none;"></a>');
+			}
+			$.ajax({
+	             type: "POST",
+	             url: "TreeController/findTreeNodeByPid.action",
+	             async: true,
+	             dataType: "json",
+	             data:{id:id},
+	             success: function(data){
+	            	 console.log(data);
+	             	 var add="";
+                     for(var i=0; i<data.length; i++) {
+                    	add += '<div id="myProject">';
+                    	if(userRole === "3" || userRole === "2"){
+                    		add += '<a class="books" style="cursor:pointer" id="books_'+data[i].id+'"></a>';
+                    	}
+                     	add += '<a href="javascript:;" class="wode" id="'+data[i].id+'">'+data[i].treeName+'</a>';
+                     	add += '<a href="javascript:;" class="miaoshu">'+data[i].treeDesc+'</a>';
+                     	if(userRole === "3" || userRole === "2"){
+	                     	add += '<dl id="dl_'+data[i].id+'"><dd class="togglelist" id="'+data[i].id+'"><a href="javascript:;">'+'编辑'+'</a></dd>';
+	                     	add += '<dd class="togglelist2"  id="'+data[i].id+'"><a href="javascript:;">'+'删除'+'</a></dd></dl>';
+                     	}
+                     	add += '</div>';
+                     }
+                     $("#addProject").before(add);
+                     if(userRole === "3" || userRole === "2"){
+ 	                    //toggle
+ 	             		$(".books").click(function(){
+ 	             			var ids = (this.id).split("_");
+ 	             			$("#dl_"+ids[1]).toggle();
+ 	             		});
+ 	             		//删除
+ 	            		$(".togglelist2").click(function(){
+ 	            			var this_a = this;
+ 	            			$.ajax({
+ 	            	             type: "POST",
+ 	            	             url: "TreeController/editTreeNode.action",
+ 	            	             async: true,
+ 	            	             dataType: "json",
+ 	            	             data:{"id":this_a.id,"treeState":"00"},
+ 	            	             success: function(data){
+ 	            	            	 //刷新列表-调用加载列表方法
+ 	            	            	_this.getPrototypeList(_productId);
+ 	                             }
+ 	                   	 	});
+ 	            		});
+ 	            		//编辑修改
+ 	            		$(".togglelist").on("click",function(){
+ 	            			var this_b = this;
+ 	            			$.ajax({
+ 	            	             type: "POST",
+ 	            	             url: "TreeController/findTreeNodeById.action",
+ 	            	             async: false,
+ 	            	             dataType: "json",
+ 	            	             data: { id: this_b.id},
+ 	            	             success: function(data){
+ 	            	        		$("#sava_id").val("");
+ 	            	               $("#treeName").val("");
+ 	            	               $("#treeDesc").val("");
+ 	            	               if($("#submitprototype").data('bootstrapValidator') !== null && $("#submitprototype").data('bootstrapValidator') !== undefined){
+		 	            	  			$("#submitprototype").data('bootstrapValidator').destroy();
+		 	            				$('#submitprototype').data('bootstrapValidator', null);
+ 	            	                };
+ 	            	                _this.dataValidator();
+ 	            	                $("#myModalLabel").html("修改原型图");
+ 	                       			$("#addprototype").modal("show");
+ 	                       			$("#sava_id").val(data.id);
+ 	                       			$("#treeName").val(data.treeName);
+ 	                       		    $("#treeDesc").val(data.treeDesc);
+ 	                             }
+ 	                   	 	});
+ 	            		});
+                     }
+	             }
+	         });
+			//跳转到新建原型图
+      		$("#addProject").click(function(){
+        		$("#sava_id").val("");
+                $("#treeName").val("");
+                $("#treeDesc").val("");
+                if($("#submitprototype").data('bootstrapValidator') !== null && $("#submitprototype").data('bootstrapValidator') !== undefined){
+                	$("#submitprototype").data('bootstrapValidator').destroy();
+                	$('#submitprototype').data('bootstrapValidator', null);
+                }
+                _this.dataValidator();
+                $("#myModalLabel").html("新增原型图")
+      			$("#addprototype").modal("show");
+//      			$("#submitok").click(function(){
+//      				var treeName = $("#treeName").val();
+//      				var treeDesc = $("#treeDesc").val();
+//      				$.ajax({
+//      		             type: "POST",
+//      		             url: "TreeController/addPicByTree.action",
+//      		             data: {treeName:treeName,treeDesc:treeDesc,treeId:_productId,treeParent:_id},
+//      		             async: false,
+//      		             dataType: "json",
+//      		             success: function(data){
+//      		            	 console.log(data);
+//      	         			if(data !== null || data !== ""){
+//      	         				$("#addprototype").modal("hide");
+//      	         			}else{
+//      	         				alert("新建失败，请联系管理员！");
+//      	         			}
+//      	                 }
+//      	     	 	});
+//      			})
+      		});
+		}
+		//获取登录人权限
+		this.getUserRole = function(){
+			var teamId = cookie.getCookie("teamId");
+			var _teamId = teamId;
+			$.ajax({
+	             type: "POST",
+	             url: "userController/getUser.action",
+	             data: {teamId: _teamId},
+	             async: false,
+	             dataType: "json",
+	             success: function(data){
+         			if(data !== null && data !== ""){
+         				userRole = data.userRole;
+         			}else{
+         				userRole = "";
+         			}
+               }
+     	 	});
+		}
+		
+		 this.savePic = function(){
+			 //验证成功，保存数据
+	    	var saveData = {
+      		    treeName : $("#treeName").val(),
+      			treeDesc : $("#treeDesc").val(),
+	    		treeParent: cookie.getCookie("taskId"),
+	    		treeId: cookie.getCookie("productId")
+	    	};
+	    	var url = "TreeController/addPicByTree.action";
+	    	var id = $("#sava_id").val();
+	    	if(id !== null && id !== ""){
+	    		saveData.id = id;
+	    		url = "TreeController/editTreeNode.action";
+	    	}
+	    	$.ajax({
+      		  	type : 'post',
+      		  	url : url,
+      		  	data : saveData,
+      		  	dataType : "json",
+      		  	async : false,
+      		  	success : function(data) {
+      		  		if (data !== null && data === '0000') {
+      		  			_this.getPrototypeList(_productId);
+      		  			$("#addprototype").modal('hide');
+      		  		} else {
+      		  			var error = data !== "" ? data : "保存失败，请联系管理员!";
+      		  			$("#error").html(error);
+      		  		}
+      		  	}   
+      	  	});
+	    }
+		 
+		/**
+		 * 获取项目详情  -- 加载项目名称
+		 */
+		this.getProductById = function(productId){
+			var productName= "";
+			$.ajax({
+	             type: "POST",
+	             url: "productController/findProductById.action?productId=" + productId,
+	             async: false,
+	             dataType: "json",
+	             success: function(data){
+	            	 if(data !== null){
+	            		 productName = data.productName;
+	            	 }
+                }
+      	 	});
+			$(".productName").html('<div class="productName" id="productName">'+'任务名称：'+productName+'</div>');
+			return productName;
+		}
+		/**
+	     * 表单验证
+	     */
+	    this.dataValidator = function(){
+	    	$('#submitprototype').bootstrapValidator({
+	            message: 'This value is not valid',
+	            feedbackIcons: {
+	                valid: 'glyphicon glyphicon-ok',
+	                invalid: 'glyphicon glyphicon-remove',
+	                validating: 'glyphicon glyphicon-refresh'
+	            },
+	            fields: {
+	            	treeName: {
+	                    message: 'The username is not valid',
+	                    validators: {
+	                        notEmpty: {
+	                            message: '请输入场景名称!'
+	                        },
+	                        stringLength: {
+	                            max: 20,
+	                            message: '长度最大不能超过20!'
+	                        },
+	                        regexp: {
+	                            regexp: /^[a-zA-Z0-9\u2E80-\u9FFF\.\_\-]+$/,
+	                            message: '输入的名称格式错误!(只能输入汉字、字母、数字、.、_、-)'
+	                        }
+	                    }
+	                },
+	                treeDesc: {
+	                    validators: {
+	                    	stringLength: {
+	                            max: 200,
+	                            message: '长度最大不能超过200!'
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    }
+		
+		
+		
+		
+		
+		
+	}
+	return prototypeList;
+},{
+	requires : ['io',
+	            'common-module/src/cookie',
+	            ]
+});

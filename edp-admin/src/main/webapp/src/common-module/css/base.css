@@ -1,0 +1,46 @@
+@charset "utf-8";
+/* CSS Document */
+/* CSS 基本样式 */
+html, body, div, p, ul, li, dl, dt, dd, h1, h2, h3, h4, h5, h6, form, input, select,ul, button, textarea, iframe, table, th, td { margin: 0; padding: 0; }
+img {border: 0 none; display:block; }
+ul, li { list-style-type: none; }
+body, input, select, button, textarea {font-size: 14px; font-family:'微软雅黑'; vertical-align:middle;}
+button {cursor: pointer;}
+i,em{ font-style:normal;}
+body{background:#fde3b9;}
+a:link,a:visited{ text-decoration:none;}
+a:hover{ text-decoration:none;transition: all 0.5s ease 0s; }
+a:active{ text-decoration:none;}
+.floatleft{float:left;}
+.floatright{float:right;}
+.posr{ position:relative;}.posa{ position:absolute;}
+.control-group{margin-bottom:10px;}
+.control-label,.controls{float:left}
+.control-label{width:120px;text-align:right;display:block;line-height:35px;color:#636775}
+/*.controls{width:280px;}*/  /*disabled by changer 20160107*/
+.calendar{  
+	border: 1px solid #c3c3d6;
+    color: #ccc;
+    display: inline-block;
+    height: 35px;
+    padding: 1px 4px;
+    width: 100%;}
+.bui-select{width:100%}
+.bui-select-input{width:87%;}
+.allchild{display: none;filter: alpha(opacity=50) ; opacity: 0.5;position: absolute;width: 100%;text-align: center;padding:300px 0 0 0;background:#000;z-index: 1111;}
+.allchild p img{width:45px;height:45px;padding-left:650px;}
+.wordCss{line-height:20px; width:100px;white-space: nowrap;}
+.uUpdate,.uCancel,.resetPass,.uView{cursor: pointer;color: #F00;}
+
+
+
+
+
+
+
+
+
+
+
+
+

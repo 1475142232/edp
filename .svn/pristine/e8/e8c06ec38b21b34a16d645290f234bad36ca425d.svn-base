@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.RuleInfoPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.RuleInfoPo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
+    <result column="rule_expression" property="ruleExpression" jdbcType="VARCHAR" />
+    <result column="rule_type" property="ruleType" jdbcType="CHAR" />
+    <result column="rule_spec" property="ruleSpec" jdbcType="VARCHAR" />
+    <result column="rule_create_time" property="ruleCreateTime" jdbcType="VARCHAR" />
+    <result column="rule_creater" property="ruleCreater" jdbcType="VARCHAR" />
+    <result column="rule_modified_time" property="ruleModifiedTime" jdbcType="VARCHAR" />
+    <result column="rule_modified_person" property="ruleModifiedPerson" jdbcType="VARCHAR" />
+    <result column="rule_product" property="ruleProduct" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, rule_name, rule_expression, rule_type, rule_spec, rule_create_time, rule_creater, 
+    rule_modified_time, rule_modified_person, rule_product
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.RuleInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rule_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from rule_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from rule_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.RuleInfoPoCriteria" >
+    delete from rule_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.RuleInfoPo" >
+    insert into rule_info (id, rule_name, rule_expression, 
+      rule_type, rule_spec, rule_create_time, 
+      rule_creater, rule_modified_time, rule_modified_person, 
+      rule_product)
+    values (#{id,jdbcType=VARCHAR}, #{ruleName,jdbcType=VARCHAR}, #{ruleExpression,jdbcType=VARCHAR}, 
+      #{ruleType,jdbcType=CHAR}, #{ruleSpec,jdbcType=VARCHAR}, #{ruleCreateTime,jdbcType=VARCHAR}, 
+      #{ruleCreater,jdbcType=VARCHAR}, #{ruleModifiedTime,jdbcType=VARCHAR}, #{ruleModifiedPerson,jdbcType=VARCHAR}, 
+      #{ruleProduct,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.RuleInfoPo" >
+    insert into rule_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="ruleName != null" >
+        rule_name,
+      </if>
+      <if test="ruleExpression != null" >
+        rule_expression,
+      </if>
+      <if test="ruleType != null" >
+        rule_type,
+      </if>
+      <if test="ruleSpec != null" >
+        rule_spec,
+      </if>
+      <if test="ruleCreateTime != null" >
+        rule_create_time,
+      </if>
+      <if test="ruleCreater != null" >
+        rule_creater,
+      </if>
+      <if test="ruleModifiedTime != null" >
+        rule_modified_time,
+      </if>
+      <if test="ruleModifiedPerson != null" >
+        rule_modified_person,
+      </if>
+      <if test="ruleProduct != null" >
+        rule_product,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleName != null" >
+        #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleExpression != null" >
+        #{ruleExpression,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleType != null" >
+        #{ruleType,jdbcType=CHAR},
+      </if>
+      <if test="ruleSpec != null" >
+        #{ruleSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleCreateTime != null" >
+        #{ruleCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleCreater != null" >
+        #{ruleCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleModifiedTime != null" >
+        #{ruleModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleModifiedPerson != null" >
+        #{ruleModifiedPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleProduct != null" >
+        #{ruleProduct,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.RuleInfoPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from rule_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rule_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ruleName != null" >
+        rule_name = #{record.ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ruleExpression != null" >
+        rule_expression = #{record.ruleExpression,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ruleType != null" >
+        rule_type = #{record.ruleType,jdbcType=CHAR},
+      </if>
+      <if test="record.ruleSpec != null" >
+        rule_spec = #{record.ruleSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ruleCreateTime != null" >
+        rule_create_time = #{record.ruleCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ruleCreater != null" >
+        rule_creater = #{record.ruleCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ruleModifiedTime != null" >
+        rule_modified_time = #{record.ruleModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ruleModifiedPerson != null" >
+        rule_modified_person = #{record.ruleModifiedPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ruleProduct != null" >
+        rule_product = #{record.ruleProduct,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rule_info
+    set id = #{record.id,jdbcType=VARCHAR},
+      rule_name = #{record.ruleName,jdbcType=VARCHAR},
+      rule_expression = #{record.ruleExpression,jdbcType=VARCHAR},
+      rule_type = #{record.ruleType,jdbcType=CHAR},
+      rule_spec = #{record.ruleSpec,jdbcType=VARCHAR},
+      rule_create_time = #{record.ruleCreateTime,jdbcType=VARCHAR},
+      rule_creater = #{record.ruleCreater,jdbcType=VARCHAR},
+      rule_modified_time = #{record.ruleModifiedTime,jdbcType=VARCHAR},
+      rule_modified_person = #{record.ruleModifiedPerson,jdbcType=VARCHAR},
+      rule_product = #{record.ruleProduct,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.RuleInfoPo" >
+    update rule_info
+    <set >
+      <if test="ruleName != null" >
+        rule_name = #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleExpression != null" >
+        rule_expression = #{ruleExpression,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleType != null" >
+        rule_type = #{ruleType,jdbcType=CHAR},
+      </if>
+      <if test="ruleSpec != null" >
+        rule_spec = #{ruleSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleCreateTime != null" >
+        rule_create_time = #{ruleCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleCreater != null" >
+        rule_creater = #{ruleCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleModifiedTime != null" >
+        rule_modified_time = #{ruleModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleModifiedPerson != null" >
+        rule_modified_person = #{ruleModifiedPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleProduct != null" >
+        rule_product = #{ruleProduct,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.RuleInfoPo" >
+    update rule_info
+    set rule_name = #{ruleName,jdbcType=VARCHAR},
+      rule_expression = #{ruleExpression,jdbcType=VARCHAR},
+      rule_type = #{ruleType,jdbcType=CHAR},
+      rule_spec = #{ruleSpec,jdbcType=VARCHAR},
+      rule_create_time = #{ruleCreateTime,jdbcType=VARCHAR},
+      rule_creater = #{ruleCreater,jdbcType=VARCHAR},
+      rule_modified_time = #{ruleModifiedTime,jdbcType=VARCHAR},
+      rule_modified_person = #{ruleModifiedPerson,jdbcType=VARCHAR},
+      rule_product = #{ruleProduct,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+    <select id="findRuleByProduceId" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.RuleInfoPoCriteria">
+      select * from rule_info where rule_product=#{rule_product} or rule_product IS NULL;
+  </select>
+</mapper>

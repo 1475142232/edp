@@ -1,0 +1,40 @@
+KISSY.add("teamcreat-module/src/projectlist",function(S){
+	function projectList(){
+		//显示编辑删除菜单
+		$(".books").click(function(){
+			$(".list").toggle();
+		});
+		this.getproductList = function(teamId){
+			//获取我的项目列表
+			 $.ajax({
+	             type: "GET",
+	             url: "productController/productList.action?teamId="+teamId,
+	             async: true,
+	             dataType: "json",
+	             success: function(data){
+	            	 //console.log(data);
+	             	 var add = '<div id="myProject">';
+	             	 add += '<div class="books"></div>';
+                     for(var i=0; i<data.length; i++) {
+                     	add += '<a href="javascript:;" class="wode" id="">'+data+'</a>';
+                     	add += '<dl><dd><a href="javascript:;" id="">'+data+'</a></dd>';
+                     	add += '<dd><a href="javascript:;" id="">'+data+'</a></dd><dl>';
+                     }
+                     add += '</div>';
+                     $(".content-box-zhu").html(add);
+                  }
+        	 });
+		}
+		//进入我的项目传参
+		/*$(".wode").on("licck", function (){
+			var productId = this.id;
+		})*/
+		
+		
+		
+		
+	}
+	return projectList;
+},{
+	requires : []
+});

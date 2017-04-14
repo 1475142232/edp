@@ -1,0 +1,36 @@
+package com.edp.dao.mapper;
+
+import com.edp.dao.domain.TaskInfoPo;
+import com.edp.dao.domain.TaskInfoPoCriteria;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+public interface TaskInfoPoMapper {
+    int countByExample(TaskInfoPoCriteria example);
+
+    int deleteByExample(TaskInfoPoCriteria example);
+
+    int deleteByPrimaryKey(String id);
+
+    int insert(TaskInfoPo record);
+
+    int insertSelective(TaskInfoPo record);
+
+    List<TaskInfoPo> selectByExample(TaskInfoPoCriteria example);
+
+    TaskInfoPo selectByPrimaryKey(String id);
+
+    int updateByExampleSelective(@Param("record") TaskInfoPo record, @Param("example") TaskInfoPoCriteria example);
+
+    int updateByExample(@Param("record") TaskInfoPo record, @Param("example") TaskInfoPoCriteria example);
+
+    int updateByPrimaryKeySelective(TaskInfoPo record);
+
+    int updateByPrimaryKey(TaskInfoPo record);
+
+	List<TaskInfoPo> findTaskInfoByDate(@Param("date")String date, @Param("state")String state,@Param("user_id")String id);
+
+	List<TaskInfoPo> findTaskInfoByProductIdAndDate(@Param("date")String date, @Param("state")String state, @Param("product_id")String productId);
+
+	List<String> findFunctionIdByScene(@Param("scene_id")String id);
+}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>分配角色</title>
+</head>
+<body>
+<div class="row rowsearch">
+    <div class="control-group span12">
+        <label class="control-label">角色名称：</label>
+
+        <div class="controls"><input type="text" class="input-large control-text" id="roleName"></div>
+    </div>
+    <div class="control-group span5">
+            <button class="button button-danger " id="roleSearch">查询</button>
+    </div>
+</div>
+
+<div id="grid"></div>
+<div id="gridbar"></div>
+</body>
+</html>

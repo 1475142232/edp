@@ -1,0 +1,828 @@
+package com.edp.service.product;
+
+import com.alibaba.dubbo.common.utils.StringUtils;
+import com.edp.common.constant.Constants;
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.DateUtil;
+import com.edp.common.utils.Docx4jUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.common.utils.SqlFormatUtil;
+import com.edp.dao.domain.*;
+import com.edp.dao.mapper.*;
+import com.edp.serviceI.bytearrayInfo.ByteArrayInfoServiceI;
+import com.edp.serviceI.dto.BytearrayInfoDto;
+import com.edp.serviceI.dto.ColumnPicDto;
+import com.edp.serviceI.dto.FlowchartDescDto;
+import com.edp.serviceI.dto.FunctionInfoDto;
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import com.edp.serviceI.product.ProductServiceI;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
+import org.activiti.bpmn.converter.BpmnXMLConverter;
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.Deployment;
+import org.activiti.engine.repository.Model;
+import org.activiti.engine.repository.ProcessDefinition;
+import org.apache.poi.ss.formula.functions.T;
+import org.docx4j.dml.wordprocessingDrawing.Inline;
+import org.docx4j.jaxb.Context;
+import org.docx4j.model.table.TblFactory;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.docx4j.openpackaging.exceptions.InvalidFormatException;
+import org.docx4j.openpackaging.io.SaveToZipFile;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
+import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
+import org.docx4j.wml.P;
+import org.docx4j.wml.PPr;
+import org.docx4j.wml.PPrBase;
+import org.docx4j.wml.Tbl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.io.*;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+
+/**
+ * @author wu_jianixing
+ * @时间：2016.4.14
+ */
+@Service("productServiceI")
+@Transactional
+public class ProductServiceImpl implements ProductServiceI {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductServiceImpl.class);
+    @Autowired
+    private ProductInfoPoMapper productInfoPoMapper;
+    @Autowired
+    private ColumnRuleRefPoMapper columnRuleRefPoMapper;
+    @Autowired
+    private ColumnInfoPoMapper columnInfoPoMapper;
+    @Autowired
+    private RepositoryService repositoryService;
+    @Autowired
+    private FunctionInfoServiceI functionInfoServiceI;
+    @Autowired
+    private FunctionInfoPoMapper functionInfoPoMapper;
+    
+
+    @Resource
+    private ByteArrayInfoServiceI byteArrayInfoServiceI;
+    
+    private String s = "^s";
+    
+    private Map<String, String> myMap = null;
+    
+    @Override
+    public ProductDto getAllProducts(ProductDto dto) {
+        ProductInfoPoCriteria example = new ProductInfoPoCriteria();
+        ProductInfoPoCriteria.Criteria productCriteria = example.createCriteria();
+        if (null != dto.getId() && !"".equals(dto.getId())) {
+            productCriteria.andIdEqualTo(dto.getId());
+        }
+        if (null != dto.getProductName() && !"".equals(dto.getProductName())) {
+            productCriteria.andProductNameLike("%" + dto.getProductName() + "%");
+        }
+        if(null != dto.getProductOrg() && !"".equals( dto.getProductOrg())){
+        	productCriteria.andProductOrgEqualTo(dto.getProductOrg());
+        }
+        String pagingStr = SqlFormatUtil.makeupOrderByAndLimit("id", SqlFormatUtil.ORDER_BY_DIRECTION_DESC, dto.getPageIndex(), dto.getLimit());
+        example.setOrderByClause(pagingStr);
+        try {
+            int count = productInfoPoMapper.countByExample(example);
+            List<ProductInfoPo> result = productInfoPoMapper.selectByExample(example);
+            List<ProductDto> returnVal = BeanCopyUtils.populateTListbyDListBySpring(result, ProductDto.class);
+            ProductDto returnDto = new ProductDto();
+            returnDto.setRows(returnVal);
+            returnDto.setResults(count);
+            return returnDto;
+        } catch (Exception e) {
+            LOGGER.error("查询全部产品错误！", e);
+        }
+        return null;
+    }
+
+
+    @Override
+    public ProductDto getAllProducts4ReqChange(ProductDto dto) {
+        ProductInfoPoCriteria example = new ProductInfoPoCriteria();
+        ProductInfoPoCriteria.Criteria productCriteria = example.createCriteria();
+        if (null != dto.getId() && !"".equals(dto.getId())) {
+            productCriteria.andIdEqualTo(dto.getId());
+        }
+        if (null != dto.getProductName() && !"".equals(dto.getProductName())) {
+            productCriteria.andProductNameLike("%" + dto.getProductName() + "%");
+        }
+
+        productCriteria.andProductVersionGreaterThan(0);//只有已经确认过需求的产品才能做变更,即productVersion大于0;
+        String pagingStr = SqlFormatUtil.makeupOrderByAndLimit("id", SqlFormatUtil.ORDER_BY_DIRECTION_DESC, dto.getPageIndex(), dto.getLimit());
+        example.setOrderByClause(pagingStr);
+        try {
+            int count = productInfoPoMapper.countByExample(example);
+            List<ProductInfoPo> result = productInfoPoMapper.selectByExample(example);
+            List<ProductDto> returnVal = BeanCopyUtils.populateTListbyDListBySpring(result, ProductDto.class);
+            ProductDto returnDto = new ProductDto();
+            returnDto.setRows(returnVal);
+            returnDto.setResults(count);
+            return returnDto;
+        } catch (Exception e) {
+            LOGGER.error("查询全部产品错误！", e);
+        }
+        return null;
+    }
+
+    /**
+     * 根据产品编号,更新产品版本,规则:原版本号+1
+     *
+     * @param productId 产品编号
+     * @return
+     * @author changer 2016-5-23
+     */
+    @Override
+    public boolean updateProductVersion(String productId) {
+        boolean state = false;
+        ProductInfoPo result = productInfoPoMapper.selectByPrimaryKey(productId);
+        if (result != null) {
+            int oldProductVersion = result.getProductVersion();
+            result.setProductVersion(oldProductVersion + 1);
+            productInfoPoMapper.updateByPrimaryKey(result);
+            state = true;
+        }
+
+        return state;
+    }
+
+    //根据id获得商品
+    @Override
+    public ProductDto getProductById(String id) {
+        try {
+            ProductInfoPo result = productInfoPoMapper.selectByPrimaryKey(id);
+            return BeanCopyUtils.populateTbyDBySpring(result, ProductDto.class);
+        } catch (Exception e) {
+            LOGGER.error("根据用户id查询全部用户错误！", e);
+        }
+        return null;
+    }
+
+    //增加商品
+    @Override
+    public void addProduct(ProductDto dto) {
+        ProductInfoPo po = BeanCopyUtils.populateTbyDBySpring(dto, ProductInfoPo.class);
+
+        productInfoPoMapper.insertSelective(po);
+    }
+
+    //修改商品
+    @Override
+    public void updateProduct(ProductDto dto) {
+        ProductInfoPo po = BeanCopyUtils.populateTbyDBySpring(dto, ProductInfoPo.class);
+        productInfoPoMapper.updateByPrimaryKeySelective(po);
+    }
+
+    //删除商品
+    @Override
+    public void delProduct(String proId) {
+        productInfoPoMapper.deleteByPrimaryKey(proId);
+    }
+
+    /**
+     * 需求文档生成,生成的文档以流的形式保存到数据库中
+     *
+     * @param dto
+     * @author changer 2016-5-23
+     */
+    @Override
+    public void getDOCbyProductId(RequestmentDto dto) {
+
+        WordprocessingMLPackage wordPackage;
+        try {
+            //创建word对象
+            wordPackage = WordprocessingMLPackage.createPackage();
+            MainDocumentPart mdp = wordPackage.getMainDocumentPart();
+
+            //根据产品编号,查询产品信息
+            String productId = dto.getTreeNodeId();
+            ProductInfoPo productInfoPo = productInfoPoMapper.selectByPrimaryKey(productId);
+            //获取产品版本号ProductVersion
+            int productVersion = 0;
+            if (productInfoPo != null) {
+                productVersion = productInfoPo.getProductVersion();
+            }
+
+            //组装需求文档
+
+            mdp.addStyledParagraphOfText("Title", dto.getTreeNodeName() + "需求文档");//主标题
+            mdp.addStyledParagraphOfText("Heading1", "1.产品说明");
+			mdp.addParagraphOfText(productInfoPo.getProductDesc());
+			mdp.addStyledParagraphOfText("Heading1", "2.场景");
+
+            DOCHeading(mdp, dto.getChildren(), wordPackage);
+
+
+            //将需求文档转成文档流
+            SaveToZipFile saver = new SaveToZipFile(wordPackage);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            saver.save(byteArrayOutputStream);
+
+            //组装数据表对象,并保存到数据库BytearrayInfo表
+            String name = dto.getTreeNodeName() + "需求文档-" + DateUtil.date2String(new Date(),"yyyyMMdd");
+            BytearrayInfoDto bytearrayInfoDto = new BytearrayInfoDto();
+            byte[] bytes = byteArrayOutputStream.toByteArray();
+            bytearrayInfoDto.setFileBytes(bytes);
+            bytearrayInfoDto.setFileName(name);
+            bytearrayInfoDto.setFileTargetid(productId);
+            bytearrayInfoDto.setFileVersion(productVersion);
+            bytearrayInfoDto.setFileType(Constants.FILETYPE_DOC);
+            byteArrayInfoServiceI.saveBytearrayInfo(bytearrayInfoDto);
+
+
+        } catch (InvalidFormatException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Docx4JException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private void DOCHeading(MainDocumentPart mdp, List<RequestmentDto> requestmentDto, WordprocessingMLPackage wordPackage) {
+    	int scount=1;
+    	List<RequestmentDto> dto=requestmentDto.get(0).getChildren();
+        for (int i = 0; i < dto.size(); i++) {
+            if(dto.get(i).getTreeNodeType().equals("8")){
+            	mdp.addStyledParagraphOfText("Heading2", "2."+scount+":"+dto.get(i).getTreeNodeName());
+                InputStream in = getViewPic(dto.get(i).getId());
+                if(in != null){
+                    P p = createImage(wordPackage, in);
+                    mdp.addObject(p);
+                    //生成流程图的说明文档
+                    mdp.addStyledParagraphOfText("Heading3","流程说明：");
+                    String sq = SequenceManage.getSequence("");
+                    String content = getFlowchartDescription(dto.get(i).getId(), sq);
+                    String[] str = content.split(sq);
+                    for (int k = 0; k < str.length; k++) {
+						mdp.addParagraphOfText(str[k]);
+					 }
+                }
+                mdp.addStyledParagraphOfText("Heading3", "功能列表");
+            	List<FunctionInfoPo> func=functionInfoPoMapper.findFuncIdBySceneId(dto.get(i).getId());
+            	for(int j=0;j<func.size();j++){
+            		 mdp.addStyledParagraphOfText("Heading4", func.get(j).getFuncName());
+            		 String PicId=functionInfoPoMapper.findPicIdByfuncId(func.get(j).getFuncId());
+            		 InputStream intwo= getViewPic(PicId);
+                     if(intwo != null){
+                         P ptwo = createImage(wordPackage, intwo);
+                         mdp.addObject(ptwo);
+                         
+                         //生成流程图的说明文档
+                         mdp.addStyledParagraphOfText("Heading3","流程说明：");
+                         String sq = SequenceManage.getSequence("");
+                         String content = getFlowchartDescription(PicId, sq);
+                         String[] str = content.split(sq);
+                         for (int k = 0; k < str.length; k++) {
+							mdp.addParagraphOfText(str[k]);
+						 }
+                     }
+            	}
+            	scount+=1;
+            }
+            
+        }
+        mdp.addStyledParagraphOfText("Heading1", "3.原型图");
+        scount=1;
+        dto=requestmentDto.get(2).getChildren();
+        for (int i = 0; i < dto.size(); i++) {
+        	if(dto.get(i).getTreeNodeType().equals("12")){
+        		mdp.addStyledParagraphOfText("Heading2", "3."+scount+":"+dto.get(i).getTreeNodeName());
+        		BytearrayInfoDto byt=byteArrayInfoServiceI.findPicById(dto.get(i).getId());
+        		InputStream in=new ByteArrayInputStream(byt.getFileBytes());
+        		if(in != null){
+                    P p = createImage(wordPackage, in);
+                    mdp.addObject(p);
+                }
+        		List<ColumnPicDto> colunmDto=functionInfoServiceI.findPicColumn(dto.get(i).getId());
+        		for(int j=0;j<colunmDto.size();j++){
+        			mdp.addParagraphOfText(colunmDto.get(j).getColumnName()+":"+colunmDto.get(j).getColunmSpec());
+        		}
+        		scount+=1;
+        	}
+        	
+        }
+        dto=requestmentDto.get(3).getChildren();
+        mdp.addStyledParagraphOfText("Heading1", "4.数据表");
+        scount=1;
+        for (int i = 0; i < dto.size(); i++) {
+        	if(dto.get(i).getTreeNodeType().equals("9")){
+        		mdp.addStyledParagraphOfText("Heading2", "4."+scount+":"+dto.get(i).getTreeNodeName());
+        		DOCTable(dto.get(i).getChildren(),wordPackage,mdp);
+        		scount+=1;
+        	}
+        }
+    }
+
+
+    private void DOCTable(List<RequestmentDto> dto, WordprocessingMLPackage wordPackage, MainDocumentPart mdp) {
+        if (dto.size() != 0) {
+            List titleList = new ArrayList();
+            titleList.add(new String[]{"序号", "英文名称", "中文名称", "类型", "必输", "约束"});
+            List dataList = new ArrayList();
+            Map<String,String> type=new HashMap<String,String>();
+            type.put("01", "数值");
+            type.put("02", "邮箱");
+            type.put("03", "日期");
+            type.put("04", "普通");
+            Map<String,String> bs=new HashMap<String,String>();
+            bs.put("0", "非必输");
+            bs.put("1", "必输");
+            
+            for (int i = 0; i < dto.size(); i++) {
+                ColumnInfoPo cp = columnInfoPoMapper.selectByPrimaryKey(dto.get(i).getId());
+                ColumnRuleRefPoCriteria example = new ColumnRuleRefPoCriteria();
+                ColumnRuleRefPoCriteria.Criteria columnRuleRefCriteria = example.createCriteria();
+                columnRuleRefCriteria.andColumnIdEqualTo(cp.getId());
+                List<ColumnRuleRefPo> result = columnRuleRefPoMapper.selectByExample(example);
+                String rule = "";
+                for (int j = 0; j < result.size(); j++) {
+                    if (j != (result.size() - 1)) {
+                        rule += result.get(j).getRuleName() + ":" + result.get(j).getRuleValue() + ",";
+                    } else {
+                        rule += result.get(j).getRuleName() + ":" + result.get(j).getRuleValue();
+                    }
+                }
+                dataList.add(new String[]{(i + 1) + "", cp.getColumnEnName(), dto.get(i).getTreeNodeName(), type.get(cp.getColumnType()), bs.get(cp.getColumnRequired()), rule});
+
+            }
+            Tbl table = TblFactory.createTable(dto.size() + 1, 6, 2000);
+            Docx4jUtils.fillTableData(wordPackage, table, dataList, titleList);
+            mdp.addObject(table);
+        } else {
+            return;
+        }
+
+    }
+    
+    private void setVersion(String id){
+    	//查询model信息
+		List<Model> modellist = repositoryService.createModelQuery().modelKey(id).list();
+		if(modellist != null && modellist.size() > 0){
+			for (int i = 0; i < modellist.size(); i++) {
+				Model model = modellist.get(i);
+				if(model.getVersion() == 0){
+					 //查询model信息
+		            List<Model> modelList = repositoryService.createModelQuery().modelKey(id).list();
+		            Integer num = 0;
+					for (int j = 0; j < modelList.size(); j++) {
+						if(num < modelList.get(j).getVersion()){
+							num = modelList.get(j).getVersion();
+						}
+					}
+					model.setVersion(num + 1);
+					repositoryService.saveModel(model);    
+				}
+			}
+			
+		}
+    }
+
+
+    public InputStream getViewPic(String id) {
+        try {
+        	setVersion(id);
+        	 //查询model信息
+            List<Model> modelList = repositoryService.createModelQuery().modelKey(id).list();
+            //查询model信息
+            Model modelData = null;
+            Integer num = 0;
+			for (int i = 0; i < modelList.size(); i++) {
+				if(num < modelList.get(i).getVersion()){
+					num = modelList.get(i).getVersion();
+				}
+			}
+			for (int i = 0; i < modelList.size(); i++) {
+				if(modelList.get(i).getVersion() == num){
+					modelData = modelList.get(i);
+				}
+			}
+            InputStream in  = null ;
+            //查询model信息
+            if(modelData != null){
+                BpmnJsonConverter jsonConverter = new BpmnJsonConverter();
+                //获取数据表信息
+                JsonNode editorNode = new ObjectMapper().readTree(repositoryService.getModelEditorSource(modelData.getId()));
+               if(editorNode.findValue("id") != null && StringUtils.isEquals("canvas", editorNode.findValue("id").textValue()) ){
+                   return in;
+               }
+               else{
+                   BpmnModel bpmnModel = jsonConverter.convertToBpmnModel(editorNode);
+                   BpmnXMLConverter xmlConverter = new BpmnXMLConverter();
+                   byte[] bpmnBytes = xmlConverter.convertToXML(bpmnModel);
+                   //部署流程
+                   String processName = modelData.getId() + ".bpmn20.xml";
+                   Deployment deployment = repositoryService.createDeployment().name(modelData.getId()).addString(processName, new String(bpmnBytes,"utf-8")).deploy();
+                   //查询流程定义图片
+                   if (deployment != null) {
+                       List<ProcessDefinition> pList = repositoryService.createProcessDefinitionQuery()
+                               .processDefinitionKey("process").list();
+                       ProcessDefinition processDefinition = null;
+                       for (ProcessDefinition pd : pList) {
+                           if (pd.getDeploymentId().equals(deployment.getId())) {
+                               processDefinition = pd;
+                           }
+                       }
+
+                       if(processDefinition != null){
+                           String diagramResourceName = processDefinition.getDiagramResourceName();
+                           in = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), diagramResourceName);
+                           //删除部署
+                           repositoryService.deleteDeployment(deployment.getId(), true);
+                       }
+                   }
+
+               }
+
+                return in;
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public String getFlowchartDescription(String id, String sq){
+    	 //查询model信息
+        List<Model> modelList = repositoryService.createModelQuery().modelKey(id).list();
+        //查询model信息
+        Model modelData = null;
+        Integer num = 0;
+		for (int i = 0; i < modelList.size(); i++) {
+			if(num < modelList.get(i).getVersion()){
+				num = modelList.get(i).getVersion();
+			}
+		}
+		for (int i = 0; i < modelList.size(); i++) {
+			if(modelList.get(i).getVersion() == num){
+				modelData = modelList.get(i);
+			}
+		}
+        InputStream in  = null ;
+        //查询model信息
+        if(modelData != null){
+        	//获取数据表信息
+            try {
+            	List<FlowchartDescDto> fdtoList = new ArrayList<FlowchartDescDto>();
+				JsonNode editorNode = new ObjectMapper().readTree(repositoryService.getModelEditorSource(modelData.getId()));
+				if(editorNode != null){
+					for (Iterator iterator = editorNode.fields(); iterator.hasNext();) {
+						Entry<String, JsonNode> jsonNode = (Entry<String, JsonNode>) iterator.next();
+						if(jsonNode.getKey().equals("childShapes")){
+							ArrayNode arrayNode = (ArrayNode)jsonNode.getValue();
+							for (int i = 0; i < arrayNode.size(); i++) {
+								JsonNode node = arrayNode.get(i);
+								String resourceId = "";
+								String stencil = "";
+								List<String> outgoing = new ArrayList<String>();
+								Map<String, String> properties = new HashMap<String, String>();
+								for (Iterator iterator2 = node.fields(); iterator2.hasNext();) {
+									Entry<String, JsonNode> childShapes = (Entry<String, JsonNode>) iterator2.next();
+									if(childShapes.getKey().equals("resourceId")){
+										resourceId = childShapes.getValue().toString();
+									}
+									if(childShapes.getKey().equals("properties")){
+										JsonNode prop = childShapes.getValue();
+										for (Iterator iterator3 = prop.fields(); iterator3.hasNext();) {
+											Entry<String, JsonNode> jsonNode3 = (Entry<String, JsonNode>) iterator3.next();
+											properties.put(jsonNode3.getKey(), jsonNode3.getValue().toString());
+										}
+									}
+									if(childShapes.getKey().equals("stencil")){
+										JsonNode jn = childShapes.getValue();
+										stencil = jn.findValue("id").toString();
+									}
+									if(childShapes.getKey().equals("outgoing")){
+										ArrayNode arrayNode2 = (ArrayNode)childShapes.getValue();
+										for (int j = 0; j < arrayNode2.size(); j++) {
+											JsonNode node2 = arrayNode2.get(j);
+											if(node2 != null && node2.findValue("resourceId") != null){
+												String outgoId = node2.findValue("resourceId").toString();
+												outgoing.add(outgoId);
+											}
+										}
+									}
+								}
+								FlowchartDescDto fdto = new FlowchartDescDto();
+								fdto.setStencil(stencil);
+								fdto.setResourceId(resourceId);
+								fdto.setProperties(properties);
+								fdto.setOutgoing(outgoing);
+								fdtoList.add(fdto);
+							}
+						}
+						
+					}
+				}
+				
+				String count = "1";
+				myMap = new HashMap<String,String>();
+				if(fdtoList.size() > 0){
+					String content = "";
+					List<FlowchartDescDto> fdtoList2 = fdtoList;
+					for (int i = 0; i < fdtoList.size(); i++) {
+						FlowchartDescDto fdto = fdtoList.get(i);
+						if(fdto.getStencil().equals("\"StartNoneEvent\"")){
+							if(!"\"\"".equals(fdto.getProperties().get("name"))){
+								content += count + ". " + mySubstring(fdto.getProperties().get("name")) + "，";
+							}else if(!"\"\"".equals(fdto.getProperties().get("documentation"))){
+								content += count + ". " + mySubstring(fdto.getProperties().get("documentation")) + "，";
+							}else{
+								content += count + ". 开始，";
+							}
+							content = foreachContent(count,fdto.getOutgoing(), fdtoList2, content, sq, false);
+						}
+					}
+					return content;
+				}
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            
+            
+        }
+    	return "";
+    }
+    
+    private String foreachContent(String count, List<String> outgoing,List<FlowchartDescDto> fdtoList2,String content, String sq, boolean bool){
+    	if(outgoing != null && outgoing.size() > 0){
+    		int count2 = 1;
+    		for (int i = 0; i < outgoing.size(); i++) { //遍历节点下的子节点
+    			boolean bl = false;
+    			for (String key : myMap.keySet()) {
+    				if(outgoing.get(i).equals(key)){
+    					String[] str = myMap.get(key).split("&&&");
+    					content += "【重新执行第" + str[1] + "步的】" + str[0] + "；" + sq;
+    					bl = true;
+    				}
+    			}
+    			if(bl){
+    				break;
+    			}
+				for (int j = 0; j < fdtoList2.size(); j++) { //循环节点数组
+					if(fdtoList2.get(j).getResourceId().equals(outgoing.get(i))){ //在节点数组中查找子节点
+						if("\"ExclusiveGateway\"".equals(fdtoList2.get(j).getStencil())){ //判断当前节点是否是“判断节点”
+							//拼接当前节点 名称+描述  sq：word中换行
+							if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("name"))){
+								content += mySubstring(fdtoList2.get(j).getProperties().get("name"));
+								if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+									content += "（"+mySubstring(fdtoList2.get(j).getProperties().get("documentation")) + "） ：" + sq;
+								}else{
+									content +=  "： " + sq;
+								}
+							}else if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+								content += mySubstring(fdtoList2.get(j).getProperties().get("documentation"))+ "：" + sq;
+							}
+							String ct = mySubstring(fdtoList2.get(j).getProperties().get("name"));
+							if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+								ct += "("+ mySubstring(fdtoList2.get(j).getProperties().get("documentation"))+")";
+							}
+							myMap.put(fdtoList2.get(j).getResourceId(), ct + "&&&" + count);
+							//进入下一级子节点
+							if(fdtoList2.get(j).getOutgoing().size() > 1){ //判断子节点数，大于1，则对子节点进行分组
+								content = foreachContent(count, fdtoList2.get(j).getOutgoing(), fdtoList2, content, sq, true);
+							}else{
+								content = foreachContent(count, fdtoList2.get(j).getOutgoing(), fdtoList2, content, sq, false);
+							}
+						}else if("\"SequenceFlow\"".equals(fdtoList2.get(j).getStencil())){ //判断当前节点是否是“连接线节点”
+							String count3 = count;
+							//拼接当前节点 名称+描述 并添加分组
+							if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("name"))){
+								if(bool){
+									count3 = count +"."+ count2;
+									content +=  count3 + ". ";
+								}
+								String[] ss = count3.split(".");
+								if(ss.length > 1){
+									for (int k = 0; k < ss.length - 1; k++) {
+										content += s;
+									}
+								}
+								content += mySubstring(fdtoList2.get(j).getProperties().get("name"));
+								if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+									content += "（"+mySubstring(fdtoList2.get(j).getProperties().get("documentation")) + "），";
+								}else{
+									content +=  "，";
+								}
+							}else if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+								if(bool){
+									count3 = count +"."+ count2;
+									content +=  count3 + ". ";
+								}
+								String[] ss = count3.split(".");
+								if(ss.length > 1){
+									for (int k = 0; k < ss.length - 1; k++) {
+										content += s;
+									}
+								}
+								content += mySubstring(fdtoList2.get(j).getProperties().get("documentation")) + "，";
+							}else{
+								if(bool){
+									count3 = count +"."+ count2;
+								}
+							}
+							
+							String ct = mySubstring(fdtoList2.get(j).getProperties().get("name"));
+							if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+								ct += "("+ mySubstring(fdtoList2.get(j).getProperties().get("documentation"))+")";
+							}
+							myMap.put(fdtoList2.get(j).getResourceId(), ct + "&&&" + count);
+							content = foreachContent(count3, fdtoList2.get(j).getOutgoing(), fdtoList2, content, sq, false);
+						}else if("\"TextAnnotation\"".equals(fdtoList2.get(j).getStencil())){
+							if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("name"))){
+								content += "（注释："+ mySubstring(fdtoList2.get(j).getProperties().get("name")) + "）";
+							}else if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+								content += "（注释："+ mySubstring(fdtoList2.get(j).getProperties().get("documentation")) + "）";
+							}
+						}else if("\"EndNoneEvent\"".equals(fdtoList2.get(j).getStencil())){
+							if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("name"))){
+								content += mySubstring(fdtoList2.get(j).getProperties().get("name"));
+								if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+									content += "（"+mySubstring(fdtoList2.get(j).getProperties().get("documentation")) + "）；" + sq;
+								}else{
+									content +=  "；" + sq;
+								}
+							}else if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+								content += mySubstring(fdtoList2.get(j).getProperties().get("documentation")) + "； " + sq;
+							}else{
+								content += "结束;" + sq;
+							}
+						}else{
+							if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("name"))){
+								content += mySubstring(fdtoList2.get(j).getProperties().get("name"));
+								if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+									content += "（"+mySubstring(fdtoList2.get(j).getProperties().get("documentation")) + "），";
+								}else{
+									content +=  "，";
+								}
+							}else if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+								content += mySubstring(fdtoList2.get(j).getProperties().get("documentation")) + "，";
+							}
+							
+							String ct = mySubstring(fdtoList2.get(j).getProperties().get("name"));
+							if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+								ct += "("+ mySubstring(fdtoList2.get(j).getProperties().get("documentation"))+")";
+							}
+							myMap.put(fdtoList2.get(j).getResourceId(), ct + "&&&" + count);
+							content = foreachContent(count,fdtoList2.get(j).getOutgoing(), fdtoList2, content, sq, false);
+						}
+						count2 = count2 + 1;
+						if(!"\"EndNoneEvent\"".equals(fdtoList2.get(j).getStencil())){
+							String ct = mySubstring(fdtoList2.get(j).getProperties().get("name"));
+							if(!"\"\"".equals(fdtoList2.get(j).getProperties().get("documentation"))){
+								ct += "("+ mySubstring(fdtoList2.get(j).getProperties().get("documentation"))+")";
+							}
+							myMap.put(fdtoList2.get(j).getResourceId(), ct + "&&&" + count);
+						}
+					}
+				}
+			}
+    	}
+    	
+    	return content;
+    }
+    
+	private String mySubstring(String str){
+    	if(str.indexOf("\"")==0) str = str.substring(1,str.length());   //去掉第一个 "
+		if(str.lastIndexOf("\"")==(str.length()-1)) str = str.substring(0,str.length()-1);  //去掉最后一个 " 
+		
+		return str;
+    }
+
+	@Override
+    public P createImage(WordprocessingMLPackage wordMLPackage, InputStream in) {
+
+
+        org.docx4j.wml.ObjectFactory factory = Context.getWmlObjectFactory();
+        org.docx4j.wml.P p = factory.createP();
+        org.docx4j.wml.R run = factory.createR();
+        try {
+            int read = 0;
+            byte[] buf = new byte[1000];
+            ByteArrayOutputStream bais = new ByteArrayOutputStream();
+
+            while ((read = in.read(buf, 0, 1000)) > 0) {
+                bais.write(buf, 0, read);
+            }
+
+            byte[] result = bais.toByteArray();
+
+            BinaryPartAbstractImage imagePart = BinaryPartAbstractImage.createImagePart(wordMLPackage, result);
+
+            Inline inline = imagePart.createImageInline(null, "altText",
+                    1, 2, false);
+
+            // Now add the inline in w:p/w:r/w:drawing
+
+            p.getContent().add(run);
+            org.docx4j.wml.Drawing drawing = factory.createDrawing();
+            run.getContent().add(drawing);
+            drawing.getAnchorOrInline().add(inline);
+
+
+            in.close();
+
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return p;
+
+
+    }
+
+    public P createNumberedP(P p, Long numId, int ilvl) {
+
+        org.docx4j.wml.ObjectFactory objectFactory = Context.getWmlObjectFactory();
+        PPr ppr = objectFactory.createPPr();
+        PPrBase.PStyle pprbasepstyle = objectFactory.createPPrBasePStyle();
+        ppr.setPStyle(pprbasepstyle);
+        pprbasepstyle.setVal("Heading5");
+        // Create object for numPr
+        PPrBase.NumPr pprbasenumpr = objectFactory.createPPrBaseNumPr();
+        ppr.setNumPr(pprbasenumpr);
+        // Create object for ilvl
+        PPrBase.NumPr.Ilvl pprbasenumprilvl = objectFactory.createPPrBaseNumPrIlvl();
+        pprbasenumpr.setIlvl(pprbasenumprilvl);
+        pprbasenumprilvl.setVal(BigInteger.valueOf(ilvl));
+        // Create object for numId
+        PPrBase.NumPr.NumId pprbasenumprnumid = objectFactory.createPPrBaseNumPrNumId();
+        pprbasenumpr.setNumId(pprbasenumprnumid);
+        pprbasenumprnumid.setVal(BigInteger.valueOf(numId));
+        p.setPPr(ppr);
+        return p;
+    }
+
+
+	@Override
+	public void addUserInfo(String productId, String userId,String type) {
+		productInfoPoMapper.addUserInfo(productId,userId,type);
+	}
+
+
+	@Override
+	public void delUserById(String id) {
+		productInfoPoMapper.delUserById(id);
+	}
+
+
+	@Override
+	public ProductDto getAllProductsByUserId(Integer id) {
+		 List<ProductInfoPo> result = productInfoPoMapper.getAllProductsByUserId(id);
+		 int count = productInfoPoMapper.countById(id);
+         List<ProductDto> returnVal = BeanCopyUtils.populateTListbyDListBySpring(result, ProductDto.class);
+         ProductDto returnDto = new ProductDto();
+         returnDto.setRows(returnVal);
+         returnDto.setResults(count);
+         return returnDto;
+	}
+
+
+	@Override
+	public void delUserByUserId(String id, String userId) {
+		productInfoPoMapper.delUserByUserId(id,userId);
+		
+	}
+
+
+
+}
+      

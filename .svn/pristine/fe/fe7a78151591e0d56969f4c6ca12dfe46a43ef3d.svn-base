@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>修改密码</title>
+</head>
+<body>
+	<div class="modifycode">
+	 <ul class="floatleft">
+	  <li><label class="control-label">原密码：</label><div class="controls"><input type="password" class="account" id="beforePassWord" onpaste="return false;" ></div></li>
+	  <li><label class="control-label">新密码：</label><div class="controls"><input type="password" class="mail" id="newPassWord"  onpaste="return false;" ></div></li>
+	  <li><label class="control-label">确认密码：</label><div class="controls"><input type="password" class="" id="repeatPassWord"  onpaste="return false;" ></div></li>
+	 </ul>
+	 <p>
+	 <button class="button button-danger  button-move " id="btnOk">确定</button>
+	 <button class="button " id="btnCancle">重置</button>
+	 </p>
+
+	</div>
+</body>
+</html> 

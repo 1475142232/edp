@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.StencilTreePoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.StencilTreePo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="tree_node_name" property="treeNodeName" jdbcType="VARCHAR" />
+    <result column="tree_node_type" property="treeNodeType" jdbcType="CHAR" />
+    <result column="tree_node_desc" property="treeNodeDesc" jdbcType="VARCHAR" />
+    <result column="tree_node_state" property="treeNodeState" jdbcType="CHAR" />
+    <result column="tree_node_parent" property="treeNodeParent" jdbcType="VARCHAR" />
+    <result column="tree_node_if_leaf" property="treeNodeIfLeaf" jdbcType="CHAR" />
+    <result column="tree_node_createtime" property="treeNodeCreatetime" jdbcType="VARCHAR" />
+    <result column="tree_node_createperson" property="treeNodeCreateperson" jdbcType="VARCHAR" />
+    <result column="tree_node_modifiedtime" property="treeNodeModifiedtime" jdbcType="VARCHAR" />
+    <result column="tree_node_levels" property="treeNodeLevels" jdbcType="INTEGER" />
+    <result column="tree_node_modifiedperson" property="treeNodeModifiedperson" jdbcType="VARCHAR" />
+    <result column="tree_node_id" property="treeNodeId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, tree_node_name, tree_node_type, tree_node_desc, tree_node_state, tree_node_parent, 
+    tree_node_if_leaf, tree_node_createtime, tree_node_createperson, tree_node_modifiedtime, 
+    tree_node_levels, tree_node_modifiedperson, tree_node_id
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.StencilTreePoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from stencil_tree
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from stencil_tree
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from stencil_tree
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.StencilTreePoCriteria" >
+    delete from stencil_tree
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.StencilTreePo" >
+    insert into stencil_tree (id, tree_node_name, tree_node_type, 
+      tree_node_desc, tree_node_state, tree_node_parent, 
+      tree_node_if_leaf, tree_node_createtime, tree_node_createperson, 
+      tree_node_modifiedtime, tree_node_levels, tree_node_modifiedperson, 
+      tree_node_id)
+    values (#{id,jdbcType=VARCHAR}, #{treeNodeName,jdbcType=VARCHAR}, #{treeNodeType,jdbcType=CHAR}, 
+      #{treeNodeDesc,jdbcType=VARCHAR}, #{treeNodeState,jdbcType=CHAR}, #{treeNodeParent,jdbcType=VARCHAR}, 
+      #{treeNodeIfLeaf,jdbcType=CHAR}, #{treeNodeCreatetime,jdbcType=VARCHAR}, #{treeNodeCreateperson,jdbcType=VARCHAR}, 
+      #{treeNodeModifiedtime,jdbcType=VARCHAR}, #{treeNodeLevels,jdbcType=INTEGER}, #{treeNodeModifiedperson,jdbcType=VARCHAR}, 
+      #{treeNodeId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.StencilTreePo" >
+    insert into stencil_tree
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="treeNodeName != null" >
+        tree_node_name,
+      </if>
+      <if test="treeNodeType != null" >
+        tree_node_type,
+      </if>
+      <if test="treeNodeDesc != null" >
+        tree_node_desc,
+      </if>
+      <if test="treeNodeState != null" >
+        tree_node_state,
+      </if>
+      <if test="treeNodeParent != null" >
+        tree_node_parent,
+      </if>
+      <if test="treeNodeIfLeaf != null" >
+        tree_node_if_leaf,
+      </if>
+      <if test="treeNodeCreatetime != null" >
+        tree_node_createtime,
+      </if>
+      <if test="treeNodeCreateperson != null" >
+        tree_node_createperson,
+      </if>
+      <if test="treeNodeModifiedtime != null" >
+        tree_node_modifiedtime,
+      </if>
+      <if test="treeNodeLevels != null" >
+        tree_node_levels,
+      </if>
+      <if test="treeNodeModifiedperson != null" >
+        tree_node_modifiedperson,
+      </if>
+      <if test="treeNodeId != null" >
+        tree_node_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeName != null" >
+        #{treeNodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeType != null" >
+        #{treeNodeType,jdbcType=CHAR},
+      </if>
+      <if test="treeNodeDesc != null" >
+        #{treeNodeDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeState != null" >
+        #{treeNodeState,jdbcType=CHAR},
+      </if>
+      <if test="treeNodeParent != null" >
+        #{treeNodeParent,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeIfLeaf != null" >
+        #{treeNodeIfLeaf,jdbcType=CHAR},
+      </if>
+      <if test="treeNodeCreatetime != null" >
+        #{treeNodeCreatetime,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeCreateperson != null" >
+        #{treeNodeCreateperson,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeModifiedtime != null" >
+        #{treeNodeModifiedtime,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeLevels != null" >
+        #{treeNodeLevels,jdbcType=INTEGER},
+      </if>
+      <if test="treeNodeModifiedperson != null" >
+        #{treeNodeModifiedperson,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeId != null" >
+        #{treeNodeId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.StencilTreePoCriteria" resultType="java.lang.Integer" >
+    select count(*) from stencil_tree
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update stencil_tree
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeName != null" >
+        tree_node_name = #{record.treeNodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeType != null" >
+        tree_node_type = #{record.treeNodeType,jdbcType=CHAR},
+      </if>
+      <if test="record.treeNodeDesc != null" >
+        tree_node_desc = #{record.treeNodeDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeState != null" >
+        tree_node_state = #{record.treeNodeState,jdbcType=CHAR},
+      </if>
+      <if test="record.treeNodeParent != null" >
+        tree_node_parent = #{record.treeNodeParent,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeIfLeaf != null" >
+        tree_node_if_leaf = #{record.treeNodeIfLeaf,jdbcType=CHAR},
+      </if>
+      <if test="record.treeNodeCreatetime != null" >
+        tree_node_createtime = #{record.treeNodeCreatetime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeCreateperson != null" >
+        tree_node_createperson = #{record.treeNodeCreateperson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeModifiedtime != null" >
+        tree_node_modifiedtime = #{record.treeNodeModifiedtime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeLevels != null" >
+        tree_node_levels = #{record.treeNodeLevels,jdbcType=INTEGER},
+      </if>
+      <if test="record.treeNodeModifiedperson != null" >
+        tree_node_modifiedperson = #{record.treeNodeModifiedperson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeId != null" >
+        tree_node_id = #{record.treeNodeId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update stencil_tree
+    set id = #{record.id,jdbcType=VARCHAR},
+      tree_node_name = #{record.treeNodeName,jdbcType=VARCHAR},
+      tree_node_type = #{record.treeNodeType,jdbcType=CHAR},
+      tree_node_desc = #{record.treeNodeDesc,jdbcType=VARCHAR},
+      tree_node_state = #{record.treeNodeState,jdbcType=CHAR},
+      tree_node_parent = #{record.treeNodeParent,jdbcType=VARCHAR},
+      tree_node_if_leaf = #{record.treeNodeIfLeaf,jdbcType=CHAR},
+      tree_node_createtime = #{record.treeNodeCreatetime,jdbcType=VARCHAR},
+      tree_node_createperson = #{record.treeNodeCreateperson,jdbcType=VARCHAR},
+      tree_node_modifiedtime = #{record.treeNodeModifiedtime,jdbcType=VARCHAR},
+      tree_node_levels = #{record.treeNodeLevels,jdbcType=INTEGER},
+      tree_node_modifiedperson = #{record.treeNodeModifiedperson,jdbcType=VARCHAR},
+      tree_node_id = #{record.treeNodeId,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.StencilTreePo" >
+    update stencil_tree
+    <set >
+      <if test="treeNodeName != null" >
+        tree_node_name = #{treeNodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeType != null" >
+        tree_node_type = #{treeNodeType,jdbcType=CHAR},
+      </if>
+      <if test="treeNodeDesc != null" >
+        tree_node_desc = #{treeNodeDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeState != null" >
+        tree_node_state = #{treeNodeState,jdbcType=CHAR},
+      </if>
+      <if test="treeNodeParent != null" >
+        tree_node_parent = #{treeNodeParent,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeIfLeaf != null" >
+        tree_node_if_leaf = #{treeNodeIfLeaf,jdbcType=CHAR},
+      </if>
+      <if test="treeNodeCreatetime != null" >
+        tree_node_createtime = #{treeNodeCreatetime,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeCreateperson != null" >
+        tree_node_createperson = #{treeNodeCreateperson,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeModifiedtime != null" >
+        tree_node_modifiedtime = #{treeNodeModifiedtime,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeLevels != null" >
+        tree_node_levels = #{treeNodeLevels,jdbcType=INTEGER},
+      </if>
+      <if test="treeNodeModifiedperson != null" >
+        tree_node_modifiedperson = #{treeNodeModifiedperson,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeId != null" >
+        tree_node_id = #{treeNodeId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.StencilTreePo" >
+    update stencil_tree
+    set tree_node_name = #{treeNodeName,jdbcType=VARCHAR},
+      tree_node_type = #{treeNodeType,jdbcType=CHAR},
+      tree_node_desc = #{treeNodeDesc,jdbcType=VARCHAR},
+      tree_node_state = #{treeNodeState,jdbcType=CHAR},
+      tree_node_parent = #{treeNodeParent,jdbcType=VARCHAR},
+      tree_node_if_leaf = #{treeNodeIfLeaf,jdbcType=CHAR},
+      tree_node_createtime = #{treeNodeCreatetime,jdbcType=VARCHAR},
+      tree_node_createperson = #{treeNodeCreateperson,jdbcType=VARCHAR},
+      tree_node_modifiedtime = #{treeNodeModifiedtime,jdbcType=VARCHAR},
+      tree_node_levels = #{treeNodeLevels,jdbcType=INTEGER},
+      tree_node_modifiedperson = #{treeNodeModifiedperson,jdbcType=VARCHAR},
+      tree_node_id = #{treeNodeId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="findCountById" resultType="java.lang.Integer">
+      select count(*) from stencil_product where product_id=#{product_id} and stencil_node_id=#{stencil_node_id}
+  </select>
+  
+  <select id="findtreeNodeParentById" resultType="java.lang.String">
+      select tree_node_id from stencil_product where product_id=#{product_id} and stencil_node_id=#{stencil_node_id} 
+  </select>
+  
+  <insert id="addTreeNode">
+       insert into stencil_product (product_id,stencil_node_id,tree_node_id)
+       values (#{product_id},#{stencil_node_id},#{tree_node_id})
+  </insert>
+  
+  <select id="findTableById" resultType="com.edp.dao.domain.TableColunmPo">
+       select fc.table_id as id,rt.tree_node_name as name from func_column fc
+       left join stencil_tree rt on fc.table_id=rt.id
+       where fc.control_id=#{control_id} and fc.func_id=#{func_id} Group By fc.table_id
+  </select>
+  
+  <select id="findColumnById" resultType="com.edp.dao.domain.TableColunmPo">
+       select fc.column_id as id,rt.tree_node_name as name from func_column fc
+       left join stencil_tree rt on fc.column_id=rt.id
+       where fc.control_id=#{control_id} and fc.table_id=#{table_id}
+  </select>
+  
+  <delete id="delStencilByProduct">
+      delete from stencil_product where product_id=#{product_id}
+  </delete>
+  
+  <delete id="delStencilById">
+      delete from stencil_product where product_id=#{product_id} and tree_node_id=#{treeNodeId}
+  </delete> 
+</mapper>

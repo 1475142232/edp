@@ -1,0 +1,502 @@
+package com.edp.service.taskTrace;
+
+import com.alibaba.dubbo.common.utils.StringUtils;
+import com.alibaba.fastjson.JSON;
+import com.edp.common.constant.Constants;
+import com.edp.common.constant.EDPCodeConstants;
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.DateUtil;
+import com.edp.common.utils.SequenceManage;
+import com.edp.common.utils.SqlFormatUtil;
+import com.edp.dao.domain.SceneInfoPo;
+import com.edp.dao.domain.TaskTracePo;
+import com.edp.dao.domain.TaskTracePoCriteria;
+import com.edp.dao.mapper.FunctionInfoPoMapper;
+import com.edp.dao.mapper.SceneInfoPoMapper;
+import com.edp.dao.mapper.TaskTracePoMapper;
+import com.edp.serviceI.bytearrayInfo.ByteArrayInfoServiceI;
+import com.edp.serviceI.columnInfo.ColumnInfoServiceI;
+import com.edp.serviceI.dto.BytearrayInfoDto;
+import com.edp.serviceI.dto.ColumnInfoDto;
+import com.edp.serviceI.dto.ColumnPicDto;
+import com.edp.serviceI.dto.FunctionInfoDto;
+import com.edp.serviceI.dto.TaskInfoDto;
+import com.edp.serviceI.dto.TaskTraceDto;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import com.edp.serviceI.product.ProductServiceI;
+import com.edp.serviceI.taskTrace.TaskTraceServiceI;
+
+import org.docx4j.openpackaging.exceptions.InvalidFormatException;
+import org.docx4j.openpackaging.io.SaveToZipFile;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
+import org.docx4j.wml.P;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * 工单操作轨迹服务实现
+ * Created by changer on 2016/7/20.
+ */
+@Service("taskTraceServiceI")
+public class TaskTraceServiceImpl implements TaskTraceServiceI {
+
+
+
+    @Resource
+    private TaskTracePoMapper taskTracePoMapper;
+
+    @Resource
+    private ByteArrayInfoServiceI byteArrayInfoServiceI;
+    
+    @Resource
+    private ProductServiceI productServiceI;
+    
+    @Autowired
+    private FunctionInfoServiceI functionInfoServiceI;
+        
+    @Autowired
+    private ColumnInfoServiceI columnInfoServiceI;
+    
+    @Autowired
+    private SceneInfoPoMapper sceneInfoPoMapper;
+    
+    @Autowired
+    private FunctionInfoPoMapper functionInfoPoMapper;
+
+    private static final Logger log = LoggerFactory.getLogger(TaskTraceServiceImpl.class);
+
+
+    @Override
+    public TaskTraceDto queryAllTaskTracesByCondition(TaskTraceDto condition) {
+
+        log.debug("条件查询工单轨迹--start");
+        //创建返回对象
+        TaskTraceDto rtnDto = new TaskTraceDto();
+
+        //创建查询对象
+        TaskTracePoCriteria example = new TaskTracePoCriteria();
+        TaskTracePoCriteria.Criteria criteria = example.createCriteria();
+
+        try{
+            if(condition != null){
+                if(condition.getId()!= null){
+                    log.debug("工单轨迹主键==>"+condition.getId());
+                    TaskTracePo po = this.taskTracePoMapper.selectByPrimaryKey(condition.getId());
+                    if(po!= null){
+                        rtnDto =   BeanCopyUtils.populateTbyDBySpring(po,TaskTraceDto.class);
+                    }
+
+                }else{
+
+                    this.composeCondition(example,criteria,condition);
+                    int count = this.taskTracePoMapper.countByExample(example);
+                    log.debug("查询工单轨迹记录数==>"+count);
+                    List<TaskTraceDto> dtos = new ArrayList<>();
+                    if(count>0){
+
+                        List<TaskTracePo> pos = this.taskTracePoMapper.selectByExampleWithBLOBs(example);
+                        dtos = BeanCopyUtils.populateTListbyDListBySpring(pos,TaskTraceDto.class);
+                    }
+
+                    rtnDto.setResults(count);
+                    rtnDto.setRows(dtos);
+
+                }
+                rtnDto.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+                rtnDto.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+
+            }else{
+                rtnDto.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+                rtnDto.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+        }
+
+
+        log.debug("条件查询工单轨迹--end");
+        return rtnDto;
+    }
+
+    @Override
+    public TaskTraceDto queryTaskTracesByTaskId(String taskId) {
+        log.debug("根据工单编号查询工单轨迹==>start");
+        TaskTraceDto rtnDto = new TaskTraceDto();
+
+        if(StringUtils.isNotEmpty(taskId)){
+            log.debug("工单编号==>"+taskId);
+            TaskTraceDto condition = new TaskTraceDto();
+            condition.setTaskId(taskId);
+            rtnDto = this.queryAllTaskTracesByCondition(condition);
+        }else{
+            rtnDto.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+        }
+        log.debug("根据工单编号查询工单轨迹==>end");
+        return rtnDto;
+    }
+
+
+    @Override
+    public TaskTraceDto findTaskTraceByPrimaryKey(int id) {
+        log.debug("根据主键查询工单轨迹==>start");
+        TaskTraceDto condition = new TaskTraceDto();
+        log.debug("主键编号==>"+id);
+        condition.setId(id);
+        log.debug("根据主键查询工单轨迹==>end");
+        return this.queryAllTaskTracesByCondition(condition);
+    }
+
+    @Override
+    public TaskTraceDto saveTaskTrace(TaskTraceDto taskTrace) {
+        log.debug("保存工单轨迹==>start");
+        TaskTraceDto rtnDto = new TaskTraceDto();
+
+        try{
+            if(taskTrace != null){
+                log.debug("输入的参==>"+JSON.toJSONString(taskTrace));
+                TaskTracePo po = BeanCopyUtils.populateTbyDBySpring(taskTrace,TaskTracePo.class);
+                int result = this.taskTracePoMapper.insert(po);
+                if(result>0){
+                    rtnDto.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+                    rtnDto.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+                }else{
+                    rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+                    rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+                }
+            }else {
+                rtnDto.setReturnCode(EDPCodeConstants.INVALID_DATA_MSG);
+                rtnDto.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+        }
+        log.debug("保存工单轨迹==>end");
+        return rtnDto;
+    }
+
+    @Override
+    public TaskTraceDto updateTaskTrace(TaskTraceDto taskTrace) {
+        log.debug("更新工单轨迹==>start");
+        TaskTraceDto rtnDto = new TaskTraceDto();
+
+        try{
+            if(taskTrace != null){
+                log.debug("输入参数==>"+JSON.toJSONString(taskTrace));
+                TaskTracePo po = BeanCopyUtils.populateTbyDBySpring(taskTrace,TaskTracePo.class);
+                int result = this.taskTracePoMapper.updateByPrimaryKeySelective(po);
+                if(result>0){
+                    rtnDto.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+                    rtnDto.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+                }else{
+                    rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+                    rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+                }
+            }else {
+                rtnDto.setReturnCode(EDPCodeConstants.INVALID_DATA_MSG);
+                rtnDto.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+        }
+        log.debug("更新工单轨迹==>end");
+        return rtnDto;
+    }
+
+    @Override
+    public TaskTraceDto deleteTaskTraceByPrimaryKey(int id) {
+
+        log.info("根据主键删除工单轨迹==>start");
+        TaskTraceDto rtnDto = new TaskTraceDto();
+
+        try{
+
+            log.info("主键==>"+id);
+                int result = this.taskTracePoMapper.deleteByPrimaryKey(id);
+
+            rtnDto.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+        }
+        log.info("根据主键删除工单轨迹==>end");
+        return rtnDto;
+    }
+
+    @Override
+    public TaskTraceDto deleteTaskTraceByTaskId(String taskId) {
+        log.info("根据工单编号删除工单轨迹==>start");
+        TaskTraceDto rtnDto = new TaskTraceDto();
+
+        TaskTracePoCriteria example = new TaskTracePoCriteria();
+        TaskTracePoCriteria.Criteria criteria = example.createCriteria();
+        try{
+            log.info("工单编号==>"+taskId);
+            criteria.andTaskIdEqualTo(taskId);
+
+            int result = this.taskTracePoMapper.deleteByExample(example);
+
+            rtnDto.setReturnCode(EDPCodeConstants.SUCCESS_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.SUCCESS_MSG);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            rtnDto.setReturnCode(EDPCodeConstants.ERROR_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.ERROR_MSG);
+        }
+        log.info("根据工单编号删除工单轨迹==>end");
+        return rtnDto;
+    }
+
+    @Override
+    public TaskTraceDto queryTaskTracesForDelayByTaskId(String taskId) {
+        TaskTraceDto rtnDto = new TaskTraceDto();
+        if(StringUtils.isNotEmpty(taskId)){
+            TaskTraceDto condition = new TaskTraceDto();
+            condition.setTaskId(taskId);
+            condition.setTaskState(EDPCodeConstants.TASK_STATE_DELAY);
+            rtnDto = this.queryAllTaskTracesByCondition(condition);
+        }else{
+            rtnDto.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+        }
+        return rtnDto;
+    }
+
+    @Override
+    public TaskTraceDto queryTaskTracesForOwnerChangeByTaskId(String taskId) {
+        TaskTraceDto rtnDto = new TaskTraceDto();
+        if(StringUtils.isNotEmpty(taskId)){
+            TaskTraceDto condition = new TaskTraceDto();
+            condition.setTaskId(taskId);
+            condition.setTaskState(EDPCodeConstants.TASK_STATE_TRANSFERED);
+            rtnDto = this.queryAllTaskTracesByCondition(condition);
+        }else{
+            rtnDto.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+        }
+        return rtnDto;
+    }
+
+    @Override
+    public TaskTraceDto queryTaskTracesForStateChangeByTaskId(String taskId) {
+        TaskTraceDto rtnDto = new TaskTraceDto();
+        if(StringUtils.isNotEmpty(taskId)){
+            TaskTraceDto condition = new TaskTraceDto();
+            condition.setTaskId(taskId);
+            rtnDto = this.queryAllTaskTracesByCondition(condition);
+        }else{
+            rtnDto.setReturnCode(EDPCodeConstants.INVALID_DATA_CODE);
+            rtnDto.setReturnInfo(EDPCodeConstants.INVALID_DATA_MSG);
+        }
+        return rtnDto;
+    }
+
+
+    /**
+     * 工单查询条件组装
+     * @param example
+     * @param condition
+     */
+    private void composeCondition(TaskTracePoCriteria example,TaskTracePoCriteria.Criteria criteria,TaskTraceDto condition){
+
+        log.info("工单轨迹查询条件组装--start");
+
+        log.info("参数===>"+ JSON.toJSONString(condition));
+        if(condition != null){
+
+            //拼装分页信息
+            String pageStr = SqlFormatUtil.makeupOrderByAndLimit("id", SqlFormatUtil.ORDER_BY_DIRECTION_DESC, condition.getPageIndex(), condition.getLimit());
+            example.setOrderByClause(pageStr);
+
+
+            //拼装查询条件
+            if(StringUtils.isNotEmpty(condition.getFromUser())){//分配人
+                criteria.andFromUserEqualTo(condition.getFromUser());
+            }
+
+            if(StringUtils.isNotEmpty(condition.getOperateTime())){//操作时间
+                criteria.andOperateTimeEqualTo(condition.getOperateTime());
+            }
+
+            if(StringUtils.isNotEmpty(condition.getTaskId())){//工单编号
+                criteria.andTaskIdEqualTo(condition.getTaskId());
+            }
+
+            if(StringUtils.isNotEmpty(condition.getTaskState())){//工单状态
+                criteria.andTaskStateEqualTo(condition.getTaskState());
+            }
+
+            if(StringUtils.isNotEmpty(condition.getToUser())){//工单负责人
+                criteria.andToUserEqualTo(condition.getToUser());
+            }
+
+            if(condition.getDelayTime()!= null &&condition.getDelayTime() >0){//工单接收时间
+                criteria.andDelayTimeEqualTo(condition.getDelayTime());
+            }
+
+
+            if(condition.getId()!=null &&condition.getId()>0){//工单类型
+                criteria.andIdEqualTo(condition.getId());
+            }
+
+        }
+        log.info("工单轨迹查询条件组装--end");
+    }
+
+	@Override
+	/**
+	 * zhang_cancan  前台附件
+	 */
+	public void addFaceTask(String tree,TaskInfoDto taskInfo,String productId,Integer version) {
+		 WordprocessingMLPackage wordPackage;
+		 try {
+	            //创建word对象
+	            wordPackage = WordprocessingMLPackage.createPackage();
+	            MainDocumentPart mdp = wordPackage.getMainDocumentPart();
+	            mdp.addStyledParagraphOfText("Title", "前端界面:"+taskInfo.getTaskName());//主标题
+	            mdp.addStyledParagraphOfText("Heading1", "1.工单说明");
+	            mdp.addParagraphOfText(taskInfo.getTaskSpec());
+	            mdp.addStyledParagraphOfText("Heading1", "2.原型图");
+	            BytearrayInfoDto byt=byteArrayInfoServiceI.findPicById(taskInfo.getTaskId());
+	            InputStream in=new ByteArrayInputStream(byt.getFileBytes());
+        		if(in != null){
+                    P p = productServiceI.createImage(wordPackage, in);
+                    mdp.addObject(p);
+                }
+        		mdp.addStyledParagraphOfText("Heading1", "3.原型图规则");
+        		List<ColumnPicDto> colunmDto=functionInfoServiceI.findPicColumn(taskInfo.getTaskId());
+        		for(int j=0;j<colunmDto.size();j++){
+        			mdp.addParagraphOfText(colunmDto.get(j).getColumnName()+":"+colunmDto.get(j).getColunmSpec());
+        		}
+        		mdp.addStyledParagraphOfText("Heading1", "4.关联表字段");
+        		List<String> FuncIds=functionInfoServiceI.findControlByPicId(taskInfo.getTaskId());
+        		String FuncId = "";
+        		for(int i=0;i<FuncIds.size();i++){
+        			FuncId+=FuncIds.get(i);
+        			if(i!=FuncIds.size()-1){
+        				FuncId+=",";
+        			}
+        		}
+        		List<ColumnInfoDto> column = columnInfoServiceI.findColumnByFunId(FuncId);
+        		for(int j=0;j<column.size();j++){
+        			mdp.addParagraphOfText(column.get(j).getColumnCnName()+":"+column.get(j).getColumnEnName());
+        		}
+        		
+       		    SaveToZipFile saver = new SaveToZipFile(wordPackage);
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                saver.save(byteArrayOutputStream);
+                
+                String name = taskInfo.getTaskName() + "需求文档-" + DateUtil.date2String(new Date(),"yyyyMMdd");
+                BytearrayInfoDto bytearrayInfoDto = new BytearrayInfoDto();
+                byte[] bytes = byteArrayOutputStream.toByteArray();
+                bytearrayInfoDto.setFileBytes(bytes);
+                bytearrayInfoDto.setFileName(name);
+                bytearrayInfoDto.setFileTargetid(taskInfo.getTaskId());
+                bytearrayInfoDto.setFileVersion(version);
+                bytearrayInfoDto.setFileType(Constants.FILETYPE_DOC);
+                byteArrayInfoServiceI.saveBytearrayInfo(bytearrayInfoDto);
+                log.info("前端生成完成！");
+		 } catch (Exception e) {
+	            e.printStackTrace();
+	     }  
+	}
+
+	@Override
+	public void addConnotationTask(String tree, TaskInfoDto taskInfo,String productId,Integer version) {
+		 WordprocessingMLPackage wordPackage;
+		 try {
+			log.info("后端生成开始！");
+			//创建word对象
+		    wordPackage = WordprocessingMLPackage.createPackage();
+		    System.out.println("come here");
+		    MainDocumentPart mdp = wordPackage.getMainDocumentPart();
+		    mdp.addStyledParagraphOfText("Title", "后台:"+taskInfo.getTaskName());//主标题
+		    mdp.addStyledParagraphOfText("Heading1", "1.场景");
+		    List<SceneInfoPo> sceneInfoPo=sceneInfoPoMapper.findSceneByFuncId(taskInfo.getTaskId());
+		    for(int i=0;i<sceneInfoPo.size();i++){
+            	mdp.addStyledParagraphOfText("Heading2", sceneInfoPo.get(i).getSceneName());
+                InputStream in = productServiceI.getViewPic(sceneInfoPo.get(i).getId());
+                if(in != null){
+                    P p = productServiceI.createImage(wordPackage, in);
+                    mdp.addObject(p);
+                    //生成流程图的说明文档
+                    mdp.addStyledParagraphOfText("Heading3","流程说明：");
+                    String sq = SequenceManage.getSequence("");
+                    String content = productServiceI.getFlowchartDescription(sceneInfoPo.get(i).getId(), sq);
+                    String[] str = content.split(sq);
+                    for (int k = 0; k < str.length; k++) {
+						mdp.addParagraphOfText(str[k]);
+					 }
+                }
+		    }
+		    log.info("后端场景生成完成！");
+		    mdp.addStyledParagraphOfText("Heading1", "2.功能");
+		    FunctionInfoDto functionInfoDto= functionInfoServiceI.getFunctionInfoListByFuncId(taskInfo.getTaskId());
+		    functionInfoDto=(FunctionInfoDto)functionInfoDto.getRows().get(0);
+		    mdp.addStyledParagraphOfText("Heading2", functionInfoDto.getFuncName());
+   		    String PicId=functionInfoPoMapper.findPicIdByfuncId(functionInfoDto.getFuncId());
+   		    InputStream intwo= productServiceI.getViewPic(PicId);
+            if(intwo != null){
+                P ptwo = productServiceI.createImage(wordPackage, intwo);
+                mdp.addObject(ptwo);
+                
+                //生成流程图的说明文档
+                mdp.addStyledParagraphOfText("Heading3","流程说明：");
+                String sq = SequenceManage.getSequence("");
+                String content = productServiceI.getFlowchartDescription(PicId, sq);
+                String[] str = content.split(sq);
+                for (int k = 0; k < str.length; k++) {
+					mdp.addParagraphOfText(str[k]);
+				 }
+            }
+            log.info("后端功能生成完成！");
+            mdp.addStyledParagraphOfText("Heading1", "3.数据表");
+//    		List<ColumnInfoDto> column = columnInfoServiceI.findColumnByFunId(functionInfoDto.getFuncId());
+//    		for(int j=0;j<column.size();j++){
+//    			mdp.addParagraphOfText(column.get(j).getColumnCnName()+":"+column.get(j).getColumnEnName());
+//    		}
+    		log.info("后端数据库生成完成！");
+    		wordPackage.save(new File("D:\\test.doc"));
+   		    SaveToZipFile saver = new SaveToZipFile(wordPackage);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            saver.save(byteArrayOutputStream);
+            
+            String name = taskInfo.getTaskName() + "需求文档-" + DateUtil.date2String(new Date(),"yyyyMMdd");
+            BytearrayInfoDto bytearrayInfoDto = new BytearrayInfoDto();
+            byte[] bytes = byteArrayOutputStream.toByteArray();
+            bytearrayInfoDto.setFileBytes(bytes);
+            bytearrayInfoDto.setFileName(name);
+            bytearrayInfoDto.setFileTargetid(taskInfo.getTaskId());
+            bytearrayInfoDto.setFileVersion(version);
+            bytearrayInfoDto.setFileType(Constants.FILETYPE_DOC);
+            byteArrayInfoServiceI.saveBytearrayInfo(bytearrayInfoDto);
+            log.info("后端生成完成！");
+		 } catch (Exception e) {
+	        e.printStackTrace();
+	     }  
+		
+	}
+}

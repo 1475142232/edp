@@ -1,0 +1,18 @@
+package com.edp.serviceI.user;
+
+import java.util.List;
+
+import com.edp.serviceI.dto.UserInfoDto;
+
+public interface UserServiceI {
+    
+	/**
+	 * 登录验证
+	 * @param UserInfoDto
+	 * @return List<UserInfoDto>
+	 */
+	List<UserInfoDto> LoginUser(UserInfoDto dto,Integer teamId);
+
+	Integer registerUser(UserInfoDto dto, String teamId);
+
+}

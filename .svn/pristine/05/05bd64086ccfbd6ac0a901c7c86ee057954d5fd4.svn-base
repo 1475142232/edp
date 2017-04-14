@@ -1,0 +1,69 @@
+package com.edp.serviceI.tree;
+
+import java.util.List;
+
+import com.edp.serviceI.dto.MasterDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.dto.TreeDto;
+
+public interface TreeServiceI {
+
+	List<TreeDto> findTreeById(List<String> treeId,String state);
+
+	Integer addTreeNode(RequestmentDto reqDto,String id);
+
+	RequestmentDto findTreeNodeById(String id);
+
+	Integer editTreeNode(RequestmentDto reqDto);
+
+	Integer delTreeNode(String id);
+
+	Integer findCNodeByPid(String reqDto);
+	
+	String  addTreeNodeByProductId(String pId,String userName,String name,String type,String productId);
+	
+	String  addTreeNodeByModuleId(String pId,String userName,String name,String type,String productId);
+
+	Integer findCountTreeById(String id);
+
+	List<String> findNodeByLevel(String treeNodeId, Integer treeNodeLevels,String state);
+
+	RequestmentDto findTreeNodeId(String id);
+
+	List<RequestmentDto> findTreeNodesById(String treeNodeParent);
+
+	Integer delTreeNodesByNodeId(String id);
+
+	RequestmentDto getDOCbyProductId(String id);
+
+	RequestmentDto normalRequestmentComfirm(String productId,Integer version);
+
+	RequestmentDto changeRequestmentComfirm(String productId,Integer version);
+
+	String findModuleIdByName(String module_name, String id,String user,String time);
+
+	List<Object> findRequestById(String tree01,String tree11,String tree66);
+
+	List<RequestmentDto> findTreeNodepId(String pId,String type);
+
+	void newModel(String id);
+
+	  List<RequestmentDto> findAllTree(RequestmentDto reqDto);
+
+	List<String> findTreeIdByPid(String id);
+
+	Integer addMasterTmp(String json, String id,String type);
+
+	String findJsonTreeById(String id,String type);
+
+	Integer editTreeByProductId(String productId, String resulet,String state);
+	
+	String EnterTree(String productId,String type,String time);
+
+	Integer findCountNotEnterByTreeId(String productId,String state);
+	
+	MasterDto addTreeNode(MasterDto masterDto);
+
+	String findEnterTreeById(String productId,Integer version);
+
+}

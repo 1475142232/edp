@@ -1,0 +1,133 @@
+KISSY.add("teamcreat-module/src/projectlist",function(S,IO, Cookie, TaskList ,Email,ResourceList){
+	function projectList(){
+		var _this = this;
+		var cookie = new Cookie();
+		var _data = "";
+		var teamId = "";
+		var userRole = "";
+		this.getproductList = function(team_Id){
+			teamId = team_Id;
+			_this.getUserRole(); //获取用户权限
+			cookie.setCookie("teamId", teamId, new Date());
+			if(userRole === "1" || userRole === "2"){
+				$("#projectList").html('<a href="javascript:;" id="addProject">+</a>');
+			}else{
+				$("#projectList").html('<a href="javascript:;" id="addProject" style="display:none;"></a>');
+			}
+			//获取项目列表
+			$.ajax({
+	             type: "GET",
+	             url: "productController/productList.action?teamId="+teamId,
+	             async: true,
+	             dataType: "json",
+	             success: function(data){
+	            	 _data = data;
+	             	 var add="";
+                     for(var i=0; i<data.length; i++) {
+                    	add += '<div id="myProject">';
+                    	if(userRole === "1" || userRole === "2"){
+                    		add += '<a class="books" style="cursor:pointer" id="books_'+data[i].id+'"></a>';
+                    	}
+                     	add += '<a href="javascript:;" class="wode" id="'+data[i].id+'">'+data[i].productName+'</a>';
+                     	if(userRole === "1" || userRole === "2"){
+	                     	add += '<dl id="dl_'+data[i].id+'"><dd class="togglelist" id="'+data[i].id+'"><a href="javascript:;">'+'编辑'+'</a></dd>';
+	                     	add += '<dd class="togglelist2"  id="'+data[i].id+'"><a href="javascript:;">'+'删除'+'</a></dd></dl>';
+                     	}
+                     	add += '</div>';
+                     }
+                     $("#addProject").before(add);
+                     if(userRole === "1" || userRole === "2"){
+	                    //toggle
+	             		$(".books").click(function(){
+	             			var ids = (this.id).split("_");
+	             			$("#dl_"+ids[1]).toggle();
+	             		});
+	             		//删除
+	            		$(".togglelist2").click(function(){
+	            			var this_a = this;
+	            			$.ajax({
+	            	             type: "POST",
+	            	             url: "productController/editProductById.action",
+	            	             async: true,
+	            	             dataType: "json",
+	            	             data:{"id":this_a.id,"productState":"00"},
+	            	             success: function(data){
+	            	            	 //刷新列表-调用加载列表方法
+	            	            	 _this.getproductList(teamId);
+	                             }
+	                   	 	});
+	            		});
+	            		//编辑修改
+	            		$(".togglelist").on("click",function(){
+	            			var this_b = this;
+	            			$.ajax({
+	            	             type: "POST",
+	            	             url: "productController/findProductById.action",
+	            	             async: false,
+	            	             dataType: "json",
+	            	             data: { productId: this_b.id},
+	            	             success: function(data){
+	                       			IO.get("views/team/myproject.html",null,function(){
+	                       				$("#mainpage").html(arguments[0], true);
+	                       				$(".head").html("修改项目");
+	                       				$("#productName").val(data.productName);
+	                       				$("#productDesc").val(data.productDesc);
+	                       				$("#creatpro").html("修改项目");
+	                       				$("#id").val(data.id);
+	                       	     	});
+	                             }
+	                   	 	});
+	            		});
+                     }
+                     //跳转到我的项目
+                     $(".wode").on("click",function(){
+                    	 var productId = this.id;
+                    	 var productName= $(this).html();
+                    	 localStorage.setItem("productId",productId);
+                    	 localStorage.setItem("productName",productName);
+                    	 localStorage.setItem("target","tasklist");
+                    	 //我的项目跳转
+                    	 IO.get("views/tasklist/tasklist.html",null,function(){
+                    		 $("#mainpage").html(arguments[0], true);
+                    		 var tasklist = new TaskList();
+                    		 tasklist.init(productId);
+                    	 });
+                     });
+                  }
+        	 });
+			//跳转到新建项目
+      		$("#addProject").click(function(){
+      			IO.get("views/team/myproject.html",null,function(){
+      				$("#mainpage").html(arguments[0], true);
+      				cookie.setCookie("teamId", teamId, new Date());
+      	     	});
+      		});
+		};
+		
+		//获取登录人权限
+		this.getUserRole = function(){
+			$.ajax({
+	             type: "POST",
+	             url: "userController/getUser.action",
+	             data: {teamId: teamId},
+	             async: false,
+	             dataType: "json",
+	             success: function(data){
+          			if(data !== null && data !== ""){
+          				userRole = data.userRole;
+          			}else{
+          				userRole = "";
+          			}
+                }
+      	 	});
+		};
+	}
+	return projectList;
+},{
+	requires : ['io',
+	            'common-module/src/cookie',
+	            'tasklist-module/src/tasklist',
+	            'email-module/src/email',
+	            'resource-module/src/resource'
+	            ]
+});

@@ -1,0 +1,56 @@
+body {
+	background: url(../img/bg.jpg);
+}
+
+/*主体部分*/
+.wrap {
+	width: 100%	;
+	background: #fff;
+}
+.email-container {
+	width: 100%;
+	height: auto;
+	border: 1px solid #dbdfd6;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+	border-radius: 5px;
+	background: #fff;
+	padding: 15px 30px 15px;
+}
+
+.email-header {
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+.emaill-mian{
+	font-size: 18px;
+}
+#pageUl{
+	width: 100%;
+	overflow: hidden;
+}
+#pageUl li{
+	text-align: center;
+	float: left;
+}
+#pageUl li:nth-child(1){
+	width: 10%;
+}
+#pageUl li:nth-child(2){
+	width: 10%;
+}
+#pageUl li:nth-child(3){
+	width: 60%;
+}
+#pageUl li:nth-child(4){
+	text-align: right;
+	width: 20%;
+}
+.email-con{
+	overflow: hidden;
+}
+.email-con ul{
+	float: left;
+}
+.email-con li,.emaill-mian li{
+	margin: 10px auto;
+}

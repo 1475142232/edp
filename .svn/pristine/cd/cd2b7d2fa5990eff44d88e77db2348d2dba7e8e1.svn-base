@@ -1,0 +1,51 @@
+
+#Config for starting boostrap, used during developing.
+#the note above writen by lyl3790, may help for your debugging.
+
+#Dubbo Container Config
+#This Configuration is used only for the Containers initiation
+dubbo.container=stonelog,spring
+
+#Logback MDC Config
+#This Configuration is used for the BocLog Container to initiate the MDC
+logback.product=cyws
+logback.module=service
+logback.node=03
+
+#Logback xml Config
+#This Configuration is used for logback.xml
+#set the log file location
+logback.file=logs
+#Set the log level: "dev" for debug/"ops" for production
+logback.mode=dev
+
+#All the Properties below are for the Spring PlaceHolder to load#
+
+#Dubbo Application Config
+#The Dubbo Configuration is more complicated
+dubbo.application.name=cyws-service
+service.registry.address=zookeeper://localhost:2181
+dubbo.registry.timeout=60000
+dubbo.protocol.port=20889
+dubbo.service.loadbalance=random
+
+#Druid Connection Config
+druid.url=jdbc:mysql://127.0.0.1:3306/edp?useUnicode=true&amp;characterEncoding=utf-8
+druid.username=root
+druid.password=root
+druid.filters=wall,stat,config
+druid.connectionProperties=config.decrypt=false
+druid.maxActive=100
+druid.initialSize=10
+druid.maxWait=60000
+druid.minIdle=10
+druid.timeBetweenEvictionRunsMillis=60000
+druid.minEvictableIdleTimeMillis=300000
+druid.validationQuery=SELECT 'x'
+druid.testWhileIdle=true
+druid.testOnBorrow=false
+druid.testOnReturn=false
+druid.maxOpenPreparedStatements=20
+druid.removeAbandoned=true
+druid.removeAbandonedTimeout=1800
+druid.logAbandoned=true

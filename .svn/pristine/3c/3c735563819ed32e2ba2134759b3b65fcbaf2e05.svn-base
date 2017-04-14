@@ -1,0 +1,112 @@
+package com.edp.service.columnInfo;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SqlFormatUtil;
+import com.edp.dao.domain.ColumnInfoPo;
+import com.edp.dao.domain.ColumnInfoPoCriteria;
+import com.edp.dao.domain.ColumnRuleRefPoCriteria;
+import com.edp.dao.mapper.ColumnInfoPoMapper;
+import com.edp.dao.mapper.ColumnRuleRefPoMapper;
+import com.edp.service.product.ProductServiceImpl;
+import com.edp.serviceI.columnInfo.ColumnInfoServiceI;
+import com.edp.serviceI.dto.ColumnInfoDto;
+
+@Service(value = "ColumnInfoService")
+public class ColumnInfoServiceImpl implements ColumnInfoServiceI {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ColumnInfoServiceImpl.class);
+	@Autowired
+	private ColumnInfoPoMapper columnInfoPoMapper;
+	@Autowired
+	private ColumnRuleRefPoMapper columnRuleRefPoMapper;
+
+
+
+
+	@Override
+	public ColumnInfoDto getAllColumnInfo(ColumnInfoDto dto) {
+		ColumnInfoPoCriteria example = new ColumnInfoPoCriteria();
+		ColumnInfoPoCriteria.Criteria columnCriteria = example.createCriteria();
+		if(null != dto.getId() && !"".equals(dto.getId())){
+			columnCriteria.andIdEqualTo(dto.getId());
+
+		}
+		if(null != dto.getColumnCnName() && !"".equals(dto.getColumnCnName())){
+			columnCriteria.andColumnCnNameLike("%"+dto.getColumnCnName()+"%");
+		}
+		if(null != dto.getColumnEnName() && !"".equals(dto.getColumnEnName())){
+			columnCriteria.andColumnEnNameLike("%"+dto.getColumnEnName()+"%");
+		}
+		if(null != dto.getColumnType() && !"".equals(dto.getColumnType())){
+			columnCriteria.andColumnTypeEqualTo(dto.getColumnType());
+		}
+
+		String pagingStr = SqlFormatUtil.makeupOrderByAndLimit("id", SqlFormatUtil.ORDER_BY_DIRECTION_DESC, dto.getPageIndex(), dto.getLimit());
+		example.setOrderByClause(pagingStr);
+
+		try{
+			int count = columnInfoPoMapper.countByExample(example);
+			List<ColumnInfoPo> result = columnInfoPoMapper.selectByExample(example);
+			List<ColumnInfoDto> result1 = BeanCopyUtils.populateTListbyDListBySpring(result, ColumnInfoDto.class);
+			ColumnInfoDto returnDto = new ColumnInfoDto();
+			returnDto.setRows(result1);
+			returnDto.setResults(count);
+			return returnDto;
+		}catch(Exception e){
+			LOGGER.error("查询错误");
+		}
+
+		return null;
+	}
+
+	@Override
+	public ColumnInfoDto getColumnInfoDtoById(String id) {
+		try{
+			
+			ColumnInfoPo cpo = columnInfoPoMapper.selectByPrimaryKey(id);
+			return BeanCopyUtils.populateTbyDBySpring(cpo, ColumnInfoDto.class);
+			
+			
+		}catch(Exception e){
+			LOGGER.error("根据id查询失败");
+		}
+		return null;
+	}
+
+	@Override
+	public void updateColumnInfo(ColumnInfoDto dto) {
+		ColumnInfoPo cpo = BeanCopyUtils.populateTbyDBySpring(dto, ColumnInfoPo.class);
+		columnInfoPoMapper.updateByPrimaryKeySelective(cpo);
+	}
+
+	@Override
+	public void addColumnInfo(ColumnInfoDto dto) {
+		
+		ColumnInfoPo cpo = BeanCopyUtils.populateTbyDBySpring(dto,ColumnInfoPo.class);
+		columnInfoPoMapper.insertSelective(cpo);
+		
+	}
+
+	@Override
+	public void delColumnInfo(String id) {
+		columnInfoPoMapper.deleteByPrimaryKey(id);
+		ColumnRuleRefPoCriteria example = new ColumnRuleRefPoCriteria();
+		ColumnRuleRefPoCriteria.Criteria columnRuleRefCriteria = example.createCriteria();
+		columnRuleRefCriteria.andColumnIdEqualTo(id);
+		columnRuleRefPoMapper.deleteByExample(example);
+	}
+
+	@Override
+	public List<ColumnInfoDto> findColumnByFunId(String funcId) {
+		List<ColumnInfoPo> po = columnRuleRefPoMapper.findColumnByFunId(funcId);
+		return BeanCopyUtils.populateTListbyDListBySpring(po, ColumnInfoDto.class);
+	}
+
+}

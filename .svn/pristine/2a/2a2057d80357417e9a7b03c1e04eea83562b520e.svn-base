@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>项目列表2</title>
+	<link rel="stylesheet" href="./src/teamcreat-module/css/index.css" />
+	<link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+</head>
+<body>
+   <div class="content-box-zhu" id="projectList">
+   		
+        <!-- 增加项目 -->
+   </div>
+	<script src="./src/jquery/jquery.min.js"></script>
+	<script src="./src/kissy/jquery.form.js"></script>
+	<script src="./src/kissy/seed-min.js"></script>
+	<script src="./src/kissy/import-style-min.js"></script>
+	<script src="./src/kissy/kissy/bui/adapter-min.js"></script>
+	<script src="./src/tasklist-module/src/bootstrap.min.js"></script>
+	<script src="./src/module-config.js"></script>
+	<script src="./src/teamcreat-module/projectlist-entry.js"></script>
+</body>
+</html>

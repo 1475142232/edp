@@ -1,0 +1,145 @@
+package com.edp.admin.taskInfo;
+
+import com.edp.admin.common.BaseController;
+import com.edp.common.utils.SequenceManage;
+import com.edp.serviceI.dto.TaskInfoDto;
+import com.edp.serviceI.dto.UserInfoDto;
+import com.edp.serviceI.taskInfo.TaskInfoServiceI;
+
+
+import com.google.gson.Gson;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * 工单控制类
+ * Created by changer on 2016/7/21.
+ */
+@Controller
+@RequestMapping("/TaskInfoController")
+public class TaskInfoController extends BaseController {
+
+
+    @Resource
+    private TaskInfoServiceI taskInfoServiceI;
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskInfoController.class);
+
+	private Gson gson = new Gson();
+
+
+
+    /**
+     * 工单添加
+     * @param taskInfo
+     * @return
+     */
+    @RequestMapping(value = "/addTaskInfo.action",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public String addTaskInfo(TaskInfoDto taskInfo){
+		//获取系统时间
+		Date today = new Date();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		taskInfo.setTaskCreateTime(sdf.format(today));
+		taskInfo.setId(SequenceManage.getSequence(""));
+		if(taskInfo.getTaskOwner()=="" || taskInfo.getTaskOwner()==null){
+			taskInfo.setTaskState("03");
+		}else{
+			taskInfo.setTaskState("02");
+		}
+    	taskInfoServiceI.addTaskInfo(taskInfo);
+        return gson.toJson("0000");
+    }
+    
+    /**
+     * 工单修改
+     * @param taskInfo
+     * @return
+     */
+    @RequestMapping(value = "/editTaskInfo.action",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public String editTaskInfo(TaskInfoDto taskInfo){
+  		//获取系统时间
+  		Date today = new Date();
+  		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  		taskInfo.setTaskLastModifiedTime(sdf.format(today));
+      	taskInfoServiceI.editTaskInfo(taskInfo);
+        return gson.toJson("0000");
+      }
+    
+    /**
+     *  查询工单
+     *  @param taskInfo
+     *  @return
+     */
+    @RequestMapping(value = "/findTaskInfoByUserId.action",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public String findTaskInfoByUserId(Integer userId,String teamId,HttpSession session){
+    	List<List<TaskInfoDto>> taskInfoDto =  new ArrayList<List<TaskInfoDto>>();
+    	if("".equals(userId) || userId==null){
+    	    UserInfoDto user=(UserInfoDto)session.getAttribute("user");
+    	    userId = user.getId();
+    	    taskInfoDto=taskInfoServiceI.findTaskInfoByUserId(userId);
+    	}else{
+    		taskInfoDto = taskInfoServiceI.findTaskInfoByUTId(userId,teamId);
+    	}
+    	
+        return gson.toJson(taskInfoDto);
+    }
+
+    
+    /**
+     * 查询日历工单
+     */
+    @RequestMapping(value = "/findTaskInfoByTime.action",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public String findTaskInfoByTime(HttpSession session){
+    	UserInfoDto user=(UserInfoDto)session.getAttribute("user");
+    	List<TaskInfoDto> taskInfo=taskInfoServiceI.findTaskInfoByTime(user.getId());
+    	return gson.toJson(taskInfo);
+    }
+   
+    /**
+     * 根据状态查询工单
+     */
+    @RequestMapping(value = "/findTaskInfoByType.action",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public String findTaskInfoByType(TaskInfoDto dto){
+    	List<TaskInfoDto> taskInfo=taskInfoServiceI.findTaskInfo(dto);
+    	return gson.toJson(taskInfo);
+    }
+    
+    /**
+     * 根据id查询工单
+     */
+    @RequestMapping(value = "/findTaskInfoById.action",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public String findTaskInfoById(String id){
+    	TaskInfoDto dto = taskInfoServiceI.findTaskInfoById(id);
+    	return gson.toJson(dto);
+    }
+    /**
+     * 工单统计 
+     * 2016/9/19 
+     * zhang_cancan
+     */
+    @RequestMapping(value = "/countTask",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public String countTask(TaskInfoDto dto,String type){
+    	List<Integer> count = taskInfoServiceI.countTask(dto,type);
+    	return gson.toJson("");
+    }
+}

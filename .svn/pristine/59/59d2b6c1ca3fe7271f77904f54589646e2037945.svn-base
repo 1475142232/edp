@@ -1,0 +1,82 @@
+package com.edp.service.problem;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.dao.domain.ProblemInfoPo;
+import com.edp.dao.domain.ProblemInfoPoCriteria;
+import com.edp.dao.mapper.ProblemInfoPoMapper;
+import com.edp.serviceI.dto.ProblemInfoDto;
+import com.edp.serviceI.problem.ProblemServiceI;
+
+@Service(value = "ProblemServiceI")
+public class ProblemServiceImpl implements ProblemServiceI{
+	
+	private static final Logger log = LoggerFactory.getLogger(ProblemServiceImpl.class);
+	
+	@Autowired
+	private ProblemInfoPoMapper problemMapper;
+
+	@Override
+	public List<ProblemInfoDto> findProblem(ProblemInfoDto dto) {
+		List<ProblemInfoDto> problems=new ArrayList<ProblemInfoDto>();
+		String[] productId=dto.getProductId().split(",");
+		List<String> product=new ArrayList<String>();
+		product.toArray(productId);
+		if(!"".equals(dto.getProblemStarteUser()) && dto.getProblemStarteUser()!=null){
+			/**
+			 * 提出问题
+			 */
+			ProblemInfoPoCriteria example = new ProblemInfoPoCriteria();
+			ProblemInfoPoCriteria.Criteria oneCrteria = example.createCriteria();
+			oneCrteria.andProductIdIn(product);
+			oneCrteria.andProblemStarteUserEqualTo(dto.getProblemStarteUser());
+			if(!"".equals(dto.getProblemStarteTime()) && dto.getProblemStarteTime()!=null){
+				oneCrteria.andProblemStarteTimeBetween(dto.getProblemStarteTime(), dto.getProblemEndTime());
+			}
+			if(!"".equals(dto.getProblemType()) && dto.getProblemType()!=null){
+				oneCrteria.andProblemTypeEqualTo(dto.getProblemType());
+			}
+			if(!"".equals(dto.getProblemLv()) && dto.getProblemLv()!=null){
+				oneCrteria.andProblemLvEqualTo(dto.getProblemLv());
+			}
+			List<ProblemInfoPo> a = problemMapper.selectByExample(example);
+			List<ProblemInfoDto> da=BeanCopyUtils.populateTListbyDListBySpring(a,ProblemInfoDto.class);
+			problems.addAll(da);
+			/**
+			 * 被提问
+			 */
+			ProblemInfoPoCriteria exampleTwo = new ProblemInfoPoCriteria();
+			ProblemInfoPoCriteria.Criteria twoCrteria = exampleTwo.createCriteria();
+			twoCrteria.andProductIdIn(product);
+			twoCrteria.andProblemEndUserEqualTo(dto.getProblemEndUser());
+			if(!"".equals(dto.getProblemStarteTime()) && dto.getProblemStarteTime()!=null){
+				twoCrteria.andProblemStarteTimeBetween(dto.getProblemStarteTime(), dto.getProblemEndTime());
+			}
+			if(!"".equals(dto.getProblemType()) && dto.getProblemType()!=null){
+				twoCrteria.andProblemTypeEqualTo(dto.getProblemType());
+			}
+			if(!"".equals(dto.getProblemLv()) && dto.getProblemLv()!=null){
+				twoCrteria.andProblemLvEqualTo(dto.getProblemLv());
+			}
+			List<ProblemInfoPo> b = problemMapper.selectByExample(exampleTwo);
+			List<ProblemInfoDto> db=BeanCopyUtils.populateTListbyDListBySpring(b,ProblemInfoDto.class);
+			problems.addAll(db);
+		}else{
+			ProblemInfoPoCriteria example = new ProblemInfoPoCriteria();
+			ProblemInfoPoCriteria.Criteria oneCrteria = example.createCriteria();
+			oneCrteria.andProductIdIn(product);
+			List<ProblemInfoPo> a = problemMapper.selectByExample(example);
+			List<ProblemInfoDto> da=BeanCopyUtils.populateTListbyDListBySpring(a,ProblemInfoDto.class);
+			problems.addAll(da);
+		}
+		return problems;
+	}
+
+}

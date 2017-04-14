@@ -1,0 +1,41 @@
+KISSY.add("tasklist-module/src/taskdetails",function(S,IO,Event){
+	function taskdetails(){
+		var _this = this;
+		this.getTaskDetails = function (listId) {
+			$.ajax({
+				url: "?="+listId,
+				type: "get",
+				async: true,
+				dataType: "json",
+				success: function (data) {
+					
+					$('.task-content ul').html('');
+					for ( i = 0; i < 0; i++) {
+						
+					}
+					//提交    --  不通过原因
+					$("#submitchange").click(function(){
+						$.ajax({
+							type: "",
+							url: "",
+							async: true,
+							dataType: "json",
+							success: function(data){
+								//提示提交成功
+							}
+						});
+					})
+					//通过
+					$("#pass").click(function(){
+						
+					})
+				}
+			});
+		}
+	}
+	return taskdetails;
+},{
+	requires : ['io',
+	            'event'
+	            ]
+});

@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.FunctionInfoPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.FunctionInfoPo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="func_name" property="funcName" jdbcType="VARCHAR" />
+    <result column="func_en_name" property="funcEnName" jdbcType="VARCHAR" />
+    <result column="func_spec" property="funcSpec" jdbcType="VARCHAR" />
+    <result column="func_create_time" property="funcCreateTime" jdbcType="VARCHAR" />
+    <result column="func_creater" property="funcCreater" jdbcType="VARCHAR" />
+    <result column="func_modified_time" property="funcModifiedTime" jdbcType="VARCHAR" />
+    <result column="func_modified_person" property="funcModifiedPerson" jdbcType="VARCHAR" />
+    <result column="func_pic" property="funcPic" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="TINYINT" />
+    <result column="func_state" property="funcState" jdbcType="CHAR" />
+    <result column="func_default" property="funcDefault" jdbcType="CHAR" />
+    <result column="func_id" property="funcId" jdbcType="VARCHAR" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="impact" property="impact" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, func_name, func_en_name, func_spec, func_create_time, func_creater, func_modified_time, 
+    func_modified_person, func_pic, version, func_state, func_default, func_id, reason, 
+    content, impact
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.FunctionInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from function_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from function_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from function_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.FunctionInfoPoCriteria" >
+    delete from function_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.FunctionInfoPo" >
+    insert into function_info (id, func_name, func_en_name, 
+      func_spec, func_create_time, func_creater, 
+      func_modified_time, func_modified_person, func_pic, 
+      version, func_state, func_default, 
+      func_id, reason, content, 
+      impact)
+    values (#{id,jdbcType=INTEGER}, #{funcName,jdbcType=VARCHAR}, #{funcEnName,jdbcType=VARCHAR}, 
+      #{funcSpec,jdbcType=VARCHAR}, #{funcCreateTime,jdbcType=VARCHAR}, #{funcCreater,jdbcType=VARCHAR}, 
+      #{funcModifiedTime,jdbcType=VARCHAR}, #{funcModifiedPerson,jdbcType=VARCHAR}, #{funcPic,jdbcType=VARCHAR}, 
+      #{version,jdbcType=TINYINT}, #{funcState,jdbcType=CHAR}, #{funcDefault,jdbcType=CHAR}, 
+      #{funcId,jdbcType=VARCHAR}, #{reason,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+      #{impact,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.FunctionInfoPo" >
+    insert into function_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="funcName != null" >
+        func_name,
+      </if>
+      <if test="funcEnName != null" >
+        func_en_name,
+      </if>
+      <if test="funcSpec != null" >
+        func_spec,
+      </if>
+      <if test="funcCreateTime != null" >
+        func_create_time,
+      </if>
+      <if test="funcCreater != null" >
+        func_creater,
+      </if>
+      <if test="funcModifiedTime != null" >
+        func_modified_time,
+      </if>
+      <if test="funcModifiedPerson != null" >
+        func_modified_person,
+      </if>
+      <if test="funcPic != null" >
+        func_pic,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+      <if test="funcState != null" >
+        func_state,
+      </if>
+      <if test="funcDefault != null" >
+        func_default,
+      </if>
+      <if test="funcId != null" >
+        func_id,
+      </if>
+      <if test="reason != null" >
+        reason,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="impact != null" >
+        impact,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="funcName != null" >
+        #{funcName,jdbcType=VARCHAR},
+      </if>
+      <if test="funcEnName != null" >
+        #{funcEnName,jdbcType=VARCHAR},
+      </if>
+      <if test="funcSpec != null" >
+        #{funcSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="funcCreateTime != null" >
+        #{funcCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="funcCreater != null" >
+        #{funcCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="funcModifiedTime != null" >
+        #{funcModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="funcModifiedPerson != null" >
+        #{funcModifiedPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="funcPic != null" >
+        #{funcPic,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=TINYINT},
+      </if>
+      <if test="funcState != null" >
+        #{funcState,jdbcType=CHAR},
+      </if>
+      <if test="funcDefault != null" >
+        #{funcDefault,jdbcType=CHAR},
+      </if>
+      <if test="funcId != null" >
+        #{funcId,jdbcType=VARCHAR},
+      </if>
+      <if test="reason != null" >
+        #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="impact != null" >
+        #{impact,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.FunctionInfoPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from function_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update function_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.funcName != null" >
+        func_name = #{record.funcName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcEnName != null" >
+        func_en_name = #{record.funcEnName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcSpec != null" >
+        func_spec = #{record.funcSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcCreateTime != null" >
+        func_create_time = #{record.funcCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcCreater != null" >
+        func_creater = #{record.funcCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcModifiedTime != null" >
+        func_modified_time = #{record.funcModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcModifiedPerson != null" >
+        func_modified_person = #{record.funcModifiedPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcPic != null" >
+        func_pic = #{record.funcPic,jdbcType=VARCHAR},
+      </if>
+      <if test="record.version != null" >
+        version = #{record.version,jdbcType=TINYINT},
+      </if>
+      <if test="record.funcState != null" >
+        func_state = #{record.funcState,jdbcType=CHAR},
+      </if>
+      <if test="record.funcDefault != null" >
+        func_default = #{record.funcDefault,jdbcType=CHAR},
+      </if>
+      <if test="record.funcId != null" >
+        func_id = #{record.funcId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.reason != null" >
+        reason = #{record.reason,jdbcType=VARCHAR},
+      </if>
+      <if test="record.content != null" >
+        content = #{record.content,jdbcType=VARCHAR},
+      </if>
+      <if test="record.impact != null" >
+        impact = #{record.impact,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update function_info
+    set id = #{record.id,jdbcType=INTEGER},
+      func_name = #{record.funcName,jdbcType=VARCHAR},
+      func_en_name = #{record.funcEnName,jdbcType=VARCHAR},
+      func_spec = #{record.funcSpec,jdbcType=VARCHAR},
+      func_create_time = #{record.funcCreateTime,jdbcType=VARCHAR},
+      func_creater = #{record.funcCreater,jdbcType=VARCHAR},
+      func_modified_time = #{record.funcModifiedTime,jdbcType=VARCHAR},
+      func_modified_person = #{record.funcModifiedPerson,jdbcType=VARCHAR},
+      func_pic = #{record.funcPic,jdbcType=VARCHAR},
+      version = #{record.version,jdbcType=TINYINT},
+      func_state = #{record.funcState,jdbcType=CHAR},
+      func_default = #{record.funcDefault,jdbcType=CHAR},
+      func_id = #{record.funcId,jdbcType=VARCHAR},
+      reason = #{record.reason,jdbcType=VARCHAR},
+      content = #{record.content,jdbcType=VARCHAR},
+      impact = #{record.impact,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.FunctionInfoPo" >
+    update function_info
+    <set >
+      <if test="funcName != null" >
+        func_name = #{funcName,jdbcType=VARCHAR},
+      </if>
+      <if test="funcEnName != null" >
+        func_en_name = #{funcEnName,jdbcType=VARCHAR},
+      </if>
+      <if test="funcSpec != null" >
+        func_spec = #{funcSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="funcCreateTime != null" >
+        func_create_time = #{funcCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="funcCreater != null" >
+        func_creater = #{funcCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="funcModifiedTime != null" >
+        func_modified_time = #{funcModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="funcModifiedPerson != null" >
+        func_modified_person = #{funcModifiedPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="funcPic != null" >
+        func_pic = #{funcPic,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=TINYINT},
+      </if>
+      <if test="funcState != null" >
+        func_state = #{funcState,jdbcType=CHAR},
+      </if>
+      <if test="funcDefault != null" >
+        func_default = #{funcDefault,jdbcType=CHAR},
+      </if>
+      <if test="funcId != null" >
+        func_id = #{funcId,jdbcType=VARCHAR},
+      </if>
+      <if test="reason != null" >
+        reason = #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="impact != null" >
+        impact = #{impact,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.FunctionInfoPo" >
+    update function_info
+    set func_name = #{funcName,jdbcType=VARCHAR},
+      func_en_name = #{funcEnName,jdbcType=VARCHAR},
+      func_spec = #{funcSpec,jdbcType=VARCHAR},
+      func_create_time = #{funcCreateTime,jdbcType=VARCHAR},
+      func_creater = #{funcCreater,jdbcType=VARCHAR},
+      func_modified_time = #{funcModifiedTime,jdbcType=VARCHAR},
+      func_modified_person = #{funcModifiedPerson,jdbcType=VARCHAR},
+      func_pic = #{funcPic,jdbcType=VARCHAR},
+      version = #{version,jdbcType=TINYINT},
+      func_state = #{funcState,jdbcType=CHAR},
+      func_default = #{funcDefault,jdbcType=CHAR},
+      func_id = #{funcId,jdbcType=VARCHAR},
+      reason = #{reason,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      impact = #{impact,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="findFcNameByCId" resultType="com.edp.dao.domain.ControlPo">
+     select * from func_control where control_id=#{control_id} and (fc_state="00" or fc_state="99" or fc_state=#{fc_state})
+  </select>
+  
+  <delete id="deleFC">
+     delete from func_control where control_id=#{control_id}  and scene_id=#{scene_id}
+  </delete>
+  
+  <insert id="addFcName">
+      insert into func_control (func_id,control_id,fc_state,fc_version,fc_name,scene_id)
+      values (#{po.func_id},#{po.control_id},#{po.fc_state},#{po.fc_version},#{po.fc_name},#{po.scene_id})
+  </insert>
+  
+  <insert id="saveFuncColumn">
+     insert into func_column (column_id,table_id,control_id,func_id)
+     values (#{column_id},#{table_id},#{control_id},#{func_id})
+  </insert>
+  
+  <select id="findSceneByTableId" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.FunctionInfoPo">
+      select * from function_info where func_id in(select func_id from func_column where table_id=#{table_id} group by func_id) group by func_id 
+  </select>
+  
+  <select id="findFuncIdBySceneId" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.FunctionInfoPo">
+      select * from  function_info where func_id in (select func_id from func_control where scene_id=#{tree_node_parent})
+  </select>
+  
+  <select id="findPicIdByfuncId" resultType="java.lang.String">
+      select id from requestment_tree where tree_node_parent=#{funcId}
+  </select>
+  
+  <select id="findFuncIdByChildren" resultType="java.lang.String">
+      select tree_node_parent from requestment_tree where id=#{funcId}
+  </select>
+  
+  <select id="findFunctionBySceneId" resultType="java.lang.String">
+      select func_id from func_control where scene_id=#{scene_id}
+  </select>
+  
+  <select id="findTableByFuncId" resultType="java.lang.String">
+       select table_id from func_column where func_id=#{func_id} Group By table_id
+  </select>
+  
+  <select id="findControlByFunId" resultType="java.lang.String">
+       select control_id from func_column where func_id=#{funId} Group By control_id
+  </select>
+  
+  <select id="findTableColumnById" resultType="com.edp.dao.domain.TableColunmPo">
+       select fc.table_id as id,st.tree_node_name as name from func_column fc
+       left join stencil_tree st  on st.id=fc.table_id
+       where fc.control_id=#{control_id} 
+  </select>
+  
+  <select id="findColumnByTable" resultType="com.edp.dao.domain.TableColunmPo">
+       select fc.column_id as id,c.column_cn_name as name from func_column fc
+       left join column_info c on c.id=fc.column_id 
+       where fc.control_id=#{control_id}  and fc.table_id=#{table_id}
+  </select>
+  
+  <select id="findControlByFuncId" resultType="java.lang.String">
+       select control_id from func_control where scene_id=#{scene_id} and func_id=#{func_id}
+  </select>
+  
+  <delete id="delFuncColumn">
+        delete from func_column where control_id=#{control_id} and func_id=#{func_id}
+  </delete>
+  
+  <select id="findMaxVersionByFunId" resultType="java.lang.Integer">
+      select max(version) from function_info where (func_state="66" or func_state=#{state}) and func_id=#{funcId}
+  </select>
+  
+   <select id="findMinVersionByFunId" resultType="java.lang.Integer">
+      select min(version) from function_info where (func_state="66" or func_state=#{state}) and func_id=#{funcId}
+  </select>
+  
+  <update id="updateFunctionInfoById">
+      update func_control 
+      set func_id = #{newId}
+      where func_id = #{funcId}
+  </update>
+</mapper>

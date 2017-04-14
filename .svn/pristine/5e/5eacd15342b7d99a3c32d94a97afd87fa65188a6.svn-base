@@ -1,0 +1,441 @@
+package com.edp.admin.product;
+
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.edp.admin.common.BaseController;
+import com.edp.admin.login.UserInfoBean;
+import com.edp.admin.user.UserController;
+import com.edp.common.constant.Constants;
+import com.edp.common.jedis.JedisUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.serviceI.columnInfo.ColumnInfoServiceI;
+import com.edp.serviceI.dto.MasterDto;
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.dto.UserDto;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import com.edp.serviceI.product.ProductServiceI;
+import com.edp.serviceI.role.RoleInfoServiceI;
+import com.edp.serviceI.sceneinfo.SceneInfoServiceI;
+import com.edp.serviceI.stencil.StencilServiceI;
+import com.edp.serviceI.tableinfo.TableInfoServiceI;
+import com.edp.serviceI.tree.TreeServiceI;
+import com.edp.serviceI.user.UserServiceI;
+import com.google.gson.Gson;
+
+import redis.clients.jedis.Jedis;
+
+
+/**
+ * 
+ * @author wu_jianxing
+ * 
+ * 时间：2016.4.18
+ *
+ */
+
+@Controller
+@RequestMapping("productController")
+public class ProductController  extends BaseController{
+	
+	@Autowired
+	private ProductServiceI productService;
+	@Autowired
+	private TreeServiceI treeServiceI;
+	@Autowired
+	private TableInfoServiceI tableInfoService;
+	@Autowired
+	private FunctionInfoServiceI functionInfoServiceI;
+	@Autowired
+	private ColumnInfoServiceI columnInfoServiceI;
+	@Autowired
+	 private RoleInfoServiceI roleInfoServiceI;
+	@Autowired
+	private SceneInfoServiceI sceneInfoService;
+	@Autowired
+	private StencilServiceI stencilServiceI;
+	@Autowired
+	private UserServiceI userServiceI;
+	
+	
+private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
+	private Gson gson = new Gson();
+	
+	@RequestMapping(value = "/productList.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String getAllProduct(ProductDto dto, HttpSession session){
+		UserDto userDto=(UserDto)session.getAttribute("user");
+		List<String> one=roleInfoServiceI.findRoleTypeByUserId(userDto.getId());
+		ProductDto allProducts =new ProductDto();               
+		if(one.contains("1")){
+		   allProducts = productService.getAllProducts(dto);
+		}else if(one.contains("2")){
+		   dto.setProductOrg(userDto.getUserDept());
+		   allProducts = productService.getAllProducts(dto);
+		}else if(one.contains("3")){
+		   allProducts = productService.getAllProductsByUserId(userDto.getId());
+		}
+		return gson.toJson(allProducts);
+	}
+
+	@RequestMapping(value = "/productList4reqchange.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String getAllProduct4ReqChange(ProductDto dto){
+		ProductDto allProducts = productService.getAllProducts4ReqChange(dto);
+		return gson.toJson(allProducts);
+	}
+	//根据id查询商品
+	@RequestMapping(value = "/getproductById.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String selectProductById(String proId){
+		ProductDto productById = productService.getProductById(proId);
+		return gson.toJson(productById);
+	}
+	
+	//添加商品
+	@RequestMapping(value = "/addproduct.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String addProduct(ProductDto dto, HttpSession session){
+		String id=SequenceManage.getSequence("");
+		//获取系统时间
+        Date today = new Date();
+	    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		//获取session中的用户信息
+		UserInfoBean userInfoBean=(UserInfoBean)session.getAttribute("userInfoBean");
+//		//树根
+		dto.setId(id);
+		dto.setProductVersion(0);//新增的产品,默认都赋值为0  modified by  changer    2016-5-19
+		dto.setProductCreater(userInfoBean.getUsername());
+		dto.setProductCreatetime(sdf.format(today));
+		UserDto userDto=(UserDto)session.getAttribute("user");
+		dto.setProductOrg(userDto.getUserDept());
+		productService.addProduct(dto);
+//		//通用默认目录
+		//创建节点
+		MasterDto product=createRequestmentDto(dto.getId(),dto.getProductName(),"0","01",id);
+		product.setText(product.getTreeNodeName());
+		List<MasterDto> master=new ArrayList<MasterDto>();
+		master.add(createRequestmentDto(SequenceManage.getSequence(""),"场景","3","01",id));
+		master.add(createRequestmentDto(SequenceManage.getSequence(""),"业务对象","5","01",id));
+		master.add(createRequestmentDto(SequenceManage.getSequence(""),"原型图","2","01",id));
+		master.add(createRequestmentDto(SequenceManage.getSequence(""),"数据表","4","01",id));
+		for(int i=0;i<master.size();i++){
+			master.get(i).setText(master.get(i).getTreeNodeName());
+			master.get(i).setExpanded(true);
+		}
+		product.setChildren(master);
+		String json=gson.toJson(product);
+		treeServiceI.addMasterTmp(json,id,"01");
+		Jedis client = JedisUtils.getJedis();
+		if(client.exists("NORMAL_NODE")==true){
+			String normal=client.get("NORMAL_NODE");
+			Map<String,List<Object>> JsonNormal=(Map<String,List<Object>>)JSON.parse(normal);
+			JsonNormal.put(id, new ArrayList<Object>());
+			client.set("NORMAL_NODE", gson.toJson(JsonNormal));
+		}else{
+			Constants.NORMAL_NODE.put(id, new ArrayList<Object>());
+			Map<String,List<Object>> JsonNormal=Constants.NORMAL_NODE;
+			client.append("NORMAL_NODE", gson.toJson(JsonNormal));
+		}
+		if(client.exists("CHANGE_NODE")==true){
+			String change=client.get("CHANGE_NODE");
+			Map<String,List<Object>> JsonChange=(Map<String,List<Object>>)JSON.parse(change);
+			JsonChange.put(id, new ArrayList<Object>());
+			client.set("CHANGE_NODE", gson.toJson(JsonChange));
+		}else{
+			Constants.CHANGE_NODE.put(id, new ArrayList<Object>());
+			Map<String,List<Object>> JsonChange=Constants.CHANGE_NODE;
+			client.append("CHANGE_NODE", gson.toJson(JsonChange));
+		}
+		UserDto uDto=new UserDto();
+		uDto.setUserDept(userDto.getUserDept());
+		uDto=userServiceI.findAllUser(uDto);
+		List<MasterDto> userMaster=new ArrayList<MasterDto>();
+		userMaster.add(new MasterDto("1","项目经理"));
+		userMaster.add(new MasterDto("2","开发人员"));
+		userMaster.add(new MasterDto("3","测试人员"));
+		userMaster.add(new MasterDto("4","业务人员"));
+		if(client.exists("USER_ROLE")==true){
+			String user=client.get("USER_ROLE");
+			String rolt=client.get("ROLE");
+			Map<String,String> JsonUser=(Map<String,String>)JSON.parse(user);
+			Map<String,String> JsonRolt = (Map<String,String>)JSON.parse(rolt);
+			JsonUser.put(id, gson.toJson(uDto.getRows()));
+			JsonRolt.put(id, gson.toJson(userMaster));
+			client.set("USER_ROLE", gson.toJson(JsonUser));
+			client.set("ROLE", gson.toJson(JsonRolt));
+		}else{
+			Map<String,String> JsonUser=new HashMap<String,String>();
+			JsonUser.put(id, gson.toJson(uDto.getRows()));
+			client.append("USER_ROLE", gson.toJson(JsonUser));
+			Map<String,String> JsonRolt=new HashMap<String,String>();
+			JsonRolt.put(id, gson.toJson(userMaster));
+			client.append("ROLE", gson.toJson(JsonRolt));
+		}
+		JedisUtils.returnResource(client);
+		return gson.toJson(id);
+	}
+	private MasterDto createRequestmentDto(String id,String treeNodeName,String treeNodeType,String treeNodeState,String treeNodeId){
+		 MasterDto masterDto=new MasterDto();
+		 masterDto.setId(id);
+		 masterDto.setTreeNodeName(treeNodeName);
+		 masterDto.setTreeNodeType(treeNodeType);
+		 masterDto.setTreeNodeState(treeNodeState);
+		 masterDto.setTreeNodeId(treeNodeId);
+		 masterDto.setTreeId(id);
+		 return treeServiceI.addTreeNode(masterDto);
+	}
+	//修改商品
+	@RequestMapping(value = "/updateproduct.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	public String updateProduct(ProductDto dto){
+		productService.updateProduct(dto);
+		return null;
+	}
+	//删除商品
+	@RequestMapping(value = "/delproduct.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	public String delProduct(String proId){
+		productService.delProduct(proId);
+		stencilServiceI.delStencilByProduct(proId);
+		List<RequestmentDto> reqDto=treeServiceI.findTreeNodesById(proId);
+		if(reqDto.size()!=0){
+		     delTreeNodeId(reqDto.get(0).getId());
+		}
+		return null;
+	}
+	/**
+	 * 删除的递归方法
+	 * @param id
+	 * @return
+	 */
+	private Integer delTreeNodeId(String id){
+		RequestmentDto reqDto=treeServiceI.findTreeNodeId(id);
+		if("0".equals(reqDto.getTreeNodeIfLeaf())){
+			List<RequestmentDto> dto=treeServiceI.findTreeNodesById(reqDto.getId());
+			for(int i=0;i<dto.size();i++){
+				delTreeNodeId(dto.get(i).getId());
+				treeServiceI.delTreeNode(dto.get(i).getId());
+				RequestmentDto Dto = new RequestmentDto();
+				Dto.setId(dto.get(i).getTreeNodeParent());
+				Dto.setTreeNodeIfLeaf("1");
+	            treeServiceI.editTreeNode(Dto);
+				delType(reqDto);
+			}			
+		}
+	    treeServiceI.delTreeNode(id);
+	    RequestmentDto Dto = new RequestmentDto();
+		Dto.setId(reqDto.getTreeNodeParent());
+		Dto.setTreeNodeIfLeaf("1");
+        treeServiceI.editTreeNode(Dto);
+		delType(reqDto);
+		return 1;
+	}
+	/**
+	 * 删除固定类型的方法
+	 * @param reqDto
+	 */
+	private void delType(RequestmentDto reqDto){
+		if("7".equals(reqDto.getTreeNodeType())){
+			functionInfoServiceI.deleteFunctionInfo(reqDto.getId(),null);
+		}else if("8".equals(reqDto.getTreeNodeType())){
+			sceneInfoService.delScene(reqDto.getId());
+			
+		}else if("9".equals(reqDto.getTreeNodeType())){
+			tableInfoService.delTable(reqDto.getId());
+		}else if("10".equals(reqDto.getTreeNodeType())){
+			columnInfoServiceI.delColumnInfo(reqDto.getId());
+		}
+	}
+	
+	//导出说明书
+	@RequestMapping(value = "/getDOCbyProductId.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String getDOCbyProductId(RequestmentDto dto){
+		productService.getDOCbyProductId(dto);
+		return gson.toJson("1");
+	}
+
+
+	/**
+	 *根据产品编号,执行正常需求确认
+	 * @param productId 产品编号
+	 * @return
+	 * @author changer 2016-5-23
+	 */
+	@RequestMapping(value = "/normalRequestmentComfirm.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String normalRequestmentComfirm(String productId){
+		ProductDto version=productService.getProductById(productId);
+		RequestmentDto requestmentDto = treeServiceI.normalRequestmentComfirm(productId,version.getProductVersion());
+		return gson.toJson(requestmentDto);
+	}
+
+	/**
+	 * 根据产品编号,执行变更需求确认
+	 * @param productId
+	 * @return
+	 * @author changer 2016-5-23
+	 */
+	@RequestMapping(value = "/changeRequestmentComfirm.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String changeRequestmentComfirm(String productId){
+		ProductDto version=productService.getProductById(productId);
+		RequestmentDto requestmentDto = treeServiceI.changeRequestmentComfirm(productId,version.getProductVersion());
+		return gson.toJson(requestmentDto);
+	}
+	/**
+	 * 确认
+	 */
+	@RequestMapping(value = "/RequestmentEnterByProductId.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String RequestmentEnterByProductId(HttpSession session,String type){
+		String state;
+		String productId=(String) session.getAttribute("productId");
+		//获取系统时间
+        Date today = new Date();
+	    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		if(type.equals("1")){
+			state="01";
+		}else{
+			state="11";
+		}
+		Integer OnOff=treeServiceI.findCountNotEnterByTreeId(productId,state);
+		if(OnOff==0){
+		    treeServiceI.EnterTree(productId, type,sdf.format(today));
+		    String tree=treeServiceI.findJsonTreeById(productId,state);
+		    JSONObject a=JSON.parseObject(tree);
+		    RequestmentDto requestmentDto = (RequestmentDto)JSONObject.toJavaObject(a, RequestmentDto.class);
+		    getDOCbyProductId(requestmentDto);
+		    if(type.equals("1")){
+		    	tree.replaceAll("\"01\"", "\"66\"");
+		    	treeServiceI.editTreeByProductId(productId, tree, state);
+		    }else{
+		    	tree.replaceAll("\"11\"", "\"66\"");
+		    	treeServiceI.editTreeByProductId(productId, tree, state);
+		    }
+		    return gson.toJson("1");
+		}else{
+			return gson.toJson("2");
+		}
+	}
+
+	/**
+	 * 分配资源
+	 * @param productId
+	 * @return
+	 * @author zhang_cancan 2016-6-23
+	 */
+	@RequestMapping(value = "/addUserInfo.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String addUserInfo(String id,String type,String userIds){
+		//产品id type id  userIds
+		//id产品Id type: 上一级的id userIds：
+		String[] Ids=userIds.split(",");
+		Jedis client = JedisUtils.getJedis();
+		String user=client.get("USER_ROLE");
+		String rolt=client.get("ROLE");
+		Map<String,String> JsonUser=(Map<String,String>)JSON.parse(user);
+		List<UserDto> masterUser=JSON.parseArray(JsonUser.get(id),UserDto.class);
+		Map<String,String> JsonRolt = (Map<String,String>)JSON.parse(rolt);
+		List<MasterDto> masterRole= JSON.parseArray(JsonRolt.get(id),MasterDto.class);
+		MasterDto master=new MasterDto();
+		for(int i=0;i<masterRole.size();i++){
+			if(masterRole.get(i).getId().equals(type)){
+				master=masterRole.get(i);
+				break;
+			}
+		}
+		for(int i=0;i<Ids.length;i++){
+			productService.delUserByUserId(id,Ids[i]);
+			productService.addUserInfo(id,Ids[i],type);
+			UserDto uDto=userServiceI.findUserById(Integer.parseInt(Ids[i]));
+			uDto.setParents(type);
+			if(master.getChildren()!=null){
+				master.getChildren().add(uDto);
+			}else{
+				master.setChildren(new ArrayList<UserDto>());
+				master.getChildren().add(uDto);
+			}
+			for(int j=0;j<masterUser.size();j++){
+				if(masterUser.get(j).getId()==Integer.parseInt(Ids[i])){
+					masterUser.remove(j);
+					break;
+				}
+			}
+		}
+		JsonUser.put(id, gson.toJson(masterUser));
+		JsonRolt.put(id, gson.toJson(masterRole));
+		client.set("USER_ROLE", gson.toJson(JsonUser));
+		client.set("ROLE", gson.toJson(JsonRolt));
+		JedisUtils.returnResource(client);
+		return gson.toJson(JsonRolt);
+	}
+	
+	/**
+	 * 删除资源
+	 */
+	@RequestMapping(value = "/delUserInfo.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String delUserInfo(String id,String userId){
+		String type=userServiceI.getTypeById(id,Integer.parseInt(userId));
+		productService.delUserByUserId(id,userId);
+		Jedis client = JedisUtils.getJedis();
+		String user=client.get("USER_ROLE");
+		String rolt=client.get("ROLE");
+		Map<String,String> JsonUser=(Map<String,String>)JSON.parse(user);
+		List<UserDto> masterUser=JSON.parseArray(JsonUser.get(id),UserDto.class);
+		Map<String,String> JsonRolt = (Map<String,String>)JSON.parse(rolt);
+		List<MasterDto> masterRole= JSON.parseArray(JsonRolt.get(id),MasterDto.class);
+		masterUser.add(userServiceI.findUserById(Integer.parseInt(userId)));
+		MasterDto master=new MasterDto();
+		for(int i=0;i<masterRole.size();i++){
+			if(masterRole.get(i).getId().equals(type)){
+				master=masterRole.get(i);
+				break;
+			}
+		}
+		for(int i=0;i<master.getChildren().size();i++){
+			JSONObject userDto=(JSONObject)master.getChildren().get(i);
+			if((Integer)userDto.get("id")==Integer.parseInt(userId)){
+				master.getChildren().remove(i);
+				break;
+			}
+		}
+		JsonUser.put(id, gson.toJson(masterUser));
+		JsonRolt.put(id, gson.toJson(masterRole));
+		client.set("USER_ROLE", gson.toJson(JsonUser));
+		client.set("ROLE", gson.toJson(JsonRolt));
+		JedisUtils.returnResource(client);
+		return gson.toJson("1");
+	}
+    
+	/**
+	 * 查询权限
+	 */
+	@RequestMapping(value = "/getUserInfo.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String getUserInfo(HttpSession session){
+		String productId=(String)session.getAttribute("productId");
+		UserDto user=(UserDto)session.getAttribute("user");
+		String type=userServiceI.getTypeById(productId,user.getId());
+		return gson.toJson(type);
+	}
+}

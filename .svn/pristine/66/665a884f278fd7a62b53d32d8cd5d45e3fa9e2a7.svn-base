@@ -1,0 +1,73 @@
+package com.edp.dao.mapper;
+
+import com.edp.dao.domain.ControlPo;
+import com.edp.dao.domain.FunctionInfoPo;
+import com.edp.dao.domain.FunctionInfoPoCriteria;
+import com.edp.dao.domain.TableColunmPo;
+
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+public interface FunctionInfoPoMapper {
+    int countByExample(FunctionInfoPoCriteria example);
+
+    int deleteByExample(FunctionInfoPoCriteria example);
+
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(FunctionInfoPo record);
+
+    int insertSelective(FunctionInfoPo record);
+
+    List<FunctionInfoPo> selectByExample(FunctionInfoPoCriteria example);
+
+    FunctionInfoPo selectByPrimaryKey(Integer id);
+
+    int updateByExampleSelective(@Param("record") FunctionInfoPo record, @Param("example") FunctionInfoPoCriteria example);
+
+    int updateByExample(@Param("record") FunctionInfoPo record, @Param("example") FunctionInfoPoCriteria example);
+
+    int updateByPrimaryKeySelective(FunctionInfoPo record);
+
+    int updateByPrimaryKey(FunctionInfoPo record);
+
+    ControlPo findFcNameByCId(@Param("control_id")String control_id, @Param("fc_state")String state);
+
+	void deleFC(@Param("control_id")String control_id, @Param("scene_id")String scene_id,@Param("fc_state")String changeAdd);
+
+	void addFcName(@Param("po")ControlPo po);
+
+	void saveFuncColumn(@Param("control_id")String control_id, @Param("table_id")String table_id, @Param("column_id")String column_id,@Param("func_id")String funcId);
+
+	List<FunctionInfoPo> findSceneByTableId(@Param("table_id")String id);
+
+	List<FunctionInfoPo> findFuncIdBySceneId(@Param("tree_node_parent")String id);
+
+	String findPicIdByfuncId(@Param("funcId")String funcId);
+
+	String findFuncIdByChildren(@Param("funcId")String funcId);
+
+	List<String> findFunctionBySceneId(@Param("scene_id")String id);
+
+	List<String> findTableByFuncId(@Param("func_id")String id);
+
+	List<String> findControlByFunId(@Param("funId")String funId);
+
+	List<TableColunmPo> findTableColumnById(@Param("control_id")String columnId);
+
+	List<TableColunmPo> findColumnByTable(@Param("control_id")String control_id, @Param("table_id")String id);
+
+	List<String> findControlByFunId(@Param("scene_id")String id, @Param("func_id")String funId);
+
+	List<String> findControlByFuncId(@Param("scene_id")String id, @Param("func_id")String string);
+
+	void delFuncColumn(@Param("control_id")String control_id,@Param("func_id")String func_id);
+
+	Integer findMaxVersionByFunId(@Param("funcId")String funcId, @Param("state")String state);
+
+	Integer findMinVersionByFunId(@Param("funcId")String funcId, @Param("state")String state);
+
+	Integer updateFunctionInfoById(@Param("funcId")String oldId, @Param("newId")String id);
+
+
+}

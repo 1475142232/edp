@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>test</title>
+		<link rel="stylesheet" href="./src/tasklist-module/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="./src/tasklist-module/css/taskdetails.css" />
+		<link rel="stylesheet" href="./src/tasklist-module/css/reset.css" />
+</head>
+<body>
+	<div class="container">
+	   <div class="row content-box-zhu" style='position:relative;'>
+	   	 <i class='back'></i>
+	   	<!--任务总体部分-->
+		 <div cass="row" style="overflow: hidden;margin:10px auto;">
+		 	<div class="col-md-6">任务名称：<span class="task-name"></div>
+		 	<div class="col-md-6">责 任 人：<span class="task-owner"></div>
+		 </div>
+		 <div class="row" style="overflow: hidden;margin:10px auto;">
+		 	<div class="col-md-6">任务内容：<span class="task_type"></span></div>
+		 	<div class="col-md-6">完成时间：<span class="task_done_time"></div>
+		 </div>
+		 <div class="task-content" id="addScene">
+			
+		 </div>
+		 <div class="footer">
+		  	<button type="button" class="btn btn-default" id="bohui">驳回</button>
+		  	<button type="button" id="pass" class="btn btn-success">通过</button>
+		 </div>
+	   </div>
+	    <!-- 模态框（Modal） -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		    <div class="modal-dialog">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		          		  请填写不通过的原因：
+		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		            </div>
+		            <div class="modal-body"><textarea name="" placeholder="请输入不通过的原因" style="width:90%;margin-left:5%;height:100px;"></textarea></div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+		                <button type="button" id="submitchange" class="btn btn-success">提交</button>
+		            </div>
+		        </div><!-- /.modal-content -->
+		    </div><!-- /.modal -->
+		</div>
+		<!-- 失败模态框  hint -->
+	  	<div class="modal fade" id="delate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header"> 提示：<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                   	</div>
+                       <div class="modal-body container-fluid">
+                           <h4 style="color: red;" class="alert">操作失败！</h4>
+                       </div>
+                       <div class="modal-footer">
+                       	<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                           <button type="submit" class="btn btn-primary" id="btn-add-delate-col">确认</button>
+                       </div>
+                </div>
+           	</div>
+   				</div>
+	</div>
+	<script src="./src/jquery/jquery.min.js"></script>
+	<script src="./src/tasklist-module/src/bootstrap.min.js"></script>
+	<script src="./src/module-config.js"></script>
+	<script src="./src/tasklist-module/taskdetails-entry.js"></script>
+	</body>
+</html>
+

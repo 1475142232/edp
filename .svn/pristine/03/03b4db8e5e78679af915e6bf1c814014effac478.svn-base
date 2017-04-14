@@ -1,0 +1,39 @@
+package com.edp.admin.functionInfo;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.edp.admin.common.BaseController;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import com.google.gson.Gson;
+
+
+
+
+@Controller
+@RequestMapping("functionInfoController")
+public class FunctionInfoController extends BaseController {
+
+    @Autowired
+    private FunctionInfoServiceI functionInfoServiceI;
+	private static final Logger LOGGER = LoggerFactory.getLogger(FunctionInfoController.class);
+	private Gson gson = new Gson();
+  
+    
+    
+    /**
+     * 增加功能
+     * 2016/9/21
+     * zhang_cancan
+     */
+    
+    
+    
+    
+   
+
+}

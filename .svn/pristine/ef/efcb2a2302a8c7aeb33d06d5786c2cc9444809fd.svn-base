@@ -1,0 +1,23 @@
+package com.edp.serviceI.sceneinfo;
+
+import java.util.List;
+
+import com.edp.serviceI.dto.FunConTrolDto;
+import com.edp.serviceI.dto.SceneInfoDto;
+/**
+ * 
+ * @author wu_jianxing(吴建行) 
+ * 时间：2016.4.22
+ */
+public interface SceneInfoServiceI {
+	public SceneInfoDto getAllScenes(SceneInfoDto dto);
+	public SceneInfoDto getSceneById(String Id);
+	public void addScene(SceneInfoDto dto);
+	public void updateScene(SceneInfoDto dto);
+	public void delScene(String Id);
+	public List<String> findControlIdById(String id);
+	public List<String> findFunctionIdById(String id);
+	Integer updateScencById(String oldId, String id);
+	List<FunConTrolDto> selectFunControl(FunConTrolDto func);
+	Integer insertFunConTrol(FunConTrolDto funConTrolDto);
+}

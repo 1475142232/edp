@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.FunctionChangeHisPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.FunctionChangeHisPo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="func_id" property="funcId" jdbcType="VARCHAR" />
+    <result column="func_name" property="funcName" jdbcType="VARCHAR" />
+    <result column="func_en_name" property="funcEnName" jdbcType="VARCHAR" />
+    <result column="func_spec" property="funcSpec" jdbcType="VARCHAR" />
+    <result column="func_create_time" property="funcCreateTime" jdbcType="VARCHAR" />
+    <result column="func_creater" property="funcCreater" jdbcType="VARCHAR" />
+    <result column="func_modified_time" property="funcModifiedTime" jdbcType="VARCHAR" />
+    <result column="func_modified_person" property="funcModifiedPerson" jdbcType="VARCHAR" />
+    <result column="func_pic" property="funcPic" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, func_id, func_name, func_en_name, func_spec, func_create_time, func_creater, 
+    func_modified_time, func_modified_person, func_pic, version
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.FunctionChangeHisPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from function_change_his
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from function_change_his
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from function_change_his
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.FunctionChangeHisPoCriteria" >
+    delete from function_change_his
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.FunctionChangeHisPo" >
+    insert into function_change_his (id, func_id, func_name, 
+      func_en_name, func_spec, func_create_time, 
+      func_creater, func_modified_time, func_modified_person, 
+      func_pic, version)
+    values (#{id,jdbcType=INTEGER}, #{funcId,jdbcType=VARCHAR}, #{funcName,jdbcType=VARCHAR}, 
+      #{funcEnName,jdbcType=VARCHAR}, #{funcSpec,jdbcType=VARCHAR}, #{funcCreateTime,jdbcType=VARCHAR}, 
+      #{funcCreater,jdbcType=VARCHAR}, #{funcModifiedTime,jdbcType=VARCHAR}, #{funcModifiedPerson,jdbcType=VARCHAR}, 
+      #{funcPic,jdbcType=VARCHAR}, #{version,jdbcType=TINYINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.FunctionChangeHisPo" >
+    insert into function_change_his
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="funcId != null" >
+        func_id,
+      </if>
+      <if test="funcName != null" >
+        func_name,
+      </if>
+      <if test="funcEnName != null" >
+        func_en_name,
+      </if>
+      <if test="funcSpec != null" >
+        func_spec,
+      </if>
+      <if test="funcCreateTime != null" >
+        func_create_time,
+      </if>
+      <if test="funcCreater != null" >
+        func_creater,
+      </if>
+      <if test="funcModifiedTime != null" >
+        func_modified_time,
+      </if>
+      <if test="funcModifiedPerson != null" >
+        func_modified_person,
+      </if>
+      <if test="funcPic != null" >
+        func_pic,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="funcId != null" >
+        #{funcId,jdbcType=VARCHAR},
+      </if>
+      <if test="funcName != null" >
+        #{funcName,jdbcType=VARCHAR},
+      </if>
+      <if test="funcEnName != null" >
+        #{funcEnName,jdbcType=VARCHAR},
+      </if>
+      <if test="funcSpec != null" >
+        #{funcSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="funcCreateTime != null" >
+        #{funcCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="funcCreater != null" >
+        #{funcCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="funcModifiedTime != null" >
+        #{funcModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="funcModifiedPerson != null" >
+        #{funcModifiedPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="funcPic != null" >
+        #{funcPic,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.FunctionChangeHisPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from function_change_his
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update function_change_his
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.funcId != null" >
+        func_id = #{record.funcId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcName != null" >
+        func_name = #{record.funcName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcEnName != null" >
+        func_en_name = #{record.funcEnName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcSpec != null" >
+        func_spec = #{record.funcSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcCreateTime != null" >
+        func_create_time = #{record.funcCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcCreater != null" >
+        func_creater = #{record.funcCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcModifiedTime != null" >
+        func_modified_time = #{record.funcModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcModifiedPerson != null" >
+        func_modified_person = #{record.funcModifiedPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.funcPic != null" >
+        func_pic = #{record.funcPic,jdbcType=VARCHAR},
+      </if>
+      <if test="record.version != null" >
+        version = #{record.version,jdbcType=TINYINT},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update function_change_his
+    set id = #{record.id,jdbcType=INTEGER},
+      func_id = #{record.funcId,jdbcType=VARCHAR},
+      func_name = #{record.funcName,jdbcType=VARCHAR},
+      func_en_name = #{record.funcEnName,jdbcType=VARCHAR},
+      func_spec = #{record.funcSpec,jdbcType=VARCHAR},
+      func_create_time = #{record.funcCreateTime,jdbcType=VARCHAR},
+      func_creater = #{record.funcCreater,jdbcType=VARCHAR},
+      func_modified_time = #{record.funcModifiedTime,jdbcType=VARCHAR},
+      func_modified_person = #{record.funcModifiedPerson,jdbcType=VARCHAR},
+      func_pic = #{record.funcPic,jdbcType=VARCHAR},
+      version = #{record.version,jdbcType=TINYINT}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.FunctionChangeHisPo" >
+    update function_change_his
+    <set >
+      <if test="funcId != null" >
+        func_id = #{funcId,jdbcType=VARCHAR},
+      </if>
+      <if test="funcName != null" >
+        func_name = #{funcName,jdbcType=VARCHAR},
+      </if>
+      <if test="funcEnName != null" >
+        func_en_name = #{funcEnName,jdbcType=VARCHAR},
+      </if>
+      <if test="funcSpec != null" >
+        func_spec = #{funcSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="funcCreateTime != null" >
+        func_create_time = #{funcCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="funcCreater != null" >
+        func_creater = #{funcCreater,jdbcType=VARCHAR},
+      </if>
+      <if test="funcModifiedTime != null" >
+        func_modified_time = #{funcModifiedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="funcModifiedPerson != null" >
+        func_modified_person = #{funcModifiedPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="funcPic != null" >
+        func_pic = #{funcPic,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.FunctionChangeHisPo" >
+    update function_change_his
+    set func_id = #{funcId,jdbcType=VARCHAR},
+      func_name = #{funcName,jdbcType=VARCHAR},
+      func_en_name = #{funcEnName,jdbcType=VARCHAR},
+      func_spec = #{funcSpec,jdbcType=VARCHAR},
+      func_create_time = #{funcCreateTime,jdbcType=VARCHAR},
+      func_creater = #{funcCreater,jdbcType=VARCHAR},
+      func_modified_time = #{funcModifiedTime,jdbcType=VARCHAR},
+      func_modified_person = #{funcModifiedPerson,jdbcType=VARCHAR},
+      func_pic = #{funcPic,jdbcType=VARCHAR},
+      version = #{version,jdbcType=TINYINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

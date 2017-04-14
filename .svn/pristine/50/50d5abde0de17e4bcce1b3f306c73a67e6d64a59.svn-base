@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>问题</title>
+		<link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+		<link rel="stylesheet" href="./src/problem-module/css/problem.css" />
+	</head>
+	<body>
+		<!-- 我的任务 -->
+	   <div class="content-box-zhu">
+	   		<ul class="g_question">
+	   			<li style="padding:0;font-weight:bold;color:#000">筛选问题：</li>
+	   			<li  class="g_dot" style="position:relative;">
+	   				<span></span>
+	   				<ul class="g_con" id="my_project" style="width: 100%;">
+	   				</ul>
+	   			</li>
+	   			<li class="g_dot">
+	   				<span>所有人</span>
+	   				<ul class="g_con" id="problem_user">
+	   					<li id="0">所有人</li>
+	   					<li id="1">我提出</li>
+	   					<li id="2">我解决</li>
+	   				</ul>
+	   			</li>
+	   			<li class="g_dot">
+	   				<span>所有类型</span>
+	   				<ul class="g_con" id="problem_type">
+	   					<li id="">所有类型</li>
+	   					<li id="type_01">求助</li>
+	   					<li id="type_02">BUG</li>
+	   				</ul>
+	   			</li>
+	   			<li class="g_dot">
+	   				<span>所有等级</span>
+	   				<ul class="g_con" id="problem_lv">
+	   					<li id="">所有等级</li>
+	   					<li id="lv_0">一般</li>
+	   					<li id="lv_1">次要</li>
+	   					<li id="lv_2">严重</li>
+	   				</ul>
+	   			</li>
+	   			<li style="float: right;">
+	   			   <input type="text"  class="form-control tab-login-input data-index"  id="sreach_name" 
+														placeholder="问题名称" style="width: 100px;float: left;"/>
+				   <button class="btn btn-primary" id="problem_sreach">搜索</button>
+	   			</li>
+	   		</ul>
+	   		<div class="g_ques">
+	   			<ul class="g_quesBar">
+	   				
+	   			</ul>
+	   		</div>
+	   </div>
+	   
+	   <script src="./src/jquery/jquery.min.js"></script>
+	   <script src="./src/kissy/jquery.form.js"></script>
+	   <script src="./src/kissy/seed-min.js"></script>
+	   <script src="./src/kissy/import-style-min.js"></script>
+	   <script src="./src/bootstrapvalidator/vendor/bootstrap/js/bootstrap.min.js"></script>
+	   <script src="./src/module-config.js"></script>
+	   <script src="./src/problem-module/problem-entry.js"></script>
+	</body>
+</html>

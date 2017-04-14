@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>原型图</title>
+	<link rel="stylesheet" href="./src/prototype-module/css/index.css" />
+	<link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+</head>
+<body>
+	<div class="content-box-zhu">
+		<div class="product">
+      			<div class="productName" id="productName">任务名称：</div>
+      			<div class="back"></div>
+       	</div>
+		<div class="row" id="projectList">
+			
+		</div>
+   		<!-- <div id="myProject">
+            <a class="books" style="cursor:pointer" id="books_'+data[i].id+'"></a>
+            <a href="javascript:;" class="wode" id="'+data[i].id+'">原型图</a>
+            <a href="javascript:;" class="miaoshu">描述。。描述描述</a> 
+            <dl id="dl_'+data[i].id+'"><dd class="togglelist" id="'+data[i].id+'"><a href="javascript:;">'+'编辑'+'</a></dd>
+            <dd class="togglelist2"  id="'+data[i].id+'"><a href="javascript:;">'+'删除'+'</a></dd></dl>
+        </div> -->
+   </div>
+   <!-- 增加原型图      --   模态框（Modal） -->
+	<div class="modal fade" id="addprototype" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	                <h4 class="modal-title" id="myModalLabel">新增原型图</h4>
+	            </div>
+	            <div class="modal-body">
+	            	<form role="form" id="submitprototype" action="" method="post">
+	            	<input type="hidden" class="form-control" name="sava_id" id="sava_id" >
+					  <div class="form-group">
+					    	<label style="width:100%;"><span style="display:inline;">请输入原型图名称：</span><input type="text" class="form-control" name="treeName" id="treeName" placeholder="请输入原型图名称" style="width:70%;display:inline-block;"></label>
+					  </div>
+					  <div class="form-group">
+					  		<label style="width:100%;"><span style="display:inline;float:left;">请输入原型图描述：</span><textarea class="form-control" name="treeDesc" id="treeDesc" placeholder="请输入原型图描述" style="width:70%;height:140px;display:inline-block;"></textarea></label>
+					  </div>
+					</form>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	                <button type="button" id="submitok" class="btn btn-primary">提交</button>
+	            </div>
+	        </div><!-- /.modal-content -->
+	    </div><!-- /.modal -->
+	</div>
+</body>
+	<script src="./src/jquery/jquery.min.js"></script>
+	<script src="./src/kissy/jquery.form.js"></script>
+	<script src="./src/kissy/seed-min.js"></script>
+	<script src="./src/kissy/import-style-min.js"></script>
+	<script src="./src/kissy/kissy/bui/adapter-min.js"></script>
+    <script src="./src/bootstrapvalidator/vendor/bootstrap/js/bootstrap.min.js"></script>
+	<script src="./src/bootstrapvalidator/dist/js/bootstrapValidator.js"></script>
+	<script src="./src/module-config.js"></script>
+	<script src="./src/prototype-module/prototype-entry.js"></script>
+	
+</html>

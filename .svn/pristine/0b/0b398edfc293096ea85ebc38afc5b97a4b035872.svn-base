@@ -1,0 +1,3 @@
+KISSY.use(['tasklist-module/src/Tasktlist'],function(S,TaskList){
+	TaskList();
+});

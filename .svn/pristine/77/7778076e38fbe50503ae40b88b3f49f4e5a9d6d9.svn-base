@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>EDP</title>
+    <link rel="stylesheet" href="./src/common-module/css/common.css" />
+</head>
+<body>
+<div id="zhezhao" class="allchild" style="display: none;">
+    <p><img src="src/common-module/img/aw.gif"></p>
+</div>
+<div id="main">欢迎来到EDP2.0</div>
+<script src="./src/jquery/jquery.min.js"></script>
+<script src="./src/kissy/jquery.form.js"></script>
+<script src="./src/kissy/seed-min.js"></script>
+<script src="./src/kissy/import-style-min.js"></script>
+<script src="./src/kissy/kissy/bui/adapter-min.js"></script>
+<script src="./src/module-config.js"></script>
+<script src="./src/common-module/src/common-utils.js"></script>
+
+<script src="./src/echarts.js"></script>
+
+<script src="./src/index.js"></script>
+<script src="./src/i18n/LoadInternal.js"></script>
+
+</body>
+</html>

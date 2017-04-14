@@ -1,0 +1,15 @@
+/**
+ * 用户管理
+ */
+KISSY.add('usermanage-module/src/userSearch', function(S,UserManage){
+	function UserSearch(){
+		this.renderInformation = function(){
+			var userManage = new UserManage();
+			userManage.init('search');
+		};
+		
+	};
+	return UserSearch;
+},{
+    requires : ['usermanage-module/src/userManage']
+});

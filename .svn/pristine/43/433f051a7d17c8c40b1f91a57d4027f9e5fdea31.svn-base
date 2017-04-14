@@ -1,0 +1,15 @@
+/**
+ * 用户管理
+ */
+KISSY.add('usermanage-module/src/userResetPwd', function(S,UserManage){
+	function UserResetPwd(){
+		this.renderInformation = function(){
+			var userManage = new UserManage();
+			userManage.init('resetPass');
+		};
+		
+	};
+	return UserResetPwd;
+},{
+    requires : ['usermanage-module/src/userManage']
+});

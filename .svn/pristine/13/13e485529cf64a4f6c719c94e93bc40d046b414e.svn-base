@@ -1,0 +1,17 @@
+KISSY.add("teamcreat-module/src/projectlist",function(S){
+	function myproject(){
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+	return projectList;
+},{
+	requires : []
+});

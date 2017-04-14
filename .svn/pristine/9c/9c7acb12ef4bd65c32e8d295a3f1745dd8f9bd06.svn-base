@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>EDP</title>
+    <link rel="stylesheet" href="./src/homepage-module/css/homepage.css" />
+    <link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="./src/bootstrapvalidator/dist/css/bootstrapValidator.css" />
+</head>
+<body>
+<div class="container">
+<!-- 导航 -->
+	<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-top:50px;display: none;" id="navTop">
+		<div class="container-fluid" style="width:1000px;"> 
+		    <div>
+		        <ul class="nav navbar-nav navbar-left" id="navUl">
+		        	<li class="dropdown">
+		                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown"><span id="team_Name"></span> <b class="caret"></b></a>
+		                <ul class="dropdown-menu" role="menu" id="teamSelect">
+		                </ul>
+		            </li>
+		            <li><a href="javascript:void(0);" class="nav-color-zhu" id="teamlink">团队</a></li>
+		            <li class="active"><a href="javascript:void(0);" class="nav-color-zhu" id="projectlink">项目</a></li>
+		            <li><a href="javascript:void(0);" class="nav-color-zhu" id="myself">我自己</a></li>
+		            <li><a href="javascript:void(0);" class="nav-color-zhu" id="showTree">结构树</a></li>
+		            <li><a href="javascript:void(0);" class="nav-color-zhu" id="problem">问题</a></li>
+		            <li><a href="javascript:void(0);" class="nav-color-zhu" id="my_Database">数据库</a></li>
+		        </ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li class="navbar-right">
+						<a href="javascript:void(0);" style="font-size: 16px;" id="signout"><span>退出</span></a>
+					</li>
+					<li class="navbar-right">
+						<a href="javascript:void(0);" id="my_message"><span class="glyphicon glyphicon-bell" style="font-size: 16px;"></span></a>
+					</li>
+				</ul>
+		    </div>
+		</div>
+	</nav>
+	<!-- 项目列表内容部分 -->
+	<div id="mainpage" class="container row">
+	</div>
+
+</div>
+
+	<!-- 模态框（Modal） --> 
+ 	<div class="modal fade" id="signoutModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+      <div class="modal-dialog"> 
+        <div class="modal-content"> 
+            <div class="modal-header"> 
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+                <h4 class="modal-title">提示信息</h4> 
+            </div> 
+            <div class="modal-body">您确认要退出系统吗？</div> 
+            <div class="modal-footer"> 
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="signout_Submit">确认</button>
+            </div> 
+        </div><!-- /.modal-content --> 
+      </div><!-- /.modal --> 
+	</div>
+	<!-- 模态框（Modal） --> 
+ 	<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+      <div class="modal-dialog"> 
+        <div class="modal-content"> 
+            <div class="modal-header"> 
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+                <h4 class="modal-title">提示信息</h4> 
+            </div> 
+            <div class="modal-body" id="errorInfo"></div> 
+            <div class="modal-footer"> 
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div> 
+        </div><!-- /.modal-content --> 
+      </div><!-- /.modal --> 
+	</div>
+	<script src="./src/jquery/jquery.min.js"></script>
+	<script src="./src/kissy/jquery.form.js"></script>
+	<script src="./src/kissy/seed-min.js"></script>
+	<script src="./src/kissy/import-style-min.js"></script>
+	<script src="./src/kissy/kissy/bui/adapter-min.js"></script>
+	<script src="./src/tasklist-module/src/bootstrap.min.js"></script>
+	<script src="./src/module-config.js"></script>
+	<script src="./src/index.js"></script>
+
+</body>
+</html>

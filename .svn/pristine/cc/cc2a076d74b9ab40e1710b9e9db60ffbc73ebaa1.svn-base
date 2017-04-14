@@ -1,0 +1,27 @@
+package dome;
+
+public class count {
+
+	public static void main(String[] args) {
+		int temp=18;
+		int[] nums =new int[]{18,42,63,85,92};
+		int start=0;
+		int end = nums.length-1;
+		int i;
+		int count=0;
+		while(true){
+			count++;
+			i = (start+end)/2;
+			if(temp == nums[i]){
+				break;
+			}
+			if(temp > nums[i]){
+				start = i;
+			}
+			if(temp<nums[i]){
+				end = i ;
+			}
+		}
+	}
+
+}

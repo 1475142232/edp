@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>项目经理分配任务工作台</title>
+		<link rel="stylesheet" href="./src/tasklist-module/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="./src/tasklist-module/css/reset.css" />
+		<link rel="stylesheet" href="./src/tasklist-module/css/tasklist.css" />
+	</head>
+
+	<body>
+		<!-- 导航 -->
+		<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-top:50px;">
+			<div class="container-fluid" style="width:1000px;">
+				<div>
+					<ul class="nav navbar-nav">
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Edp 2.0 <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li>
+									<a href="#" class="nav-color-zhu">edp1.0</a>
+								</li>
+								<li>
+									<a href="#" class="nav-color-zhu">Edp2.0</a>
+								</li>
+							</ul>
+						</li>
+						<li>
+							<a href="#" class="nav-color-zhu">团队</a>
+						</li>
+						<li class="active">
+							<a href="#" class="nav-color-zhu">项目</a>
+						</li>
+						<li>
+							<a href="#" class="nav-color-zhu">我自己</a>
+						</li>
+						<li>
+							<a href="#" class="nav-color-zhu">结构树</a>
+						</li>
+						<li>
+							<a href="#" class="nav-color-zhu">问题</a>
+						</li>
+						<li>
+							<a href="#" class="nav-color-zhu">数据库</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+		<div class="wrap">
+			<div class="project-container">
+				<div class="project-header">
+					<div class="project-hd-info">
+						<span class="project-team">EDP开发组</span>
+						<span class="project-date">项目日历</span><br />
+						<span class="project-name">EDP2.0</span>
+						<label for="success1">
+							<input id="success1" type="checkbox" checked />已完成任务
+						</label>
+						<label for="success2">
+							<input id="success2" type="checkbox" checked />未完成任务
+						</label>
+						<label for="success3">
+							<input id="success3" type="checkbox" checked />未分配任务
+						</label>
+					</div>
+					<div class="project-links">
+						<a href="#">
+							<span class="main">0</span>
+							<span>已完成任务</span>
+						</a>
+						<a href="#">
+							<span class="main">0</span>
+							<span>未完成任务</span>
+						</a>
+						<a href="#" style="border-right: 0;">
+							<span class="main">0</span>
+							<span>未分配任务</span>
+						</a>
+					</div>
+				</div>
+				<div class="project-main">
+					<div class="project-main-wrap">
+						<!--<div class="main-common" id="test">
+							<p class="title">测&nbsp;&nbsp;试</p>
+							<a href="javascript:void(0);" id="add_test" style="width:115px">分配测试任务</a>
+							<div class="modal fade bs-example-modal-lg" id="add-test" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="false">
+								<div class="modal-dialog modal-lg">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h4 class="modal-title" id="myModalLabel">分配工单</h4></div>
+										<div class="modal-body container-fluid">
+											<form id="form-add-test">
+												<div class="row">
+													<div class="col-md-5 col-md-offset-1"><label for="">选择工单：</label>
+														<select name="" id="" class="input-lg" style="height: 46px;width: 225px;">
+															<option value="请选择工单">请选择工单</option>
+															<option value=""></option>
+															<option value=""></option>
+														</select>
+													</div>
+													<div class="col-md-5"><label for="">执行人员：</label>
+														<select name="" id="" class="input-lg" style="height: 46px;width: 225px;">
+															<option value="请选择组内成员">请选择组内成员</option>
+															<option value=""></option>
+															<option value=""></option>
+														</select>
+													</div>
+												</div>
+												<div class="row marginTop">
+													<div class="col-md-5 col-md-offset-1"><label for="">工单级别：</label>
+														<select name="" id="" class="input-lg" style="height: 46px;width: 225px;">
+															<option value="请选择级别">请选择级别</option>
+															<option value="简单">简单</option>
+															<option value="较容易">较容易</option>
+															<option value="较难">较难</option>
+															<option value="难">难</option>
+														</select>
+													</div>
+													<div class="col-md-5"><label for="">任务估时：</label><input type="text" name="" id="" class="input-lg" /></div>
+												</div>
+												<div class="row marginTop">
+													<div class="col-md-5"><label for="">任务期限：</label><input type="text" name="" id="" class="input-lg" /></div>
+													<div class="col-md-5"><label for="">代码编写人：</label><input type="text" name="" id="" class="input-lg" /></div>
+												</div>
+												<div class="row marginTop">
+													<div class="col-md-5 col-md-offset-1"><label for="" style="vertical-align: top;">任务说明:</label><textarea name="" rows="5" cols="73" value="" id=""></textarea></div>
+												</div>
+											</form>
+										</div>
+										<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button><button type="button" class="btn btn-primary" id="btn_add_test" data-dismiss="modal">确认</button></div>
+									</div>
+								</div>
+							</div>
+						</div>-->
+						<!--<div class="main-common" id="add_">
+							<p class="title">项目疑问</p>
+							<a href="javascript:void(0);" id="add_" style="width:115px">添加项目阶段</a>
+						</div>-->
+						
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</body>
+	<script src="./src/tasklist-module/js/bootstrap.min.js"></script>
+	<script src="./src/tasklist-module/js/jquery.min.js"></script>
+	<script src="./src/kissy/jquery.form.js"></script>
+	<script src="./src/kissy/seed-min.js"></script>
+	<script src="./src/kissy/import-style-min.js"></script>
+	<script src="./src/kissy/kissy/bui/adapter-min.js"></script>
+	<script src="./src/module-config.js"></script>
+	<script src="./src/task-module/tasklist-entry.js"></script>
+
+</html>

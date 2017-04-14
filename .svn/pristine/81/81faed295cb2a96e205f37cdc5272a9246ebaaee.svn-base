@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title></title>
+</head>
+<body>     
+<!-- 初始隐藏 dialog内容 -->    
+	<div id="content" class="content">      
+		<form class="form-horizontal well" id="modifyUserForm">
+			<div class="row">
+				<div class="control-group">
+					<label class="control-label">用户名：</label>
+					<div class="controls">
+						<label id="userName" class="control-textval"></label>
+					</div>
+				</div>
+ 			</div>
+ 			<div class="row">
+				<div class="control-group">
+					<label class="control-label">姓名：</label>
+					<div class="controls">
+						<input id="realName" name="realName" type="text" class="input-normal control-text">
+					</div>
+				</div>
+ 			</div>
+ 			<div class="row">
+ 				<div class="control-group">
+ 					<label class="control-label">所属机构：</label>
+ 					<div class="controls">
+ 						<label name="orgName" id="orgName" type="text" ></label>
+ 					</div>
+ 					<!-- <label style="color:red;"><s>*</s></label>  -->
+ 				</div>
+ 			</div>
+ 			<div class="row">
+ 				<div class="control-group">
+ 					<label class="control-label">手机号：</label>
+ 					<div class="controls">
+ 						<input name="phoneNum" id="phoneNum" type="text" class="input-normal control-text">
+ 					</div>
+ 				</div>
+ 			</div>
+
+			<div class="row">
+				<div class="control-group">
+					<label class="control-label">角色：</label>
+					<div class="controls">
+						<label id="roleId" class="control-textval"></label>
+					</div>
+				</div>
+			</div>
+ 			<div class="row">
+ 				<input type="button" class="button button-danger button-move" id="modifyUser" value="修改"/>
+ 			</div>
+ </form>    
+ </div>       
+</body>
+</html>

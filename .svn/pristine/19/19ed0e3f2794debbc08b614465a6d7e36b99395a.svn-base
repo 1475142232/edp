@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>项目列表2</title>
+	<link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" href="./src/myself-module/css/myself.css" />
+</head>
+<body>
+   <!-- 我的任务 -->
+   <div class="row content-box-zhu">
+   		<!-- 个人信息-->
+   		<div class="task-dateil">
+   			<div class="task-dateil-left">
+   				<div class="task-dateil-img"><img src="./src/myself-module/img/bg.jpg" height="100px"/></div>
+   				<div class="task-dateil-info">
+   					<ul>
+   						<li class="info-username" id="info_UserName">--</li>
+   						<li class="info-usermail" id="info_UserMail">--</li>
+   						<li>
+   							<input id="info_UserId" type="hidden"/>
+   							<a href="javascript:void(0);">修改密码</a><a id="CalendarId" href="javascript:void(0);" style="margin-left: 20px;">项目日历</a>
+   						</li>
+   					</ul>
+   				</div>
+   			</div>
+   			<div class="task-dateil-right">
+   				<ul class="task-dateil-ul">
+   					<li class="task-dateil-li1">
+   						<span style="font-size: 20px;" id="no_task">0</span>
+   						<span>未完成的任务</span>
+   					</li>
+   					<li class="task-dateil-li2"><div class="task-dateil-xian">&nbsp;</div></li>
+   					<li class="task-dateil-li1">
+   						<span style="font-size: 20px;" id="yes_task">0</span>
+   						<span>已完成的任务</span>
+   					</li>
+   					<li class="task-dateil-li2"><div class="task-dateil-xian">&nbsp;</div></li>
+   					<li class="task-dateil-li1">
+   						<span style="font-size: 20px;" id="approve_task">0</span>
+   						<span>审核中的任务</span>
+   					</li>
+   				</ul>
+   			</div>
+   		</div>
+   		<div class="task-dateil-heng">&nbsp;</div>
+   		<div class="task-dateil-task">
+   			<div class="task-deteil-list">
+   				<div class="task-deteil-no">
+   					<div class="task-list-top">
+   						<img src="./src/myself-module/img/no_task.png" width="34px" height="34px"/><span class="top-span">未完成的任务</span>
+   						<hr class="top-heng"/>
+   					</div>
+   					<div class="task-list-center" id="noList">
+   						
+   					</div>
+   				</div>
+   				<div class="task-deteil-yes">
+   					<div class="task-list-top">
+   						<img src="./src/myself-module/img/yes-task.png" width="34px" height="34px"/><span class="top-span">已完成的任务</span>
+   						<hr class="top-heng"/>
+   					</div>
+   					<div class="task-list-center" id="yesList">
+   					
+   					</div>
+   					
+   				</div>
+   				<div class="task-deteil-approve">
+   					<div class="task-list-top">
+   						<img src="./src/myself-module/img/approve_task.png" width="34px" height="34px"/><span class="top-span">审核中的任务</span>
+   						<hr class="top-heng"/>
+   					</div>
+   					<div class="task-list-center" id="approveList">
+<!--    						<div class="task-list-info"> -->
+<!--    							<div class="task-list-info-name"> -->
+<!--    								<input type="radio" name="task" style="float:left;"/> -->
+<!--    								<span id="" class="info-taskname">流程图任务XXXXXXXXXXXXXXXXXXXXXXXXXX</span> -->
+<!--    								<span id="" class="info-tasktime">交付时间：</span> -->
+<!--    								<span class="info-tasktime">2016-8-20</span> -->
+<!--    							</div> -->
+<!--    							<div class="task-list-info-desc"> -->
+<!--    								这是一个XXX流程，需要有XXX功能，XXX功能，XXX功能，要求。。。。。。。。。 -->
+<!--    							</div> -->
+<!--    						</div> -->
+   					</div>
+   				</div>
+   			</div>
+   			<div class="task-deteil-handle">
+   				<ul>
+   					<li class="handle-info"><div class="handle-info-div"><img src="./src/myself-module/img/edit.png"/><a>编辑</a></div></li>
+   					<li class="handle-heng"></li>
+   					<li class="handle-info"><div class="handle-info-div"><img src="./src/myself-module/img/detail.png"/><a>详情</a></div></li>
+   					<li class="handle-heng"></li>
+   					<li class="handle-info"><div class="handle-info-div"><img src="./src/myself-module/img/qiuzhu.png"/><a>问题</a></div></li>
+   					<li class="handle-heng"></li>
+   					<li class="handle-info"><div class="handle-info-div"><img src="./src/myself-module/img/submit.png"/><a>提交</a></div></li>
+   				</ul>
+   			</div>
+   		</div>
+   </div>
+   
+	<!-- 模态框（Modal） --> 
+   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+	    <div class="modal-dialog"> 
+	        <div class="modal-content"> 
+	            <div class="modal-header"> 
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+	                <h4 class="modal-title" id="myModalLabel">提示框</h4> 
+	            </div> 
+	            <div class="modal-body" id="modelInfo"></div> 
+	            <div class="modal-footer"> 
+	                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+	            </div> 
+	        </div><!-- /.modal-content --> 
+	    </div><!-- /.modal --> 
+	</div>
+	
+	<script src="./src/jquery/jquery.min.js"></script>
+	<script src="./src/kissy/jquery.form.js"></script>
+	<script src="./src/kissy/seed-min.js"></script>
+	<script src="./src/kissy/import-style-min.js"></script>
+	<script src="./src/module-config.js"></script>
+	<script src="./src/myself-module/myself-entry.js"></script>
+</body>
+</html>

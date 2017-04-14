@@ -1,0 +1,55 @@
+KISSY.add('usermanage-module/src/assignrole', function(S, Node, Event, IO,
+		Grid, Data, Picker, Tree, Pageing) {
+	function AssignRole() {
+		var _this = this;
+		var pageing = new Pageing();
+		this.renderInformation = function() {
+			_this.rendneassignrole();
+		};
+		this.rendneassignrole = function() {
+			var columns = [ {
+				title : '角色名称',// 角色名称
+				dataIndex : 'roleName',
+				elCls : 'center',
+				width : 120,
+				sortable : false,
+				elCls : 'center wordCss earncolor',
+				cellTpl:'<span title = "{text}">{text}</span>' 
+			}, {
+				title : '角色描述',// 角色描述
+				dataIndex : 'roleDesc',
+				elCls : 'center',
+				width : 120,
+				sortable : false,
+				elCls : 'center wordCss earncolor',
+				cellTpl:'<span title = "{text}">{text}</span>' 
+			}, {
+				title : '菜单',// 菜单
+				dataIndex : 'menuDesc',
+				elCls : 'center',
+				width : 800,
+				sortable : false,
+				elCls : 'center wordCss earncolor',
+				cellTpl:'<span title = "{text}">{text}</span>' 
+			} ];
+
+			pageing.initPageing('grid', columns, 'roleController/getAllRoles',
+					10, '', 'gridbar', '');
+			Event.on("#roleSearch", "click", function() {
+				var roleName = Node.all("#roleName").val();
+				var params = {
+					roleName : roleName,
+					pageIndex:0
+				};
+				pageing.store.load(params);
+			});
+
+		};
+
+	}
+	;
+	return AssignRole;
+}, {
+	requires : [ 'node', 'event', 'io', 'bui/grid', 'bui/data', 'bui/picker',
+			'bui/tree', 'common-module/src/pageing-grid' ]
+});

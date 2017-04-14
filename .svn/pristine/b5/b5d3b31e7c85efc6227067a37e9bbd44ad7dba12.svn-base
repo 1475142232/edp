@@ -1,0 +1,107 @@
+package com.edp.serviceI.taskInfo;
+
+import java.util.List;
+
+import com.edp.serviceI.common.BaseDto;
+import com.edp.serviceI.dto.TaskInfoDto;
+
+/**
+ * 工单信息服务接口
+ * Created by changer on 2016/7/20.
+ */
+public interface TaskInfoServiceI {
+
+    /**
+     * 查询所有的工单信息
+     * @return
+     */
+    TaskInfoDto  queryAllTaskInfosByCondition(TaskInfoDto conditon) ;
+
+    /**
+     * 查询产品下的所有工单信息
+     * @param productId
+     * @return
+     */
+    TaskInfoDto   querAllTaskInfosByProductId(String productId);
+
+    /**
+     * 根据工单编号查询工单信息
+     * @param taskId
+     * @return
+     */
+    TaskInfoDto  findTaskInfoByTaskId(String taskId);
+
+    /**
+     * 根据主键查询工单信息
+     * @param id
+     * @return
+     */
+    TaskInfoDto  findTaskInfoByPrimaryKey(int id);
+
+    /**
+     * 根据版本号查询工单信息
+     * @param version
+     * @return
+     */
+    TaskInfoDto  findTaskInfoByVersion(int version);
+
+
+    /**
+     * 保存工单信息
+     * @param taskInfo
+     * @return
+     */
+    TaskInfoDto  saveTaskInfo(TaskInfoDto taskInfo);
+
+    /**
+     * 更新工单信息
+     * @param taskInfo
+     * @return
+     */
+    TaskInfoDto updateTaskInfo(TaskInfoDto taskInfo);
+
+    /**
+     * 根据主键删除工单信息
+     * @param id
+     * @return
+     */
+    TaskInfoDto deleteTaskInfoByPrimaryKey(int id);
+
+    /**
+     * 根据产品编号删除工单信息
+     * @param productId
+     * @return
+     */
+    TaskInfoDto deleteTaskInfoByProductId(String productId);
+
+
+    /**
+     * 根据多个编号查询工单信息
+     * @param ids
+     * @return
+     */
+    TaskInfoDto queryTaskInfosByIds(String ids);
+
+
+    /**
+     * 根据计划编号，查询工单池信息，过滤已被选工单
+     * @param planId
+     * @return
+     */
+    TaskInfoDto queryTaskInfosForPlan(String planId,String productId);
+    
+    
+    /**
+     * 新增任务 
+     * zhangcancan 2016/9/2
+     * @param taskInfo
+     * @return
+     */
+	Integer addTaskInfo(TaskInfoDto taskInfo);
+
+	Integer editTaskInfo(TaskInfoDto taskInfo);
+
+	List<List<TaskInfoDto>> findTaskInfoByUserId(Integer userId);
+
+	List<TaskInfoDto> findTaskInfoByTime(Integer id);
+}

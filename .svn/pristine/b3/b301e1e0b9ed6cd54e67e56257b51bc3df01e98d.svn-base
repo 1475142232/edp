@@ -1,0 +1,128 @@
+package com.edp.service.sceneinfo;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SqlFormatUtil;
+import com.edp.dao.domain.FunConTrolPo;
+import com.edp.dao.domain.FunConTrolPoCriteria;
+import com.edp.dao.domain.SceneInfoPo;
+import com.edp.dao.domain.SceneInfoPoCriteria;
+import com.edp.dao.mapper.FunConTrolPoMapper;
+import com.edp.dao.mapper.SceneInfoPoMapper;
+import com.edp.serviceI.dto.FunConTrolDto;
+import com.edp.serviceI.dto.SceneInfoDto;
+import com.edp.serviceI.sceneinfo.SceneInfoServiceI;
+/**
+ * 
+ * @author wu_jianxing(吴建行)
+ * 时间：2016.4.26
+ */
+@Service("sceneServiceI")
+public class SceneInfoServiceImpl implements SceneInfoServiceI {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SceneInfoServiceImpl.class);
+	@Autowired
+	private SceneInfoPoMapper sceneInfoPoMapper;
+	@Autowired
+	private FunConTrolPoMapper funControlPoMapper;
+	public SceneInfoDto getAllScenes(SceneInfoDto dto) {
+		SceneInfoPoCriteria example = new SceneInfoPoCriteria();
+		SceneInfoPoCriteria.Criteria sceneCriteria = example.createCriteria();
+		if (null != dto.getId() && !"".equals(dto.getId())) {
+			sceneCriteria.andIdEqualTo(dto.getId());
+		}
+		if (null != dto.getSceneName() && !"".equals(dto.getSceneName())) {
+			sceneCriteria.andSceneNameLike("%"+dto.getSceneName()+"%");
+		}
+		String pagingStr = SqlFormatUtil.makeupOrderByAndLimit("id", SqlFormatUtil.ORDER_BY_DIRECTION_DESC,
+				dto.getPageIndex(), dto.getLimit());
+		example.setOrderByClause(pagingStr);
+		try {
+			int count = sceneInfoPoMapper.countByExample(example);
+			List<SceneInfoPo> result = sceneInfoPoMapper.selectByExample(example);
+			List<SceneInfoDto> returnVal = BeanCopyUtils.populateTListbyDListBySpring(result, SceneInfoDto.class);
+			SceneInfoDto returnDto = new SceneInfoDto();
+			returnDto.setRows(returnVal);
+			returnDto.setResults(count);
+			return returnDto;
+		} catch (Exception e) {
+			LOGGER.error("查询全部产品错误！", e);
+		}
+		return null;
+	}
+
+	public SceneInfoDto getSceneById(String Id) {
+		try {
+			SceneInfoPo result = sceneInfoPoMapper.selectByPrimaryKey(Id);
+			return BeanCopyUtils.populateTbyDBySpring(result, SceneInfoDto.class);
+		} catch (Exception e) {
+			LOGGER.error("根据用户id查询表错误！", e);
+		}
+		return null;
+	}
+
+	public void addScene(SceneInfoDto dto) {
+		SceneInfoPo po = BeanCopyUtils.populateTbyDBySpring(dto, SceneInfoPo.class);
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	String format = sdf.format(new Date());
+    	po.setSceneCreateTime(format);
+    	sceneInfoPoMapper.insertSelective(po);
+	}
+
+	public void updateScene(SceneInfoDto dto) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String format = sdf.format(new Date());
+		dto.setSceneModifiedTime(format);
+		SceneInfoPo po = BeanCopyUtils.populateTbyDBySpring(dto, SceneInfoPo.class);
+		sceneInfoPoMapper.updateByPrimaryKeySelective(po);
+	}
+	// 删除表功能
+	public void delScene(String Id) {
+		sceneInfoPoMapper.deleteByPrimaryKey(Id);
+	}
+
+	@Override
+	public List<String> findControlIdById(String id) {
+		// TODO Auto-generated method stub
+		return sceneInfoPoMapper.findControlIdById(id);
+	}
+
+	@Override
+	public List<String> findFunctionIdById(String id) {
+		// TODO Auto-generated method stub
+		return sceneInfoPoMapper.findFunctionIdById(id);
+	}
+
+	@Override
+	public Integer updateScencById(String oldId, String id) {
+		return sceneInfoPoMapper.updateScencById(oldId,id);
+	}
+
+	@Override
+	public List<FunConTrolDto> selectFunControl(FunConTrolDto func) {
+		FunConTrolPoCriteria example = new FunConTrolPoCriteria();
+		FunConTrolPoCriteria.Criteria sceneCriteria = example.createCriteria();
+		if(func.getSceneId()!=null && func.getSceneId()!=""){
+			sceneCriteria.andSceneIdEqualTo(func.getSceneId());
+		}
+		if(func.getFuncId()!=null && func.getSceneId()!=""){
+			sceneCriteria.andFuncIdEqualTo(func.getFuncId());
+		}
+		List<FunConTrolPo> po=funControlPoMapper.selectByExample(example);
+		List<FunConTrolDto> dto = BeanCopyUtils.populateTListbyDListBySpring(po, FunConTrolDto.class);
+		return dto;
+	}
+
+	@Override
+	public Integer insertFunConTrol(FunConTrolDto funConTrolDto) {
+		FunConTrolPo po = BeanCopyUtils.populateTbyDBySpring(funConTrolDto, FunConTrolPo.class);
+		return funControlPoMapper.insert(po);
+	}
+}

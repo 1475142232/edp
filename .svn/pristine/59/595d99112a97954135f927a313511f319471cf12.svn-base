@@ -1,0 +1,150 @@
+package com.edp.service.user;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.dao.domain.ProductInfoPo;
+import com.edp.dao.domain.TeamInfoPo;
+import com.edp.dao.domain.UserInfoPo;
+import com.edp.dao.domain.UserInfoPoCriteria;
+import com.edp.dao.mapper.ProductInfoPoMapper;
+import com.edp.dao.mapper.TeamInfoPoMapper;
+import com.edp.dao.mapper.UserInfoPoMapper;
+import com.edp.serviceI.dto.TableInfoDto;
+import com.edp.serviceI.dto.UserDto;
+import com.edp.serviceI.dto.UserInfoDto;
+import com.edp.serviceI.user.UserServiceI;
+
+@Service(value = "UserServiceI")
+public class UserServiceImpl implements UserServiceI{
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+	
+	@Autowired
+	private UserInfoPoMapper userMapper;
+	@Autowired
+	private TeamInfoPoMapper  teamMapper;
+    @Autowired
+    private ProductInfoPoMapper productInfoPoMapper;
+     
+	/**
+	 * 登录验证
+	 */
+	@Override
+	public List<UserInfoDto> LoginUser(UserInfoDto dto,String teamId) {
+		UserInfoPoCriteria example = new UserInfoPoCriteria();
+		UserInfoPoCriteria.Criteria userCrteria = example.createCriteria();
+		if(null != dto.getUserMail() && !"".equals(dto.getUserMail())){
+			userCrteria.andUserMailEqualTo(dto.getUserMail());
+		}else{
+			return new ArrayList<UserInfoDto>();
+		}
+		if(null != dto.getUserPassword() && !"".equals(dto.getUserPassword())){
+			userCrteria.andUserPasswordEqualTo(dto.getUserPassword());
+		}else{
+			return new ArrayList<UserInfoDto>();
+		}
+		List<UserInfoPo> result = userMapper.selectByExample(example);
+		if(result.size()==0){
+			return new ArrayList<UserInfoDto>();
+		}
+		if(null != teamId){
+			teamMapper.insertUser(result.get(0).getId(),teamId,3);
+		}
+		return BeanCopyUtils.populateTListbyDListBySpring(result, UserInfoDto.class);
+	}
+
+	/**
+	 * 注册
+	 */
+	@Override
+	public Integer registerUser(UserInfoDto dto, String teamId) {
+		dto.setUserCreate(dto.getUserName());
+		UserInfoPo po=BeanCopyUtils.populateTbyDBySpring(dto, UserInfoPo.class);	
+		if(teamId!=null && !"".equals(teamId)){
+			TeamInfoPo teamPo=teamMapper.selectByPrimaryKey(teamId);
+			dto.setUserCreate(teamPo.getTeamCreat());
+			userMapper.insert(po);
+			UserInfoPoCriteria example = new UserInfoPoCriteria();
+			UserInfoPoCriteria.Criteria userCrteria = example.createCriteria();
+			userCrteria.andUserMailEqualTo(dto.getUserMail());
+			List<UserInfoPo> userInfoPo = userMapper.selectByExample(example);
+			return teamMapper.insertUser(userInfoPo.get(0).getId(),teamId,3);	
+		}else{
+			return userMapper.insert(po);
+		}
+	}
+	
+	/**
+	 * 查询用户
+	 */
+	@Override
+	public List<UserInfoDto> findAllUser(UserInfoDto dto) {
+		UserInfoPoCriteria example = new UserInfoPoCriteria();
+		UserInfoPoCriteria.Criteria userCrteria = example.createCriteria();
+		if(null != dto.getUserMail() && !"".equals(dto.getUserMail())){
+			userCrteria.andUserMailEqualTo(dto.getUserMail());
+		}
+		List<UserInfoPo> result = userMapper.selectByExample(example);
+		return BeanCopyUtils.populateTListbyDListBySpring(result, UserInfoDto.class);
+	}
+
+	@Override
+	public List<UserInfoDto> findUserByProductId(String productId) {
+		ProductInfoPo po = productInfoPoMapper.selectByPrimaryKey(productId);
+		List<UserInfoPo> result = userMapper.findUserByProductId(productId,po.getProductCreater());
+		return BeanCopyUtils.populateTListbyDListBySpring(result, UserInfoDto.class);
+	}
+
+	@Override
+	public List<UserInfoDto> findUserByTeamId(String teamId) {
+		List<UserInfoPo> result = userMapper.findUserByTeamId(teamId);
+		List<UserInfoDto> dto=BeanCopyUtils.populateTListbyDListBySpring(result, UserInfoDto.class);
+		for(int i=0;i<dto.size();i++){
+			dto.get(i).setUserRole(userMapper.findRoleById(teamId,dto.get(i).getId()));
+		}
+		return dto;
+	}
+
+	@Override
+	public Integer delUserByTeamId(String teamId, Integer userId) {
+		return userMapper.delUserByTeamId(teamId,userId);
+	}
+
+	@Override
+	public Integer delUserByProductId(String productId, Integer userId) {
+		return userMapper.delUserByProductId(productId,userId);
+	}
+
+	@Override
+	public List<UserInfoDto> selectUserByTeamId(String teamId, String userIds) {
+		List<UserInfoPo> result = userMapper.selectUserByTeamId(teamId , userIds);
+		return BeanCopyUtils.populateTListbyDListBySpring(result, UserInfoDto.class);
+	}
+
+	@Override
+	public Integer editUserById(UserInfoDto user) {
+		UserInfoPo po=BeanCopyUtils.populateTbyDBySpring(user, UserInfoPo.class);	
+		return userMapper.updateByPrimaryKey(po);
+	}
+
+	@Override
+	public String findRoleById(String teamId, Integer id) {
+		// TODO Auto-generated method stub
+		return userMapper.findRoleById(teamId,id);
+	}
+
+	@Override
+	public Integer editUserRoleById(UserInfoDto user,String teamId) {
+		// TODO Auto-generated method stub
+		return userMapper.editUserRoleById(user.getId(),teamId,user.getUserRole());
+	}
+
+}

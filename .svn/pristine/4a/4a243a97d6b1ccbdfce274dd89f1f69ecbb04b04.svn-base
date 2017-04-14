@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>EDP</title>
+	<link rel="stylesheet" href="./src/common-module/css/bs3/dpl.css"/>
+    <link rel="stylesheet" href="./src/common-module/css/bs3/bui.css"/>
+    <link rel="stylesheet" href="./src/common-module/css/base.css"/>
+    <link rel="stylesheet" href="./src/common-module/css/logon.css"/>
+    <link rel="stylesheet" href="./src/common-module/css/common.css"/>
+    <link rel="stylesheet" href="./src/common-module/css/comm.css"/>
+</head>
+<body>
+	<div style="width:100%;height: 100%;">
+	         <div id="atree" style="float:left;width:100%;height: 233px;" >
+	          
+	        </div>
+	        <div id="t2" style="float:left;width:100%;height: 157px;background-color: #ffffff;border-top: 1px solid gray;" >
+	          	<form id="addFrom" class="form-horizontal">
+			        <input type="text" name="parentId" id="parentId" style="display:none">
+			        <div class="row" style="margin-top: 5px;margin-left: 5px;">
+			             <span id="parentName" style="color: red;">添加功能</span>
+			        </div>
+			        <div class="row" style="min-height: 50px;margin-top: 15px;" id="moduleRow">
+			        	<div class="control-group span11" style="height: 45px;">
+			        		 <label class="control-label" id="nameType">功能名称：</label>
+			        		 <div class="controls">
+			        		 	<input type="text" name="name" id="name" class="input-large" style="width: 160px;" data-rules="{required : true,maxlength: 50,regexp:[/^[\d|A-z|\u4E00-\u9FFF]+$/,'只能输入汉字、数字或英文']}">
+				             </div>
+			        	</div>
+			        	<div class="control-group span11" style="height: 45px;">
+			        		 <label class="control-label" id="nameType">功能名称：</label>
+			        		 <div class="controls">
+			        		 	<textarea name="desc" id="desc" class="input-large" style="width: 183px;" data-rules="{maxlength: 200,'长度最大为200'}"></textarea>
+				             </div>
+			        		 <button  id="Save_Module" type="button" class="button button-primary" style="margin-top: 26px;margin-left: 26px;">添加</button>
+			        	</div>
+			        </div>
+			    </form>
+	        </div>
+		</div>
+	</div>
+	
+	<script src="./src/kissy/jquery-1.8.2.min.js"></script>
+	<script src="./src/kissy/jquery.form.js"></script>
+	<script src="./src/kissy/seed-min.js"></script>
+	<script src="./src/kissy/import-style-min.js"></script>
+	<script src="./src/kissy/kissy/bui/adapter-min.js"></script>
+	<script src="./src/common-module/src/common-utils.js"></script>
+	<script src="./src/activititree-module/tree-config.js"></script>
+	<script src="./src/activititree-module/tree-index.js"></script>
+	<script src="./src/i18n/LoadInternal.js"></script>
+</body>
+</html>

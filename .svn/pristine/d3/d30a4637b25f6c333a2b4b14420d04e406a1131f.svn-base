@@ -1,0 +1,3 @@
+KISSY.use(['teamcreat-module/src/myproject'],function(S,MyProject){
+	MyProject();//run MyProject
+});

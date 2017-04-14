@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.TableInfoPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.TableInfoPo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="table_name" property="tableName" jdbcType="VARCHAR" />
+    <result column="data_id" property="dataId" jdbcType="VARCHAR" />
+    <result column="table_creat" property="tableCreat" jdbcType="VARCHAR" />
+    <result column="table_creattime" property="tableCreattime" jdbcType="VARCHAR" />
+    <result column="table_desc" property="tableDesc" jdbcType="VARCHAR" />
+    <result column="modify_creat" property="modifyCreat" jdbcType="VARCHAR" />
+    <result column="modify_creattime" property="modifyCreattime" jdbcType="VARCHAR" />
+    <result column="table_state" property="tableState" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, table_name, data_id, table_creat, table_creattime, table_desc, modify_creat, 
+    modify_creattime, table_state
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.TableInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from table_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from table_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from table_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.TableInfoPoCriteria" >
+    delete from table_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.TableInfoPo" >
+    insert into table_info (id, table_name, data_id, 
+      table_creat, table_creattime, table_desc, 
+      modify_creat, modify_creattime, table_state
+      )
+    values (#{id,jdbcType=VARCHAR}, #{tableName,jdbcType=VARCHAR}, #{dataId,jdbcType=VARCHAR}, 
+      #{tableCreat,jdbcType=VARCHAR}, #{tableCreattime,jdbcType=VARCHAR}, #{tableDesc,jdbcType=VARCHAR}, 
+      #{modifyCreat,jdbcType=VARCHAR}, #{modifyCreattime,jdbcType=VARCHAR}, #{tableState,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.TableInfoPo" >
+    insert into table_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="tableName != null" >
+        table_name,
+      </if>
+      <if test="dataId != null" >
+        data_id,
+      </if>
+      <if test="tableCreat != null" >
+        table_creat,
+      </if>
+      <if test="tableCreattime != null" >
+        table_creattime,
+      </if>
+      <if test="tableDesc != null" >
+        table_desc,
+      </if>
+      <if test="modifyCreat != null" >
+        modify_creat,
+      </if>
+      <if test="modifyCreattime != null" >
+        modify_creattime,
+      </if>
+      <if test="tableState != null" >
+        table_state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="tableName != null" >
+        #{tableName,jdbcType=VARCHAR},
+      </if>
+      <if test="dataId != null" >
+        #{dataId,jdbcType=VARCHAR},
+      </if>
+      <if test="tableCreat != null" >
+        #{tableCreat,jdbcType=VARCHAR},
+      </if>
+      <if test="tableCreattime != null" >
+        #{tableCreattime,jdbcType=VARCHAR},
+      </if>
+      <if test="tableDesc != null" >
+        #{tableDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyCreat != null" >
+        #{modifyCreat,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyCreattime != null" >
+        #{modifyCreattime,jdbcType=VARCHAR},
+      </if>
+      <if test="tableState != null" >
+        #{tableState,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.TableInfoPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from table_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update table_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tableName != null" >
+        table_name = #{record.tableName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dataId != null" >
+        data_id = #{record.dataId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tableCreat != null" >
+        table_creat = #{record.tableCreat,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tableCreattime != null" >
+        table_creattime = #{record.tableCreattime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tableDesc != null" >
+        table_desc = #{record.tableDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.modifyCreat != null" >
+        modify_creat = #{record.modifyCreat,jdbcType=VARCHAR},
+      </if>
+      <if test="record.modifyCreattime != null" >
+        modify_creattime = #{record.modifyCreattime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tableState != null" >
+        table_state = #{record.tableState,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update table_info
+    set id = #{record.id,jdbcType=VARCHAR},
+      table_name = #{record.tableName,jdbcType=VARCHAR},
+      data_id = #{record.dataId,jdbcType=VARCHAR},
+      table_creat = #{record.tableCreat,jdbcType=VARCHAR},
+      table_creattime = #{record.tableCreattime,jdbcType=VARCHAR},
+      table_desc = #{record.tableDesc,jdbcType=VARCHAR},
+      modify_creat = #{record.modifyCreat,jdbcType=VARCHAR},
+      modify_creattime = #{record.modifyCreattime,jdbcType=VARCHAR},
+      table_state = #{record.tableState,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.TableInfoPo" >
+    update table_info
+    <set >
+      <if test="tableName != null" >
+        table_name = #{tableName,jdbcType=VARCHAR},
+      </if>
+      <if test="dataId != null" >
+        data_id = #{dataId,jdbcType=VARCHAR},
+      </if>
+      <if test="tableCreat != null" >
+        table_creat = #{tableCreat,jdbcType=VARCHAR},
+      </if>
+      <if test="tableCreattime != null" >
+        table_creattime = #{tableCreattime,jdbcType=VARCHAR},
+      </if>
+      <if test="tableDesc != null" >
+        table_desc = #{tableDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyCreat != null" >
+        modify_creat = #{modifyCreat,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyCreattime != null" >
+        modify_creattime = #{modifyCreattime,jdbcType=VARCHAR},
+      </if>
+      <if test="tableState != null" >
+        table_state = #{tableState,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.TableInfoPo" >
+    update table_info
+    set table_name = #{tableName,jdbcType=VARCHAR},
+      data_id = #{dataId,jdbcType=VARCHAR},
+      table_creat = #{tableCreat,jdbcType=VARCHAR},
+      table_creattime = #{tableCreattime,jdbcType=VARCHAR},
+      table_desc = #{tableDesc,jdbcType=VARCHAR},
+      modify_creat = #{modifyCreat,jdbcType=VARCHAR},
+      modify_creattime = #{modifyCreattime,jdbcType=VARCHAR},
+      table_state = #{tableState,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

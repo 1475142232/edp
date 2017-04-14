@@ -1,0 +1,15 @@
+package com.edp.serviceI.functionInfo;
+
+import java.util.List;
+
+import com.edp.serviceI.dto.ColumnPicDto;
+import com.edp.serviceI.dto.ControlDto;
+import com.edp.serviceI.dto.CtableDto;
+import com.edp.serviceI.dto.FunColumnDto;
+import com.edp.serviceI.dto.FunctionInfoDto;
+import com.edp.serviceI.dto.RequestmentDto;
+
+public interface FunctionInfoServiceI {
+
+	
+}

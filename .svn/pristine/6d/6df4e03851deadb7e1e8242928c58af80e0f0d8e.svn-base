@@ -1,0 +1,21 @@
+package com.edp.serviceI.columnInfo;
+
+import java.util.List;
+
+import com.edp.serviceI.dto.ColumnInfoDto;
+
+public interface ColumnInfoServiceI {
+	
+	public ColumnInfoDto getAllColumnInfo(ColumnInfoDto dto);
+
+	public ColumnInfoDto getColumnInfoDtoById(String id);
+
+	public void updateColumnInfo(ColumnInfoDto dto);
+
+	public void addColumnInfo(ColumnInfoDto dto);
+
+	public void delColumnInfo(String id);
+
+	public List<ColumnInfoDto> findColumnByFunId(String funcId);
+
+}

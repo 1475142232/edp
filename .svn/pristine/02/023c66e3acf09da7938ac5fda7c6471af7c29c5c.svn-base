@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>项目列表2</title>
+	<link rel="stylesheet" href="./src/teamcreat-module/css/index.css" />
+	<link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+</head>
+<body>
+	<!-- 导航 -->
+	<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-top:50px;">
+		<div class="container-fluid" style="width:1000px;"> 
+		    <div>
+		        <ul class="nav navbar-nav">
+		        	<li class="dropdown">
+		                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Edp 2.0 <b class="caret"></b></a>
+		                <ul class="dropdown-menu">
+		                    <li><a href="#" class="nav-color-zhu">edp1.0</a></li>
+		                    <li><a href="#" class="nav-color-zhu">Edp2.0</a></li>
+		                </ul>
+		            </li>
+		            <li><a href="团队选择团队创建1.html" class="nav-color-zhu">团队</a></li>
+		            <li class="active"><a href="项目列表2.html" class="nav-color-zhu">项目</a></li>
+		            <li><a href="#" class="nav-color-zhu">我自己</a></li>
+		            <li><a href="#" class="nav-color-zhu">结构树</a></li>
+		            <li><a href="#" class="nav-color-zhu">问题</a></li>
+		            <li><a href="#" class="nav-color-zhu">数据库</a></li>
+		        </ul>
+		    </div>
+		</div>
+	</nav>
+	<!-- 项目列表内容部分 -->
+	<div class="container">
+	   <div class="row content-box-zhu">
+	   		<!-- 我的项目 -->
+	   		<!-- <div id="myProject">
+	   			<a href="javascript:;" class="books"></a>
+	   			<a href="javascript:;" class="wode">我的项目</a>
+	   			<dl class="list">
+	   				<dd><a href="javascript:;">编辑</a></dd>
+	   				<dd><a href="javascript:;">删除</a></dd>
+	   			</dl>
+	   		</div> -->
+	        <!-- 增加项目 -->
+	        <a id="addProject" href="javascript;:">+</a>
+	   </div>
+	</div>
+	<script src="./src/jquery/jquery.min.js"></script>
+	<script src="./src/kissy/jquery.form.js"></script>
+	<script src="./src/kissy/seed-min.js"></script>
+	<script src="./src/kissy/import-style-min.js"></script>
+	<script src="./src/kissy/kissy/bui/adapter-min.js"></script>
+	<script src="./src/module-config.js"></script>
+	<script src="./src/teamcreat-module/projectlist-entry.js"></script>
+</body>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>用户管理</title>
+	<style>
+		.bui-select-list{
+			overflow: auto;
+			overflow-x: auto;
+			max-height: 150px;
+			_height : 150px;
+		}
+	</style>
+</head>
+<body>
+
+<div class="row rowsearch">
+	<div class="control-group span8 " >
+		<label class="control-label" >用户名：</label>
+		<div class="controls" ><input type="text" class="input-normal control-text"  id="userName_q"></div>
+	</div>
+	<div class="control-group span8">
+		<label class="control-label" >用户角色：</label>
+		<div class="controls" >
+		<select name="role" id="role_q">
+			<option value="0" selected="selected">全部</option>
+			<option value="1">超级管理员</option>
+			<option value="2">普通管理员</option>
+			<option value="3">普通操作员</option>
+		</select>
+		</div>
+	</div>
+	<div class="control-group span8">
+		<label class="control-label" >所属部门：</label>
+		<div class="controls" ><input type="text" class="input-normal control-text" id="department_q"></div>
+	</div>
+	<div class="control-group  searchmove"><button class="button button-danger " id="userSearch">查询</button></div>
+</div>
+
+<div id="userGrid"></div>
+<div id="pagingBar"></div>
+<div id="content" class ="hide">
+	<form class="form-horizontal" id="userForm">
+		<div class="row">
+			<div class="control-group">
+				<label class="control-label"><s>*</s>用户名：</label>
+				<div class="controls">
+					<input id="userName" name="userName" type="text" data-rules="{required:true}" class="input-normal control-text" disabled>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="control-group">
+				<label class="control-label">姓名：</label>
+				<div class="controls">
+					<input id="realName" name="realName" type="text" class="input-normal control-text">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="control-group">
+				<label class="control-label">所属机构：</label>
+				<div class="controls" id="orgDiv">
+					<input name="orgCode" id="orgCode" type="hidden" class="input-normal control-text">
+					<input name="orgName" id="orgName" type="hidden" class="input-normal control-text">
+				</div>
+				<!-- <label style="color:red;"><s>*</s></label>  -->
+			</div>
+		</div>
+		<div class="row">
+			<div class="control-group">
+				<label class="control-label">手机号：</label>
+				<div class="controls">
+					<input name="phoneNum" id="phoneNum" type="text" class="input-normal control-text">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="control-group">
+				<label class="control-label">身份证号：</label>
+				<div class="controls">
+					<input name="centNo" id="centNo" type="text" class="input-normal control-text">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="control-group">
+				<label class="control-label">角色：</label>
+				<div class="controls">
+					<select name="roleId" id="roleId" class="input-normal">
+						<option value="1">超级管理员</option>
+						<option value="2">普通管理员</option>
+						<option value="3">普通操作员</option>
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="row hide" >
+			<div class="control-group">
+				<label class="control-label">角色名：</label>
+				<div class="controls">
+					<input name="roleName" id="roleName" type="text" data-rules="{required:true}" class="input-normal control-text">
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+</body>
+</html>

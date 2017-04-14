@@ -1,0 +1,115 @@
+KISSY.add("email-module/src/email",function(S,IO){
+    function EmailList(){
+        var _this = this;
+        var checkDate = '';
+    	var pageNumber = 10;//每页显示条数
+        $("#navUl li").removeClass("active");
+        this.getEmail = function(){
+            $.ajax({
+                type: "post",
+                url:"MailController/getMailByUserId.action?=state"+""+"&pageNow"+1+"&pageSize"+pageNumber,
+                dataType:"json",
+                success:function(msg){
+                	$(".ul1").html("");
+                	$(".ul2").html("");
+                	$(".ul3").html("");
+                	$(".ul4").html("");
+                	for (i = 0;i < msg.length; i++) {
+                		var state = "<li "+msg[i].mail+">"+msg[i].mailState+"</li>";
+                		$(".ul1").append(state);
+                		var creatuser = "<li>"+msg[i].mailCreatuser+"</li>";
+                		$(".ul2").append(Creatuser);
+                		var desc = "<li>"+msg[i].mailDesc+"</li>";
+                		$(".ul3").append(desc);
+                		var creattiame = "<li>"+msg[i].mailCreattiame+"</li>";
+                		$(".ul4").append(creattiame);
+                	}
+                	_this.getPage();
+                }
+             });
+               
+            //日期筛选
+            $("#check-date").on('click',function(){
+                $("input[name='date']").blur(function(){
+                    checkDate = $("input[name='date']").val();
+                });
+                $.ajax({
+                    url: '',
+                    type: 'post',
+                    cache: false,
+                    async: false,
+                    dataType: 'json',
+                    data: {  : checkDate},
+                    success:function(){
+                        _this.getEmail();
+                        _this.getPage();
+                    }
+                });
+            });
+        }
+        this.getPage = function(){
+        	var element = $('#bp-3-element-test');//获得数据装配的位置
+        	//初始化所需数据
+            var options = {
+                bootstrapMajorVersion:3,//版本号。3代表的是第三版本
+                currentPage: 1, //当前页数
+                numberOfPages: 5, //显示页码数标个数
+                totalPages:21, //总共的数据所需要的总页数
+                itemTexts: function (type, page, current) {
+                		//图标的更改显示可以在这里修改。
+                switch (type) {
+                        case "first":
+                            return "<<";
+                        case "prev":
+                            return "<";
+                        case "next":
+                            return ">";
+                        case "last":
+                            return ">>";
+                        case "page":
+                            return  page;
+                    }
+                },
+                tooltipTitles: function (type, page, current) {
+    				//如果想要去掉页码数字上面的预览功能，则在此操作。例如：可以直接return。
+                    switch (type) {
+    		            case "first":
+    		                return "Go to first page";
+    		            case "prev":
+    		                return "Go to previous page";
+    		            case "next":
+    		                return "Go to next page";
+    		            case "last":
+    		                return "Go to last page";
+    		            case "page":
+    		                return (page === current) ? "Current page is " + page : "Go to page " + page;
+    		        }
+                },
+                onPageClicked: function (e, originalEvent, type, page) {
+                    //单击当前页码触发的事件。若需要与后台发生交互事件可在此通过ajax操作。page为目标页数。
+                    //console.log(e);
+                    //console.log(originalEvent);
+                    //console.log(type);
+                    //console.log(page);
+                	 $.ajax({
+                         url: '',
+                         type: 'post',
+                         cache: false,
+                         async: false,
+                         dataType: 'json',
+         //              data: {  : page, : pageNumber},
+                         success:function(){
+                             _this.getEmail();
+                             _this.getPage();
+                         }
+                     });
+                }
+            };
+            element.bootstrapPaginator(options);	//进行初始化   
+        }
+    }
+	return EmailList;
+},{
+	requires : ['io'
+	            ]
+});

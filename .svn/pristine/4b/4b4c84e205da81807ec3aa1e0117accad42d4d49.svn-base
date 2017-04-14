@@ -1,0 +1,30 @@
+package com.edp.dao.mapper;
+
+import com.edp.dao.domain.TreeTaskPo;
+import com.edp.dao.domain.TreeTaskPoCriteria;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+public interface TreeTaskPoMapper {
+    int countByExample(TreeTaskPoCriteria example);
+
+    int deleteByExample(TreeTaskPoCriteria example);
+
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(TreeTaskPo record);
+
+    int insertSelective(TreeTaskPo record);
+
+    List<TreeTaskPo> selectByExample(TreeTaskPoCriteria example);
+
+    TreeTaskPo selectByPrimaryKey(Integer id);
+
+    int updateByExampleSelective(@Param("record") TreeTaskPo record, @Param("example") TreeTaskPoCriteria example);
+
+    int updateByExample(@Param("record") TreeTaskPo record, @Param("example") TreeTaskPoCriteria example);
+
+    int updateByPrimaryKeySelective(TreeTaskPo record);
+
+    int updateByPrimaryKey(TreeTaskPo record);
+}

@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.ProblemInfoPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.ProblemInfoPo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="problem_name" property="problemName" jdbcType="VARCHAR" />
+    <result column="problem_type" property="problemType" jdbcType="VARCHAR" />
+    <result column="problem_lv" property="problemLv" jdbcType="VARCHAR" />
+    <result column="problem_starte_user" property="problemStarteUser" jdbcType="INTEGER" />
+    <result column="problem_starte_time" property="problemStarteTime" jdbcType="VARCHAR" />
+    <result column="problem_starte_name" property="problemStarteName" jdbcType="VARCHAR" />
+    <result column="problem_end_user" property="problemEndUser" jdbcType="INTEGER" />
+    <result column="problem_end_time" property="problemEndTime" jdbcType="VARCHAR" />
+    <result column="problem_end_name" property="problemEndName" jdbcType="VARCHAR" />
+    <result column="problem_state" property="problemState" jdbcType="VARCHAR" />
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.edp.dao.domain.ProblemInfoPo" extends="BaseResultMap" >
+    <result column="problem_desc" property="problemDesc" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, problem_name, problem_type, problem_lv, problem_starte_user, problem_starte_time, 
+    problem_starte_name, problem_end_user, problem_end_time, problem_end_name, problem_state, 
+    product_id
+  </sql>
+  <sql id="Blob_Column_List" >
+    problem_desc
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.edp.dao.domain.ProblemInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from problem_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.ProblemInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from problem_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from problem_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from problem_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.ProblemInfoPoCriteria" >
+    delete from problem_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.ProblemInfoPo" >
+    insert into problem_info (id, problem_name, problem_type, 
+      problem_lv, problem_starte_user, problem_starte_time, 
+      problem_starte_name, problem_end_user, problem_end_time, 
+      problem_end_name, problem_state, product_id, 
+      problem_desc)
+    values (#{id,jdbcType=INTEGER}, #{problemName,jdbcType=VARCHAR}, #{problemType,jdbcType=VARCHAR}, 
+      #{problemLv,jdbcType=VARCHAR}, #{problemStarteUser,jdbcType=INTEGER}, #{problemStarteTime,jdbcType=VARCHAR}, 
+      #{problemStarteName,jdbcType=VARCHAR}, #{problemEndUser,jdbcType=INTEGER}, #{problemEndTime,jdbcType=VARCHAR}, 
+      #{problemEndName,jdbcType=VARCHAR}, #{problemState,jdbcType=VARCHAR}, #{productId,jdbcType=VARCHAR}, 
+      #{problemDesc,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.ProblemInfoPo" >
+    insert into problem_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="problemName != null" >
+        problem_name,
+      </if>
+      <if test="problemType != null" >
+        problem_type,
+      </if>
+      <if test="problemLv != null" >
+        problem_lv,
+      </if>
+      <if test="problemStarteUser != null" >
+        problem_starte_user,
+      </if>
+      <if test="problemStarteTime != null" >
+        problem_starte_time,
+      </if>
+      <if test="problemStarteName != null" >
+        problem_starte_name,
+      </if>
+      <if test="problemEndUser != null" >
+        problem_end_user,
+      </if>
+      <if test="problemEndTime != null" >
+        problem_end_time,
+      </if>
+      <if test="problemEndName != null" >
+        problem_end_name,
+      </if>
+      <if test="problemState != null" >
+        problem_state,
+      </if>
+      <if test="productId != null" >
+        product_id,
+      </if>
+      <if test="problemDesc != null" >
+        problem_desc,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="problemName != null" >
+        #{problemName,jdbcType=VARCHAR},
+      </if>
+      <if test="problemType != null" >
+        #{problemType,jdbcType=VARCHAR},
+      </if>
+      <if test="problemLv != null" >
+        #{problemLv,jdbcType=VARCHAR},
+      </if>
+      <if test="problemStarteUser != null" >
+        #{problemStarteUser,jdbcType=INTEGER},
+      </if>
+      <if test="problemStarteTime != null" >
+        #{problemStarteTime,jdbcType=VARCHAR},
+      </if>
+      <if test="problemStarteName != null" >
+        #{problemStarteName,jdbcType=VARCHAR},
+      </if>
+      <if test="problemEndUser != null" >
+        #{problemEndUser,jdbcType=INTEGER},
+      </if>
+      <if test="problemEndTime != null" >
+        #{problemEndTime,jdbcType=VARCHAR},
+      </if>
+      <if test="problemEndName != null" >
+        #{problemEndName,jdbcType=VARCHAR},
+      </if>
+      <if test="problemState != null" >
+        #{problemState,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null" >
+        #{productId,jdbcType=VARCHAR},
+      </if>
+      <if test="problemDesc != null" >
+        #{problemDesc,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.ProblemInfoPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from problem_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update problem_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.problemName != null" >
+        problem_name = #{record.problemName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.problemType != null" >
+        problem_type = #{record.problemType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.problemLv != null" >
+        problem_lv = #{record.problemLv,jdbcType=VARCHAR},
+      </if>
+      <if test="record.problemStarteUser != null" >
+        problem_starte_user = #{record.problemStarteUser,jdbcType=INTEGER},
+      </if>
+      <if test="record.problemStarteTime != null" >
+        problem_starte_time = #{record.problemStarteTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.problemStarteName != null" >
+        problem_starte_name = #{record.problemStarteName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.problemEndUser != null" >
+        problem_end_user = #{record.problemEndUser,jdbcType=INTEGER},
+      </if>
+      <if test="record.problemEndTime != null" >
+        problem_end_time = #{record.problemEndTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.problemEndName != null" >
+        problem_end_name = #{record.problemEndName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.problemState != null" >
+        problem_state = #{record.problemState,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productId != null" >
+        product_id = #{record.productId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.problemDesc != null" >
+        problem_desc = #{record.problemDesc,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update problem_info
+    set id = #{record.id,jdbcType=INTEGER},
+      problem_name = #{record.problemName,jdbcType=VARCHAR},
+      problem_type = #{record.problemType,jdbcType=VARCHAR},
+      problem_lv = #{record.problemLv,jdbcType=VARCHAR},
+      problem_starte_user = #{record.problemStarteUser,jdbcType=INTEGER},
+      problem_starte_time = #{record.problemStarteTime,jdbcType=VARCHAR},
+      problem_starte_name = #{record.problemStarteName,jdbcType=VARCHAR},
+      problem_end_user = #{record.problemEndUser,jdbcType=INTEGER},
+      problem_end_time = #{record.problemEndTime,jdbcType=VARCHAR},
+      problem_end_name = #{record.problemEndName,jdbcType=VARCHAR},
+      problem_state = #{record.problemState,jdbcType=VARCHAR},
+      product_id = #{record.productId,jdbcType=VARCHAR},
+      problem_desc = #{record.problemDesc,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update problem_info
+    set id = #{record.id,jdbcType=INTEGER},
+      problem_name = #{record.problemName,jdbcType=VARCHAR},
+      problem_type = #{record.problemType,jdbcType=VARCHAR},
+      problem_lv = #{record.problemLv,jdbcType=VARCHAR},
+      problem_starte_user = #{record.problemStarteUser,jdbcType=INTEGER},
+      problem_starte_time = #{record.problemStarteTime,jdbcType=VARCHAR},
+      problem_starte_name = #{record.problemStarteName,jdbcType=VARCHAR},
+      problem_end_user = #{record.problemEndUser,jdbcType=INTEGER},
+      problem_end_time = #{record.problemEndTime,jdbcType=VARCHAR},
+      problem_end_name = #{record.problemEndName,jdbcType=VARCHAR},
+      problem_state = #{record.problemState,jdbcType=VARCHAR},
+      product_id = #{record.productId,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.ProblemInfoPo" >
+    update problem_info
+    <set >
+      <if test="problemName != null" >
+        problem_name = #{problemName,jdbcType=VARCHAR},
+      </if>
+      <if test="problemType != null" >
+        problem_type = #{problemType,jdbcType=VARCHAR},
+      </if>
+      <if test="problemLv != null" >
+        problem_lv = #{problemLv,jdbcType=VARCHAR},
+      </if>
+      <if test="problemStarteUser != null" >
+        problem_starte_user = #{problemStarteUser,jdbcType=INTEGER},
+      </if>
+      <if test="problemStarteTime != null" >
+        problem_starte_time = #{problemStarteTime,jdbcType=VARCHAR},
+      </if>
+      <if test="problemStarteName != null" >
+        problem_starte_name = #{problemStarteName,jdbcType=VARCHAR},
+      </if>
+      <if test="problemEndUser != null" >
+        problem_end_user = #{problemEndUser,jdbcType=INTEGER},
+      </if>
+      <if test="problemEndTime != null" >
+        problem_end_time = #{problemEndTime,jdbcType=VARCHAR},
+      </if>
+      <if test="problemEndName != null" >
+        problem_end_name = #{problemEndName,jdbcType=VARCHAR},
+      </if>
+      <if test="problemState != null" >
+        problem_state = #{problemState,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null" >
+        product_id = #{productId,jdbcType=VARCHAR},
+      </if>
+      <if test="problemDesc != null" >
+        problem_desc = #{problemDesc,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.edp.dao.domain.ProblemInfoPo" >
+    update problem_info
+    set problem_name = #{problemName,jdbcType=VARCHAR},
+      problem_type = #{problemType,jdbcType=VARCHAR},
+      problem_lv = #{problemLv,jdbcType=VARCHAR},
+      problem_starte_user = #{problemStarteUser,jdbcType=INTEGER},
+      problem_starte_time = #{problemStarteTime,jdbcType=VARCHAR},
+      problem_starte_name = #{problemStarteName,jdbcType=VARCHAR},
+      problem_end_user = #{problemEndUser,jdbcType=INTEGER},
+      problem_end_time = #{problemEndTime,jdbcType=VARCHAR},
+      problem_end_name = #{problemEndName,jdbcType=VARCHAR},
+      problem_state = #{problemState,jdbcType=VARCHAR},
+      product_id = #{productId,jdbcType=VARCHAR},
+      problem_desc = #{problemDesc,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.ProblemInfoPo" >
+    update problem_info
+    set problem_name = #{problemName,jdbcType=VARCHAR},
+      problem_type = #{problemType,jdbcType=VARCHAR},
+      problem_lv = #{problemLv,jdbcType=VARCHAR},
+      problem_starte_user = #{problemStarteUser,jdbcType=INTEGER},
+      problem_starte_time = #{problemStarteTime,jdbcType=VARCHAR},
+      problem_starte_name = #{problemStarteName,jdbcType=VARCHAR},
+      problem_end_user = #{problemEndUser,jdbcType=INTEGER},
+      problem_end_time = #{problemEndTime,jdbcType=VARCHAR},
+      problem_end_name = #{problemEndName,jdbcType=VARCHAR},
+      problem_state = #{problemState,jdbcType=VARCHAR},
+      product_id = #{productId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

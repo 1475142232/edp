@@ -1,0 +1,211 @@
+/*项目列表*/
+.dropdown-toggle{font-size:20px;color:#CC9966 !important;font-weight: bold;color:#996666 !important}
+.nav-color-zhu{font-size:16px;color:#CC9966 !important;font-weight: bold;}
+.content-box-zhu{width:100%;min-height:500px;padding:40px 40px;border-radius:8px;background:#fff;margin:0 auto;-webkit-box-shadow:3px 3px 3px #CCCCCC;  -moz-box-shadow:3px 3px 3px #CCCCCC;box-shadow:3px 3px 3px #CCCCCC; }
+.myDatabase{width:220px;height:150px;margin:20px;display:inline-block;background-color:rgba(249, 249, 249, 1);border:1px solid #eee;border-radius:4px;background-image: url(../img/database.png); background-repeat:no-repeat;background-position:80px 27px;position:relative;}
+#addDatabase{width:220px;height:150px;font-size:50px;font-weight:bolder;margin:20px;display:inline-block;background-color:rgba(249, 249, 249, 1);text-align:center;line-height:150px;vertical-align:top;}
+.myDatabase>dl{width:65px;height:100px;display:none;text-align: center;background-image: url(../img/list.png);background-repeat:no-repeat;position:absolute;right:0px;top:30px;}
+.myDatabase>dl>dd{width:60px;height:auto;display:block;padding-top:20px;}
+.books{z-index:2;width:20px;height:20px;display:block;background-image:url(../img/books.png); background-repeat:no-repeat;background-position:center;float:right;margin:10px 20px;}			
+.wode{width:auto;height:auto;margin-top:90px;text-align:center;display:block;font-size:20px;color:#333;}
+
+.product_name{
+	text-align:center;
+	display:block;
+	font-size: 14px;
+	color: #999999;
+}
+
+.data-index{
+	width: 60%;
+	display: -webkit-inline-box !important;
+}
+.form-label{
+	display: inline-block;
+	width: 110px;
+	text-align: right;
+	margin-right: 5px;
+}
+
+.abs{
+	height: 64px;
+    position: absolute;
+    top: 0;
+    left: 15px;
+}
+
+#save_Form small{
+    margin-left: 120px;
+}
+
+#save_Form i{
+    margin-left: 120px;
+    top: 0px;
+    right: 85px;
+}
+
+/* 表字段样式 */
+.table-parent-title{
+	width: auto;
+	height: 40px;
+	font-size: 18px;
+	margin-left: 20px;
+	margin-right: 20px;
+}
+
+.table-heng{
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-bottom: 10px;
+	height: 2px;
+	background-color: #9BCE37;
+}
+
+.table-operation{
+	margin-left: 20px;
+	margin-right: 20px;
+}
+
+.table-add-del{
+	margin-bottom: 20px;
+}
+
+.list {
+	width: 100%;
+	border-radius: 5px;
+}
+.list_table{
+	width: 100%;
+	min-height: 300px;
+	padding: 0px !important;
+	border:solid #CCCCCC; 
+	border-width:1px 0px 0px 1px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+
+.list-title {
+	font-size: 16px;
+	height: 40px;
+	line-height: 40px;
+}
+
+.list-left{
+	width:20%; 
+	border:solid #CCCCCC; 
+	border-width:0px 1px 1px 0px; 
+	text-align: center;
+}
+
+.list-right{
+	width: 80%;
+	border:solid #CCCCCC; 
+	border-width:0px 1px 1px 0px; 
+	text-align: center;
+}
+
+.table-list{
+	padding-top: 10px;
+	padding-bottom: 10px;
+	min-height: 260px;
+	border-bottom-left-radius: 4px;
+	vertical-align: top;
+}
+
+.table-list a{
+	display: block;
+	height: 30px;
+	line-height: 30px;
+	font-size: 15px;
+}
+
+.table-list a:HOVER{
+	background-color: #E7E7E7;
+}
+
+.table-list a:ACTIVE{
+	background-color: #E7E7E7;
+}
+
+.table-list .active{
+	background-color: #E7E7E7;
+}
+
+.field-list{
+	padding-top: 10px;
+	padding-left: 20px;
+    padding-right: 20px;
+	padding-bottom: 10px;
+	min-height: 260px;
+	border-bottom-right-radius: 4px;
+	vertical-align: top;
+}
+
+.add_table{
+	background: url(../img/add-table.png) no-repeat;
+	font-size: 15px;
+	height: 40px;
+	line-height: 44px;
+    display: block;
+    width: 100px;
+    float: left;
+    padding-left: 39px;
+}
+
+.edit_table{
+	background: url(../img/edit.png) no-repeat;
+	font-size: 15px;
+	height: 40px;
+	line-height: 44px;
+    display: block;
+    width: 100px;
+    float: left;
+    padding-left: 39px;
+}
+
+.del_table{
+	background: url(../img/del-table.png) no-repeat;
+	font-size: 15px;
+	height: 40px;
+	line-height: 44px;
+    display: block;
+    width: 100px;
+    float: left;
+    padding-left: 39px;
+}
+
+.add_field{
+	float: left;
+	margin-left: 10px;
+	margin-bottom: 10px;
+}
+
+.del_field{
+	float: left;
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+
+
+
+#tableSave_Form small{
+    margin-left: 120px;
+    margin-bottom: 0px !important;
+}
+
+#tableSave_Form i{
+    top: 0px;
+    right: 88px;
+}
+
+#fieldSave_Form small{
+    margin-left: 120px;
+    margin-bottom: 0px !important;
+}
+
+#fieldSave_Form i{
+    top: 0px;
+    right: 88px;
+}

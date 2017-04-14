@@ -1,0 +1,154 @@
+KISSY.add("homepage-module/src/homepage",function(S,IO, Cookie,ProjectList, TaskList ,Email,ResourceList,ShowTree){
+	function HomePage(){
+		var _this = this;
+		var cookie = new Cookie();
+		
+		this.init = function(){
+			IO.get("views/team/teamcreat.html",null,function(){
+  				$("#mainpage").html(arguments[0], true);
+  				$("#navTop").hide();
+  	     	});
+			//设置头部导航点击事件
+			_this.renderNavTop();
+			//获取团队列表
+			_this.getTeamListbyId();
+		}
+		
+		/**
+		 * 导航点击事件
+		 */
+		this.renderNavTop = function(){
+      		$("#teamlink").on("click",function(){
+    			_this.navQie(this.id);
+    			//“团队”跳转 -- 9.9增
+     			IO.get("views/resource/resource.html",null,function(){
+         			$("#mainpage").html(arguments[0], true);
+         			var teamId = cookie.getCookie("teamId");
+         			var resourcelist = new ResourceList();
+         			resourcelist.getresourcelist(teamId);
+             	});
+    		});
+      		
+      		$("#projectlink").on("click",function(){
+    			_this.navQie(this.id);
+    			//“项目”跳转
+    			IO.get("views/team/projectlist.html",null,function(){
+         			$("#mainpage").html(arguments[0], true);
+         			var teamId = cookie.getCookie("teamId");
+         			var projectlist = new ProjectList();
+         			projectlist.getproductList(teamId);
+             	});
+    		});
+      		
+			$("#myself").on("click",function(){
+				_this.navQie(this.id);
+				//“我自己”跳转
+	 			IO.get("views/myself/myself.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	         	});
+			});
+			
+			$("#my_Database").on("click",function(){
+				_this.navQie(this.id);
+				//“数据库”跳转
+	 			IO.get("views/database/database_list.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	         	});
+			});
+			
+			$("#my_message").on("click",function(){
+				//“站内信”跳转
+	 			IO.get("views/email/email.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	     			var email = new Email();
+	     			email.getEmail();
+	         	});
+			});
+			
+			$("#problem").on("click",function(){
+				_this.navQie(this.id);
+				//“问题”跳转
+	 			IO.get("views/problem/problem_list.html",null,function(){
+	     			$("#mainpage").html(arguments[0], true);
+	         	});
+			});
+			
+			$("#showTree").on("click",function(){
+				_this.navQie(this.id);
+				IO.get("views/tree/showTree.html",null,function(){
+					$("#mainpage").html(arguments[0], true);
+		 			var showTree = new ShowTree();
+		 			showTree.init();
+				});
+			});
+		
+		};
+		
+		/**
+		 * 团队列表
+		 */
+		this.getTeamListbyId = function(){
+			$("#teamSelect").html("");
+			//团队列表获取-----
+			$.ajax({
+	             type: "GET",
+	             url: "TeamController/getAllTream.action",
+	             async: true,
+	             dataType: "json",
+	             success: function(data){
+	            	 if(data !== null && data.length > 0){
+	            		 var teamId = cookie.getCookie("teamId");
+	            		 var teamList = "";
+	            		 for(var i=0; i<data.length; i++) {
+	            			 teamList += '<li id="team_'+ data[i].id +'"><a href="javascript:void(0);" class="nav-color-zhu">'+ data[i].teamName +'</a></li>';
+	            			 if(data[i].id == teamId){
+	            				 $("#team_Name").text(data[i].teamName);
+	            			 }
+	            		 }
+	            		 teamList += '<li class="add-team"><a href="javascript:void(0);">新建团队</a></li>';
+	            		 $("#teamSelect").html(teamList);
+	            		 $('.dropdown-toggle').dropdown();
+	            		 
+	            		 //团队获取Id
+	            		 $("#teamSelect li").on("click", function(){
+	            			 _this.navQie("projectlink");
+	            			 var teamIds = (this.id).split("_");
+	            			 if(teamIds.length > 1){
+	            				 //团队跳转
+	            				 IO.get("views/team/projectlist.html",null,function(){
+	            					 $("#mainpage").html(arguments[0], true);
+	            					 var projectlist = new ProjectList();
+	            	         		 projectlist.getproductList(teamIds[1]);
+	            				 });
+	            			 }
+	            		 });
+	            		 
+	            		 $(".add-team").on("click", function(){
+	            			 IO.get("views/team/teamcreat.html",null,function(){
+            	  				$("#mainpage").html(arguments[0], true);
+            	  				$("#navTop").hide();
+            	  	     	 });
+	            		 });
+	            	 }
+	              }
+	        });
+		};
+		
+		this.navQie = function(id){
+			var li = $("#navUl li.active");
+			if(li !== null && li !== undefined){
+				li.removeAttr("class");
+			}
+			$("#"+id).parent().attr("class","active");
+		}
+	};
+	
+	return HomePage;
+},{
+	requires : ['io','common-module/src/cookie',
+	            'teamcreat-module/src/projectlist',
+	            'tasklist-module/src/tasklist',
+	            'email-module/src/email',
+	            'resource-module/src/resource',
+	            "tree-module/src/showTree"]
+});

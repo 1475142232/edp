@@ -1,0 +1,279 @@
+package com.edp.admin.reqChangeInfo;
+
+import com.alibaba.dubbo.common.utils.StringUtils;
+import com.alibaba.fastjson.JSON;
+import com.edp.admin.common.BaseController;
+import com.edp.admin.login.UserInfoBean;
+import com.edp.common.constant.Constants;
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.DateUtil;
+import com.edp.serviceI.columnInfo.ColumnInfoServiceI;
+import com.edp.serviceI.dto.ColumnInfoDto;
+import com.edp.serviceI.dto.FunctionInfoDto;
+import com.edp.serviceI.dto.ReqChangeInfoDto;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import com.edp.serviceI.reqChangeInfo.ReqChangeInfoServiceI;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.util.Date;
+
+/**
+ * 需求变更信息表操作类
+ * Created by changer on 2016/5/25.
+ */
+
+@Controller
+@RequestMapping("reqChangeInfo")
+public class ReqChangeInfoController extends BaseController {
+
+    @Resource
+    private ReqChangeInfoServiceI reqChangeInfoServiceI;//需求变更信息服务
+
+    @Resource
+    private FunctionInfoServiceI functionInfoServiceI;//功能信息服务
+
+    @Resource
+    private ColumnInfoServiceI columnInfoServiceI;//数据字段操作服务
+
+    /**
+     * 列表查询 带分页
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "queryReqChangeInfoList.action", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public String queryReqChangeInfoList(ReqChangeInfoDto params) {
+
+        ReqChangeInfoDto rtn = this.reqChangeInfoServiceI.queryReqChangeInfoList(params);
+
+        return JSON.toJSONString(rtn);
+    }
+
+    /**
+     * 根据主键ID查询记录
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "findReqChangeInfoById.action", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public String findReqChangeInfoById(int id) {
+        ReqChangeInfoDto rtn = this.reqChangeInfoServiceI.findReqChangeInfoById(id);
+
+        return JSON.toJSONString(rtn);
+    }
+
+    /**
+     * 根据功能编号查询变更信息记录集合
+     *
+     * @param refId   关联编号
+     * @param refType 关联类型   2.功能   1. 数据字段
+     * @return
+     */
+    @RequestMapping(value = "findReqChangeInfoVoByRefId.action", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public String findReqChangeInfoVoByRefId(String refId, String refType,Integer version, HttpSession session) {
+
+        ReqChangeInfoVo rtnVo = new ReqChangeInfoVo();
+
+        if (StringUtils.isNotEmpty(refId) || StringUtils.isNotEmpty(refType)) {
+
+
+            FunctionInfoDto functionInfo = this.functionInfoServiceI.getFunctionInfo(refId,version);
+
+            if(functionInfo != null){
+
+
+                rtnVo  = BeanCopyUtils.populateTbyDBySpring(functionInfo,rtnVo);
+
+                int id = functionInfo.getId();
+
+                ReqChangeInfoDto reqChangeInfo = this.reqChangeInfoServiceI.findReqChangeInfoById(id);
+
+                if(reqChangeInfo!= null){
+                    rtnVo.setReason(reqChangeInfo.getReason());
+                    rtnVo.setContent(reqChangeInfo.getContent());
+                    rtnVo.setImpact(reqChangeInfo.getImpact());
+
+                }
+
+            }
+/*
+            if (StringUtils.isEquals(Constants.REFTYPE_COLLUMN, refType)) {//数据字段变更
+
+                //查询字段信息
+                ColumnInfoDto columnInfoDto = this.columnInfoServiceI.getColumnInfoDtoById(refId);
+
+                rtnVo.setColumnCnName(columnInfoDto.getColumnCnName());
+                rtnVo.setColumnEnName(columnInfoDto.getColumnEnName());
+                rtnVo.setColumnRequired(columnInfoDto.getColumnRequired());
+                rtnVo.setColumnType(columnInfoDto.getColumnType());
+
+            } else if (StringUtils.isEquals(Constants.REFTYPE_FUNCTION, refType)) {//功能变更
+                //查询功能信息
+                FunctionInfoDto functionInfoDto = this.functionInfoServiceI.getFunctionInfo(refId, null);
+                rtnVo.setFuncEnName(functionInfoDto.getFuncEnName());
+                rtnVo.setFuncName(functionInfoDto.getFuncName());
+                rtnVo.setFuncSpec(functionInfoDto.getFuncSpec());
+                rtnVo.setId(functionInfoDto.getId());
+                rtnVo.setFuncId(functionInfoDto.getFuncId());
+            }*/
+
+        }
+
+
+        return JSON.toJSONString("");
+    }
+
+
+    /**
+     * 保存变更信息记录
+     *
+     * @param vo
+     * @param refType 1.数据字段  2.功能
+     * @return
+     */
+    @RequestMapping(value = "saveReqChangeInfo.action", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public String saveReqChangeInfo(ReqChangeInfoVo vo, String refType, HttpSession session) {
+        //创建需求变更对象
+        ReqChangeInfoDto saveDto = new ReqChangeInfoDto();
+        //获得当前登录对象
+        UserInfoBean user = this.getUserInfoBean(session);
+        saveDto = BeanCopyUtils.populateTbyDBySpring(vo, saveDto);
+        saveDto.setFunctionId(vo.getFuncId());
+        saveDto.setFunctionEnName(vo.getFuncEnName());
+        saveDto.setFunctionName(vo.getFuncName());
+        saveDto.setFunctionSpec(vo.getFuncSpec());
+        saveDto.setApplyor(user.getUsername());
+        saveDto.setApplyTime(DateUtil.time2String(new Date()));
+        ReqChangeInfoDto rtn = this.reqChangeInfoServiceI.saveReqChangeInfo(saveDto);
+
+        if (StringUtils.isEquals(Constants.REFTYPE_COLLUMN, refType)) {//数据字段变更
+            //创建字段信息对象
+            ColumnInfoDto columnInfoDto = new ColumnInfoDto();
+            columnInfoDto = BeanCopyUtils.populateTbyDBySpring(vo, columnInfoDto);
+
+            columnInfoDto.setColumnModifiedPerson(user.getUsername());
+            columnInfoDto.setColumnModifiedTime(DateUtil.time2String(new Date()));
+            columnInfoServiceI.updateColumnInfo(columnInfoDto);
+
+        } else if (StringUtils.isEquals(Constants.REFTYPE_FUNCTION, refType)) {
+            //创建功能信息对象
+            FunctionInfoDto functionInfoDto = new FunctionInfoDto();
+            functionInfoDto = BeanCopyUtils.populateTbyDBySpring(vo, functionInfoDto);
+
+            functionInfoDto.setFuncModifiedPerson(user.getUsername());
+            functionInfoDto.setFuncModifiedTime(DateUtil.time2String(new Date()));
+
+            functionInfoServiceI.updateFunctionInfo(functionInfoDto);
+        }
+
+
+        return JSON.toJSONString(rtn);
+    }
+
+
+    /**
+     * 更新变更信息记录
+     *
+     * @param vo
+     * @param refType 1.数据字段  2.功能
+     * @return
+     */
+    @RequestMapping(value = "updateReqChangeInfo.action", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public String updateReqChangeInfo(ReqChangeInfoVo vo, String refType,Integer version, HttpSession session) {
+
+
+        //根据功能id查询最新的记录
+
+        FunctionInfoDto last = this.functionInfoServiceI.getFunctionInfo(vo.getFuncId(),version);
+
+        if(last != null && !StringUtils.isEquals(Constants.TreeStates.CHANGE_ADD,last.getFuncState())){//不存在预变更记录,新增一条
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+    	//查询变更信息记录
+    	 ReqChangeInfoDto updateDto = this.reqChangeInfoServiceI.findLastestReqChangeInfoByRefId(vo.getFuncId());
+ 
+        //获得当前登录对象
+        UserInfoBean user = this.getUserInfoBean(session);
+        updateDto.setContent(vo.getContent());
+        updateDto.setReason(vo.getReason());
+        updateDto.setImpact(vo.getImpact());
+        updateDto.setFunctionEnName(vo.getFuncEnName());
+        updateDto.setFunctionName(vo.getFuncName());
+        updateDto.setFunctionSpec(vo.getFuncSpec());
+        //更新需求变更信息
+        ReqChangeInfoDto rtn = this.reqChangeInfoServiceI.updateReqChangeInfo(updateDto);
+
+        if (StringUtils.isEquals(Constants.REFTYPE_COLLUMN, refType)) {//数据字段变更
+            //创建字段信息对象
+            ColumnInfoDto columnInfoDto = new ColumnInfoDto();
+            columnInfoDto = BeanCopyUtils.populateTbyDBySpring(vo, columnInfoDto);
+
+            columnInfoDto.setColumnModifiedPerson(user.getUsername());
+            columnInfoDto.setColumnModifiedTime(DateUtil.time2String(new Date()));
+            columnInfoServiceI.updateColumnInfo(columnInfoDto);
+
+        } else if (StringUtils.isEquals(Constants.REFTYPE_FUNCTION, refType)) {
+            //创建功能信息对象
+            FunctionInfoDto functionInfoDto = new FunctionInfoDto();
+            functionInfoDto = BeanCopyUtils.populateTbyDBySpring(vo, functionInfoDto);
+
+            functionInfoDto.setFuncModifiedPerson(user.getUsername());
+            functionInfoDto.setFuncModifiedTime(DateUtil.time2String(new Date()));
+
+            functionInfoServiceI.updateFunctionInfo(functionInfoDto);
+        }
+
+        return JSON.toJSONString(rtn);
+    }
+
+
+    /**
+     * 根据主键编号删除变更记录
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "deleteReqChangeInfoById.action", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public String deleteReqChangeInfoById(int id) {
+        ReqChangeInfoDto rtn = this.reqChangeInfoServiceI.deleteReqChangeInfoById(id);
+
+        return JSON.toJSONString(rtn);
+    }
+
+
+    /**
+     * 根据功能编号删除变更记录
+     *
+     * @param funcId
+     * @return
+     */
+    @RequestMapping(value = "deleteReqChangeInfoByFuncId.action", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public String deleteReqChangeInfoByFuncId(String funcId) {
+        ReqChangeInfoDto rtn = this.reqChangeInfoServiceI.deleteReqChangeInfoByFuncId(funcId);
+
+        return JSON.toJSONString(rtn);
+    }
+}

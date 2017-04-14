@@ -1,0 +1,73 @@
+package com.edp.serviceI.dto;
+
+public class TreeTaskDto {
+    private Integer id;
+
+    private String treeId;
+
+    private String taskId;
+
+    private String input;
+
+    private String out;
+
+    private String creattime;
+
+    private String creat;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getTreeId() {
+        return treeId;
+    }
+
+    public void setTreeId(String treeId) {
+        this.treeId = treeId == null ? null : treeId.trim();
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId == null ? null : taskId.trim();
+    }
+
+    public String getInput() {
+        return input;
+    }
+
+    public void setInput(String input) {
+        this.input = input == null ? null : input.trim();
+    }
+
+    public String getOut() {
+        return out;
+    }
+
+    public void setOut(String out) {
+        this.out = out == null ? null : out.trim();
+    }
+
+    public String getCreattime() {
+        return creattime;
+    }
+
+    public void setCreattime(String creattime) {
+        this.creattime = creattime == null ? null : creattime.trim();
+    }
+
+    public String getCreat() {
+        return creat;
+    }
+
+    public void setCreat(String creat) {
+        this.creat = creat == null ? null : creat.trim();
+    }
+}

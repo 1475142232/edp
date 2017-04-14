@@ -1,0 +1,89 @@
+KISSY.add('usermanage-module/src/modifyInfo',function(S,Node, Event,IO,Form,AlertDialog, Validator) {
+     function ModifyInfo() {
+    	var _this = this;
+    	var alertDialog = new AlertDialog();
+    	var validator = new Validator();
+    	this.renderInformation = function(){
+    		_this.renderPage();
+    		_this.initEvent();
+    	};
+    	
+    	this.initEvent = function(){
+    		Event.on("#modifyUser","click",function(){
+    			var phoneNumAlter = Node.all("#phoneNumLater").html();
+    			if (phoneNumAlter != "" && phoneNumAlter != null && phoneNumAlter != undefined) {
+    				alertDialog.showMessage("有未通过的验证信息，请重新输入", "1", "")
+    			} else {
+    				_this.submitForm();
+    			}
+    			
+    		});
+    	};
+    	
+    	this.renderPage = function() {
+    		IO({
+				url: 'userController/getUserInfo.action',
+				type: "post",
+				dataType : 'json',
+				async : false,
+				cache : false,
+				success: function(data){
+					Node.all("#userName").html(data.userName);
+					Node.all("#realName").val(data.realName);
+					Node.all("#orgName").html(data.orgName);
+					Node.all("#phoneNum").val(data.phoneNum);
+					Node.all("#roleId").html(data.regDate);
+				},
+				error: function(XMLHttpRequest, textStatus, errorThrown){
+				}
+			});
+    	};
+    	
+    	Event.on("#phoneNum", "keydown", function(){
+    		Node.all("#phoneNumLater").remove();
+    	});
+    	
+    	Event.on("#phoneNum", "blur", function(){
+    		if (!validator.validatePhone("phoneNum", "phoneNumLater")) {
+    			return;
+    		}
+    	});
+    	
+    	this.submitForm = function(){
+    		var url = 'userController/updateUserInfo.action';
+    		var data = _this.getValues();
+    		IO({
+				url: url,
+				type: "post",
+				data : data,
+				//dataType : 'json',
+				//cache : false,
+				async : false,
+				success: function(data){
+					if (data) {
+						_this.renderPage();
+						alertDialog.showMessage("修改成功", "1", null);
+					}
+				},
+				error: function(XMLHttpRequest, textStatus, errorThrown){
+				}
+			});
+    	};
+    	
+    	this.getValues = function(){
+    		var vForm = new Form.HForm({
+				srcNode : '#modifyUserForm'
+			}).render();
+    		return vForm.serializeToObject();
+    	};
+    	
+     }; 
+    return ModifyInfo;
+}, {
+	requires : ['node', 
+	            'event', 
+	            'io',
+	            'bui/form',
+	            'common-module/src/alertDialog',
+	            'common-module/src/validator']
+});

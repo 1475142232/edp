@@ -1,0 +1,66 @@
+KISSY.add("email-module/src/email",function(S,IO,Pageing){
+	function EmailList(){
+		var _this = this;
+		var pageing = new Pageing();
+		
+		$("#navUl li").removeClass("active");
+		this.getEmail = function(data){
+			columns = [{
+				title : '时间',
+				dataIndex :'',
+				elCls : 'center',
+				width:'20%'
+			},{
+				title : '主题',
+				dataIndex :'',
+				elCls : 'center',
+				width: '20%'
+			},{
+				title : '状态',
+				dataIndex : '',
+				elCls : 'center',
+				width: '20%'
+			},{
+				dataIndex : 'id',
+				visible : false
+			}];
+			
+			pageing.initPageing('grid',columns,'MailController/getMailByUserId.action',6,{data : "00,01" },'page','');
+			
+			pageing.grid.on("itemclick",function(ev){
+				var item = ev.item, // 点击行的记录
+				target = $(ev.domTarget); // 点击的元素
+				if (target.hasClass('button-success')) {
+					_this.workDetail(item.id);
+				}
+			});
+		} 
+		$("input[name='date']").blur(function(){
+			var checkDate = $("input[name='date']").val();
+			alert(checkDate);
+		});	
+					
+		$("#check-date").on('click',function(){
+			var checkDate = '';
+			$("input[name='date']").blur(function(){
+				checkDate = $("input[name='date']").val();
+			});
+			$.ajax({
+				url: '',
+				type: 'post',
+				cache: false,
+				async: false,
+				dataType: 'json',
+//				data: {  : checkDate},
+				success:function(){
+					_this.getEmail();
+				}
+			});
+		})
+	}
+	return EmailList;
+},{
+	requires : ['io',
+	            'common-module/src/pageing-grid'
+	            ]
+});

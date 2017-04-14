@@ -1,0 +1,134 @@
+KISSY.add("tasklist-module/src/taskdetails",function(S,IO,TaskList){
+	function taskdetails(){
+		var _this = this;
+		var _listId = '';
+		var _userRole = '3';
+		this.getTaskDetails = function () {
+			_listId = localStorage.getItem("listId");
+			_this.getUser();
+			if (_userRole === '3') {
+				$('.footer').css('display','none');
+			}
+			$('.task-content ul').html('');
+			$('.task-name').html('');
+			$('.task-owner').html('');
+			$('.task_type').html('');
+			$('.task_done_time').html('');
+			$.ajax({
+				url: "TaskInfoController/findTaskInfoById.action?id="+ _listId,
+				type: "POST",
+				async: true,
+				dataType: "json",
+				success: function (data) {
+					var state = "";
+					if (data.taskState == "01") {
+						state = "已完成";
+						$('.footer').css('display','none');
+					}else if (data.taskState == "02") {
+						state = "未完成";
+					}else if (data.taskState == "03") {
+						state = "未分配";
+					}else if (data.taskState == "04") {
+						state = "审核中";
+					};
+					$('.task-content ul').html('');
+					$('.task-name').html(data.taskName);
+					$('.task-owner').html(data.userName);
+					$('.task_type').html(state);
+					$('.task_done_time').html(data.taskDoneTime);
+					if (_userRole === '1' || _userRole === '2') {
+						//提交    --  不通过原因
+						$("#bohui").unbind('click');
+						$("#bohui").on('click',function(){
+							$('#myModal').modal('show');
+							$('#submitchange').unbind('click');
+							$('#submitchange').on('click',function(){
+								var obj = $('#myModal textarea').html();
+								$.ajax({
+									type: "post",
+									url: "TaskInfoController/editTaskInfo.action",
+									async: true,
+									dataType: "json",
+									data: {
+										id : _listId,
+										taskState : '02'
+									},
+									success: function(data){
+										$('#myModal').modal('hide');
+										_this.getTaskDetails();
+									}
+								});
+							})
+						})
+						//通过
+						$("#pass").unbind('click');
+						$("#pass").on('click',function(){
+							$('#delate').modal('show');
+							$('.alert').html('确定审核通过吗？');
+							$('#btn-add-delate-col').unbind('click');
+							$('#btn-add-delate-col').on('click',function(){
+								$.ajax({
+									type: "post",
+									url: "TaskInfoController/editTaskInfo.action",
+									async: true,
+									dataType: "json",
+									data: {
+										id : _listId,
+										taskState : '01'
+									},
+									success: function(data){
+										$('#delate').modal('hide');
+										_this.getTaskDetails();
+									}
+								})
+							})
+						});
+					}
+				}
+			});
+			_this.backFrist();
+		}
+		//返回
+		this.backFrist = function(){
+			$(".back").on("click",function(){
+				var taskTarget = localStorage.getItem("taskTarget");
+				//根据不同来源跳转
+				if(taskTarget === "taskList"){
+					//任务列表
+					IO.get("views/tasklist/tasklist.html",null,function(){
+						$("#mainpage").html(arguments[0], true);
+						var tasklist = new TaskList();
+						tasklist.init(localStorage.getItem("productId"));
+					});
+				}else{
+					//“我自己”跳转
+		 			IO.get("views/myself/myself.html",null,function(){
+		     			$("#mainpage").html(arguments[0], true);
+		         	});
+				}
+			});
+		}
+		//获取权限
+		this.getUser = function(){
+			$.ajax({
+				url: 'userController/getUser.action',
+				type: 'post',
+				cache: false,
+				async: false,
+				dataType: 'json',
+				success: function (data){
+					if (data !== null && data !== '') {
+						_userRole = data.userRole;
+					} else{
+						$("#delate").modal("show");
+					}
+				}
+			})
+		}
+		
+	}
+	return taskdetails;
+},{
+	requires : ['io','tasklist-module/src/tasklist'
+	            ]
+});

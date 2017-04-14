@@ -1,0 +1,168 @@
+KISSY.add('usermanage-module/src/modifycode',function(S,Node, Event,IO,Grid,Data,AlertDialog) {
+     function ModifyCode() {
+    	var _this = this,
+    	$ = Node.all,
+    	userName = Node.all("#userId").html(),
+    	alertDialog = new AlertDialog();
+    	
+	    this.renderInformation = function() {
+	    	
+	    };
+	    
+	    this.checkPassValidate = function() {
+	    	var returnVal = true;
+	    	var beforePassword = $("#beforePassWord").val();
+	    	IO({
+	    		url:"userController/comparePassword.action",
+	    		type:"post",
+	    		async : false,
+	    		data:{'userName':userName, 'beforePassWord':beforePassword},
+	    		success:function(databack){
+	    			if(databack!==null && databack!==undefined){
+			    		if (databack === "2") {
+			    			returnVal = false;
+			    		} else {
+			    			returnVal = true;
+			    		}
+			    	}
+	    		},
+	    		error : function() {
+	    			
+	    		}
+	    	});
+	    	return returnVal;
+	    };
+	    
+    	Event.on("#beforePassWord", 'blur', function() {
+    		var beforePassword = $("#beforePassWord").val();
+    		if (beforePassword.length < 6 || beforePassword.length > 20) {
+    			Node.all("#beforePassWordAlter").remove();
+    			$("#beforePassWord").parent().append(newErrorMsg("beforePassWordAlter",'原密码长度只能为6到20位'));
+    			return;
+    		} else if (!_this.checkPassValidate()) {
+    			Node.all("#beforePassWordAlter").remove();
+    			$("#beforePassWord").parent().append(newErrorMsg("beforePassWordAlter",'原密码和登录密码不一致'));
+    			return;
+    		}
+    	});
+    	
+    	Event.on("#beforePassWord", 'keydown', function(){
+    		Node.all("#beforePassWordAlter").remove();
+    	});
+    	
+    	Event.on("#newPassWord", 'blur', function() {
+    		var newPassword = $("#newPassWord").val();
+    		var beforePassword = $("#beforePassWord").val();
+    		if (newPassword.length < 6 || newPassword.length > 20) {
+    			Node.all("#newPassWordAlter").remove();
+    			$("#newPassWord").parent().append(newErrorMsg("newPassWordAlter",'新密码长度只能为6到20位'));
+    			return;
+    		} else if (newPassWord === beforePassword) {
+    			Node.all("#newPassWordAlter").remove();
+    			$("#newPassWord").parent().append(newErrorMsg("newPassWordAlter",'新密码不能和原密码相同'));
+    			return;
+    		}
+    	});
+    	
+    	Event.on("#newPassWord", 'keydown', function(){
+    		Node.all("#newPassWordAlter").remove();
+    		e = event.keyCode;
+	    	if (e==13||e==32) {
+	    		return false; // 取消此事件的默认操作
+	    	}
+    	});
+    	
+    	Event.on("#repeatPassWord", 'blur', function() {
+    		var newPassword = $("#newPassWord").val();
+    		var repeatPassword = $("#repeatPassWord").val();
+    		if (repeatPassword !== newPassword) {
+    			Node.all("#repeatPassWordAlter").remove();
+    			$("#repeatPassWord").parent().append(newErrorMsg("repeatPassWordAlter",'重复密码和新密码必须相同'));
+    			return;
+    		}
+    	});
+    	
+    	Event.on("#repeatPassWord", 'keydown', function(){
+    		Node.all("#repeatPassWordAlter").remove();
+    		e = event.keyCode;
+	    	if (e==13||e==32) {
+	    		return false; // 取消此事件的默认操作
+	    	}
+    	});
+    	
+    	Event.on("#btnCancle", "click", function() {
+    		$("#beforePassWord").val('');
+			$("#newPassWord").val('');
+			$("#repeatPassWord").val('');
+			$("#beforePassWordAlter").remove();
+    		$("#newPassWordAlter").remove();
+    		$("#repeatPassWordAlter").remove();
+    	});
+    	
+    	Event.on("#btnOk", 'click', function() {
+    		var newPassword = $("#newPassWord").val();
+    		var repeatPassword = $("#repeatPassWord").val();
+    		var beforePassword = $("#beforePassWord").val();
+    		var beforePassWordAlter = $("#beforePassWordAlter").html();
+    		var newPassWordAlter = $("#newPassWordAlter").html();
+    		var repeatPassWordAlter = $("#repeatPassWordAlter").html();
+    		if (beforePassword === null || beforePassword === "") {
+    			Node.all("#beforePassWordAlter").remove();
+    			$("#beforePassWord").parent().append(newErrorMsg("beforePassWordAlter",'原密码不能为空'));
+    			return;
+    		}
+    		if (newPassword === null || newPassword === "") {
+    			Node.all("#newPassWordAlter").remove();
+    			$("#newPassWord").parent().append(newErrorMsg("newPassWordAlter",'新密码不能为空'));
+    			return;
+    		}
+    		if (repeatPassword === null || repeatPassword === "") {
+    			Node.all("#repeatPassWordAlter").remove();
+    			$("#repeatPassWord").parent().append(newErrorMsg("repeatPassWordAlter",'重复密码不能为空'));
+    			return;
+    		}
+    		if ((beforePassWordAlter != null && beforePassWordAlter != "" && beforePassWordAlter != undefined) ||
+    				(newPassWordAlter != null && newPassWordAlter != "" && newPassWordAlter != undefined) ||
+    				(repeatPassWordAlter != null && repeatPassWordAlter != "" && repeatPassWordAlter != undefined)) {
+    			alertDialog.showMessage("有检查未通过的数据，请重新输入", "1", null);
+    			return;
+    		}
+    		IO({
+	    		url:"userController/updatePwd.action",
+	    		type:"post",
+	    		async : false,
+	    		data:{'userName':userName, 'password':newPassword},
+	    		success:function(databack){
+	    			if(databack!==undefined){
+			    		if (databack) {
+			    			alertDialog.showMessage("修改成功", "1", null);
+			    			$("#beforePassWord").val('');
+			    			$("#newPassWord").val('');
+			    			$("#repeatPassWord").val('');
+			    		} else {
+			    			alertDialog.showMessage("修改失败", "1", null);
+			    		}
+			    	}
+	    		},
+	    		error : function() {
+	    			
+	    		}
+	    	});
+    	});
+    /*重置*/
+    	Event.on("#btnCancle",'click',function(){
+			$("#beforePassWord").val('');
+			$("#newPassWord").val('');
+			$("#repeatPassWord").val('');
+    	
+     });
+     }; 
+    return ModifyCode;
+}, {
+	requires : ['node', 
+	            'event', 
+	            'io',
+	            'bui/grid',
+	            'bui/data',
+	            'common-module/src/alertDialog']
+});

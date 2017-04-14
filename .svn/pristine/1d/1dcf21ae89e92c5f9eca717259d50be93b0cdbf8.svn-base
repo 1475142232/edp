@@ -1,0 +1,89 @@
+package com.edp.serviceI.functionInfo;
+
+import java.util.List;
+
+import com.edp.serviceI.dto.ColumnPicDto;
+import com.edp.serviceI.dto.ControlDto;
+import com.edp.serviceI.dto.CtableDto;
+import com.edp.serviceI.dto.FunColumnDto;
+import com.edp.serviceI.dto.FunctionInfoDto;
+import com.edp.serviceI.dto.RequestmentDto;
+
+public interface FunctionInfoServiceI {
+
+	 FunctionInfoDto getAllFunctionInfo(FunctionInfoDto dto);
+
+	 FunctionInfoDto getFunctionInfoDtoById(int id);
+
+	FunctionInfoDto getFunctionInfoListByFuncId(String functionId);
+
+	FunctionInfoDto getFunctionInfoByFuncIdAndVersion(String functionId,int version);
+
+	FunctionInfoDto getTheLastFunctionInfoHasBeComfirmedByFunctionId(String functionId);
+
+	FunctionInfoDto getTheLastFunctionInfoHasBeComfirmedByFunctionIdAndVersion(String functionId,int version);
+
+	FunctionInfoDto getTheUnComfirmedFunctionInfoByFunctionId(String functionId);
+
+	FunctionInfoDto getFunctionInfo(String functionId,Integer version);
+
+	FunctionInfoDto deleteFunctionInfo(String functionId,Integer version);
+
+	 void updateFunctionInfo(FunctionInfoDto dto);
+
+	 void addFunctionInfo(FunctionInfoDto dto);
+
+	 void delFunctionInfo(int id);
+
+	 ControlDto findFcNameByCId(String control_id, String normalAdd);
+
+	void deleFC(String control_id,String scene_id , String changeAdd);
+
+	void addFcName(ControlDto dto);
+
+	void saveFuncColumn(String control_id, String table_id, String column_id,String funcId);
+
+	void addPicColumn(ColumnPicDto dto);
+
+	List<ColumnPicDto> findPicColumn(String picId);
+
+	void delPicColumn(Integer id);
+
+	void addfuncPicById(Integer funcId,String funcPId);
+
+	String findSceneByColumnId(String columnId);
+
+	String findSceneByTableId(String tableId);
+
+	String findSceneByFuncId(String funcId);
+
+	String findFuncIdByChildren(String funcId);
+
+	List<String> findFunctionBySceneId(String id);
+
+	List<String> findTableByFuncId(String id);
+
+	List<String> findControlByFunId(String funId);
+
+	List<CtableDto> findTableColumnById(String columnId);
+
+	List<CtableDto> findColumnByTable(String columnId, String id);
+
+	List<String> findControlByFuncId(String id, String string);
+
+	void delFuncColumn(String control_id,String funcId);
+
+	Integer findMaxVersionByFunId(String funcId,String state);
+
+	Integer findMinVersionByFunId(String funcId, String string);
+
+	Integer updateFunctionInfoById(String oldId, String id);
+
+	List<FunColumnDto> selectFunColumn(FunColumnDto funcol);
+
+	Integer insertFunColumn(FunColumnDto funColumnDto);
+
+	List<String> findControlByPicId(String taskId);
+
+
+}

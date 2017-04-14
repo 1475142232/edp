@@ -1,0 +1,48 @@
+body{font-family:"微软雅黑";}
+.g_question li{float:left;padding:0 20px;font-family:"微软雅黑";font-size:16px;color:#428bca;cursor:pointer;}
+.g_con{border:1px solid #ccc;border-radius:5px;z-index:100;background:#fff;min-width: 90px;}
+.g_question li .g_con li{padding:0 10px;line-height:30px;width:100%;text-align: center;}
+.g_question li .g_con li:hover{background:#ccc;}
+.hover{}
+.g_ques{margin-top:40px;overflow:hidden;}
+.g_quesBar{padding:8px 0;overflow:hidden;}
+.g_quesBar li{clear:both;overflow:hidden;border-bottom: 1px dashed #9BCE37;cursor:pointer;}
+.g_quesBar li div{font-size:14px;line-height:55px;}
+.g_quesBar li div span{float:left;}
+.g_quesBar li:HOVER{
+	background-color: #f5f5f5;
+}
+.g_time{color:#ccc}
+.g_help{display:inline-block;width:40px;line-height:40px;text-align: center;font-size:13px;margin:5px 10px 5px 10px;color: white;font-weight: 900;}
+.lv_0{background: url(../img/greenBg.png)}
+.lv_1{background: url(../img/blueBg.png)}
+.lv_2{background: url(../img/redBg.png)}
+.g_helpcon{color:#428bca;display:inline-block;width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.g_per{background:url(../img/approve_task.png) no-repeat 0 20px;text-indent:20px;background-size:14px 14px;color:#428bca;padding-right:10px;}
+.g_dot{position:relative;}
+.g_con{display:none;position:absolute;left:-2px;top:22px}
+/*================================================details==================================================*/
+.g_tittle{border-bottom:1px dashed #9BCE37;padding-bottom:40px;margin: 0px;}
+.g_tittle img{margin-top: -10px;}
+.g_detail{margin-top:30px;padding-bottom:60px;}
+.g_detail p{text-indent:28px;line-height:30px;}
+.g_reply{border-top:1px dashed #9BCE37;padding-top:5px;font-size:12px;}
+.g_reply ul li{padding-left:35px;width:100%;line-height:30px;clear: both;margin:10px 0;overflow: hidden;}
+.g_reply ul li span{float:left;}
+.g_replayname{background:url(../img/approve_task.png) no-repeat 0 9px;text-indent:20px;background-size:14px 14px;}
+.g_replaycon{display:inline-block;width:74%;margin-left:5%;}
+.g_reply ul li .g_replaytime{float:right;}
+.g_footer{position:absolute;right:5px;bottom:20px;}
+.g_footer button{float: left;}
+.g_footer label{float: left; height: 30px;line-height: 35px;margin-left: 5px;}
+.g_footer select{height: 33px;float: left;width: 93px;margin-right: 5px;}
+.problem_info{
+    float: left;
+    margin-left: 10px;
+    font-size: 13px;
+    margin-top: 6px;
+    color: #999999;
+}
+.active{
+	background-color: #ccc;
+}

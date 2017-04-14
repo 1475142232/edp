@@ -1,0 +1,15 @@
+/**
+ * 用户管理
+ */
+KISSY.add('usermanage-module/src/userUpdate', function(S,UserManage){
+	function UserUpdate(){
+		this.renderInformation = function(){
+			var userManage = new UserManage();
+			userManage.init('uUpdate');
+		};
+		
+	};
+	return UserUpdate;
+},{
+    requires : ['usermanage-module/src/userManage']
+});

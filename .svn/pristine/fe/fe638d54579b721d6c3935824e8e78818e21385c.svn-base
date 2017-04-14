@@ -1,0 +1,17 @@
+<#list table as tableInfoDto>  
+     delete from ${tableInfoDto.tableName};
+     create table ${tableInfoDto.tableName} (
+        <#list tableInfoDto.getChildren() as columnInfoDto>  
+           ${columnInfoDto.columnName} ${columnInfoDto.columnType}(${columnInfoDto.columnLength})
+           <#if columnInfoDto.columnRequired == "true"> 
+                NOT NULL 
+           </#if>
+           ,
+        </#list>
+        <#list tableInfoDto.getChildren() as columnInfoDto>  
+           <#if columnInfoDto.columnKey == "true">  
+              PRIMARY KEY ( ${columnInfoDto.columnName} )
+           </#if>
+        </#list>
+     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+</#list>  

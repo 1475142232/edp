@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.MenuInfoPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.MenuInfoPo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="menu_name" property="menuName" jdbcType="VARCHAR" />
+    <result column="menu_value" property="menuValue" jdbcType="VARCHAR" />
+    <result column="menu_spec" property="menuSpec" jdbcType="VARCHAR" />
+    <result column="menu_create" property="menuCreate" jdbcType="VARCHAR" />
+    <result column="menu_createtime" property="menuCreatetime" jdbcType="VARCHAR" />
+    <result column="menu_parent" property="menuParent" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, menu_name, menu_value, menu_spec, menu_create, menu_createtime, menu_parent
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.MenuInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from menu_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from menu_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from menu_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.MenuInfoPoCriteria" >
+    delete from menu_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.MenuInfoPo" >
+    insert into menu_info (id, menu_name, menu_value, 
+      menu_spec, menu_create, menu_createtime, 
+      menu_parent)
+    values (#{id,jdbcType=INTEGER}, #{menuName,jdbcType=VARCHAR}, #{menuValue,jdbcType=VARCHAR}, 
+      #{menuSpec,jdbcType=VARCHAR}, #{menuCreate,jdbcType=VARCHAR}, #{menuCreatetime,jdbcType=VARCHAR}, 
+      #{menuParent,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.MenuInfoPo" >
+    insert into menu_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="menuName != null" >
+        menu_name,
+      </if>
+      <if test="menuValue != null" >
+        menu_value,
+      </if>
+      <if test="menuSpec != null" >
+        menu_spec,
+      </if>
+      <if test="menuCreate != null" >
+        menu_create,
+      </if>
+      <if test="menuCreatetime != null" >
+        menu_createtime,
+      </if>
+      <if test="menuParent != null" >
+        menu_parent,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="menuName != null" >
+        #{menuName,jdbcType=VARCHAR},
+      </if>
+      <if test="menuValue != null" >
+        #{menuValue,jdbcType=VARCHAR},
+      </if>
+      <if test="menuSpec != null" >
+        #{menuSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="menuCreate != null" >
+        #{menuCreate,jdbcType=VARCHAR},
+      </if>
+      <if test="menuCreatetime != null" >
+        #{menuCreatetime,jdbcType=VARCHAR},
+      </if>
+      <if test="menuParent != null" >
+        #{menuParent,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.MenuInfoPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from menu_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update menu_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.menuName != null" >
+        menu_name = #{record.menuName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.menuValue != null" >
+        menu_value = #{record.menuValue,jdbcType=VARCHAR},
+      </if>
+      <if test="record.menuSpec != null" >
+        menu_spec = #{record.menuSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="record.menuCreate != null" >
+        menu_create = #{record.menuCreate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.menuCreatetime != null" >
+        menu_createtime = #{record.menuCreatetime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.menuParent != null" >
+        menu_parent = #{record.menuParent,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update menu_info
+    set id = #{record.id,jdbcType=INTEGER},
+      menu_name = #{record.menuName,jdbcType=VARCHAR},
+      menu_value = #{record.menuValue,jdbcType=VARCHAR},
+      menu_spec = #{record.menuSpec,jdbcType=VARCHAR},
+      menu_create = #{record.menuCreate,jdbcType=VARCHAR},
+      menu_createtime = #{record.menuCreatetime,jdbcType=VARCHAR},
+      menu_parent = #{record.menuParent,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.MenuInfoPo" >
+    update menu_info
+    <set >
+      <if test="menuName != null" >
+        menu_name = #{menuName,jdbcType=VARCHAR},
+      </if>
+      <if test="menuValue != null" >
+        menu_value = #{menuValue,jdbcType=VARCHAR},
+      </if>
+      <if test="menuSpec != null" >
+        menu_spec = #{menuSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="menuCreate != null" >
+        menu_create = #{menuCreate,jdbcType=VARCHAR},
+      </if>
+      <if test="menuCreatetime != null" >
+        menu_createtime = #{menuCreatetime,jdbcType=VARCHAR},
+      </if>
+      <if test="menuParent != null" >
+        menu_parent = #{menuParent,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.MenuInfoPo" >
+    update menu_info
+    set menu_name = #{menuName,jdbcType=VARCHAR},
+      menu_value = #{menuValue,jdbcType=VARCHAR},
+      menu_spec = #{menuSpec,jdbcType=VARCHAR},
+      menu_create = #{menuCreate,jdbcType=VARCHAR},
+      menu_createtime = #{menuCreatetime,jdbcType=VARCHAR},
+      menu_parent = #{menuParent,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="countMenuByRoleId" resultType="java.lang.Integer">
+      select count(*) from role_menu where role_id=#{roleId} and  menu_id=#{menuId}
+  </select>
+  
+  <delete id="delMenuByRoleId" parameterType="java.lang.Integer">
+     delete from role_menu
+      where role_id = #{roleId}
+  </delete>
+  
+  <insert id="addMenuByRoleId" parameterType="java.lang.Integer" >
+      insert into role_menu (role_id,menu_id)
+    values (#{roleId},#{menuId})
+  </insert>
+</mapper>

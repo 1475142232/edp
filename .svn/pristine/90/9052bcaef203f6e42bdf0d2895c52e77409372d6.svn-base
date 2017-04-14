@@ -1,0 +1,12 @@
+package com.edp.serviceI.tableinfo;
+
+import com.edp.serviceI.dto.TableInfoDto;
+
+public interface TableInfoServiceI {
+	public TableInfoDto getAllTables(TableInfoDto dto);
+	public TableInfoDto getTableById(String Id);
+	public void addTable(TableInfoDto dto);
+	public void updateTable(TableInfoDto dto);
+	public void delTable(String Id);
+	public String findcolumnIdByTable(String id, String name);
+}

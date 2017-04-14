@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.RequestmentTreePoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.RequestmentTreePo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="tree_node_name" property="treeNodeName" jdbcType="VARCHAR" />
+    <result column="tree_node_type" property="treeNodeType" jdbcType="CHAR" />
+    <result column="tree_node_desc" property="treeNodeDesc" jdbcType="VARCHAR" />
+    <result column="tree_node_state" property="treeNodeState" jdbcType="CHAR" />
+    <result column="tree_node_parent" property="treeNodeParent" jdbcType="VARCHAR" />
+    <result column="tree_node_if_leaf" property="treeNodeIfLeaf" jdbcType="CHAR" />
+    <result column="tree_node_createtime" property="treeNodeCreatetime" jdbcType="VARCHAR" />
+    <result column="tree_node_createperson" property="treeNodeCreateperson" jdbcType="VARCHAR" />
+    <result column="tree_node_modifiedtime" property="treeNodeModifiedtime" jdbcType="VARCHAR" />
+    <result column="tree_node_levels" property="treeNodeLevels" jdbcType="INTEGER" />
+    <result column="tree_node_modifiedperson" property="treeNodeModifiedperson" jdbcType="VARCHAR" />
+    <result column="tree_node_id" property="treeNodeId" jdbcType="VARCHAR" />
+    <result column="tree_node_version" property="treeNodeVersion" jdbcType="INTEGER" />
+    <result column="tree_id" property="treeId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, tree_node_name, tree_node_type, tree_node_desc, tree_node_state, tree_node_parent, 
+    tree_node_if_leaf, tree_node_createtime, tree_node_createperson, tree_node_modifiedtime, 
+    tree_node_levels, tree_node_modifiedperson, tree_node_id, tree_node_version, tree_id
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.RequestmentTreePoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from requestment_tree
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from requestment_tree
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from requestment_tree
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.RequestmentTreePoCriteria" >
+    delete from requestment_tree
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.RequestmentTreePo" >
+    insert into requestment_tree (id, tree_node_name, tree_node_type, 
+      tree_node_desc, tree_node_state, tree_node_parent, 
+      tree_node_if_leaf, tree_node_createtime, tree_node_createperson, 
+      tree_node_modifiedtime, tree_node_levels, tree_node_modifiedperson, 
+      tree_node_id, tree_node_version, tree_id
+      )
+    values (#{id,jdbcType=VARCHAR}, #{treeNodeName,jdbcType=VARCHAR}, #{treeNodeType,jdbcType=CHAR}, 
+      #{treeNodeDesc,jdbcType=VARCHAR}, #{treeNodeState,jdbcType=CHAR}, #{treeNodeParent,jdbcType=VARCHAR}, 
+      #{treeNodeIfLeaf,jdbcType=CHAR}, #{treeNodeCreatetime,jdbcType=VARCHAR}, #{treeNodeCreateperson,jdbcType=VARCHAR}, 
+      #{treeNodeModifiedtime,jdbcType=VARCHAR}, #{treeNodeLevels,jdbcType=INTEGER}, #{treeNodeModifiedperson,jdbcType=VARCHAR}, 
+      #{treeNodeId,jdbcType=VARCHAR}, #{treeNodeVersion,jdbcType=INTEGER}, #{treeId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.RequestmentTreePo" >
+    insert into requestment_tree
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="treeNodeName != null" >
+        tree_node_name,
+      </if>
+      <if test="treeNodeType != null" >
+        tree_node_type,
+      </if>
+      <if test="treeNodeDesc != null" >
+        tree_node_desc,
+      </if>
+      <if test="treeNodeState != null" >
+        tree_node_state,
+      </if>
+      <if test="treeNodeParent != null" >
+        tree_node_parent,
+      </if>
+      <if test="treeNodeIfLeaf != null" >
+        tree_node_if_leaf,
+      </if>
+      <if test="treeNodeCreatetime != null" >
+        tree_node_createtime,
+      </if>
+      <if test="treeNodeCreateperson != null" >
+        tree_node_createperson,
+      </if>
+      <if test="treeNodeModifiedtime != null" >
+        tree_node_modifiedtime,
+      </if>
+      <if test="treeNodeLevels != null" >
+        tree_node_levels,
+      </if>
+      <if test="treeNodeModifiedperson != null" >
+        tree_node_modifiedperson,
+      </if>
+      <if test="treeNodeId != null" >
+        tree_node_id,
+      </if>
+      <if test="treeNodeVersion != null" >
+        tree_node_version,
+      </if>
+      <if test="treeId != null" >
+        tree_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeName != null" >
+        #{treeNodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeType != null" >
+        #{treeNodeType,jdbcType=CHAR},
+      </if>
+      <if test="treeNodeDesc != null" >
+        #{treeNodeDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeState != null" >
+        #{treeNodeState,jdbcType=CHAR},
+      </if>
+      <if test="treeNodeParent != null" >
+        #{treeNodeParent,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeIfLeaf != null" >
+        #{treeNodeIfLeaf,jdbcType=CHAR},
+      </if>
+      <if test="treeNodeCreatetime != null" >
+        #{treeNodeCreatetime,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeCreateperson != null" >
+        #{treeNodeCreateperson,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeModifiedtime != null" >
+        #{treeNodeModifiedtime,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeLevels != null" >
+        #{treeNodeLevels,jdbcType=INTEGER},
+      </if>
+      <if test="treeNodeModifiedperson != null" >
+        #{treeNodeModifiedperson,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeId != null" >
+        #{treeNodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeVersion != null" >
+        #{treeNodeVersion,jdbcType=INTEGER},
+      </if>
+      <if test="treeId != null" >
+        #{treeId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.RequestmentTreePoCriteria" resultType="java.lang.Integer" >
+    select count(*) from requestment_tree
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update requestment_tree
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeName != null" >
+        tree_node_name = #{record.treeNodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeType != null" >
+        tree_node_type = #{record.treeNodeType,jdbcType=CHAR},
+      </if>
+      <if test="record.treeNodeDesc != null" >
+        tree_node_desc = #{record.treeNodeDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeState != null" >
+        tree_node_state = #{record.treeNodeState,jdbcType=CHAR},
+      </if>
+      <if test="record.treeNodeParent != null" >
+        tree_node_parent = #{record.treeNodeParent,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeIfLeaf != null" >
+        tree_node_if_leaf = #{record.treeNodeIfLeaf,jdbcType=CHAR},
+      </if>
+      <if test="record.treeNodeCreatetime != null" >
+        tree_node_createtime = #{record.treeNodeCreatetime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeCreateperson != null" >
+        tree_node_createperson = #{record.treeNodeCreateperson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeModifiedtime != null" >
+        tree_node_modifiedtime = #{record.treeNodeModifiedtime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeLevels != null" >
+        tree_node_levels = #{record.treeNodeLevels,jdbcType=INTEGER},
+      </if>
+      <if test="record.treeNodeModifiedperson != null" >
+        tree_node_modifiedperson = #{record.treeNodeModifiedperson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeId != null" >
+        tree_node_id = #{record.treeNodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.treeNodeVersion != null" >
+        tree_node_version = #{record.treeNodeVersion,jdbcType=INTEGER},
+      </if>
+      <if test="record.treeId != null" >
+        tree_id = #{record.treeId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update requestment_tree
+    set id = #{record.id,jdbcType=VARCHAR},
+      tree_node_name = #{record.treeNodeName,jdbcType=VARCHAR},
+      tree_node_type = #{record.treeNodeType,jdbcType=CHAR},
+      tree_node_desc = #{record.treeNodeDesc,jdbcType=VARCHAR},
+      tree_node_state = #{record.treeNodeState,jdbcType=CHAR},
+      tree_node_parent = #{record.treeNodeParent,jdbcType=VARCHAR},
+      tree_node_if_leaf = #{record.treeNodeIfLeaf,jdbcType=CHAR},
+      tree_node_createtime = #{record.treeNodeCreatetime,jdbcType=VARCHAR},
+      tree_node_createperson = #{record.treeNodeCreateperson,jdbcType=VARCHAR},
+      tree_node_modifiedtime = #{record.treeNodeModifiedtime,jdbcType=VARCHAR},
+      tree_node_levels = #{record.treeNodeLevels,jdbcType=INTEGER},
+      tree_node_modifiedperson = #{record.treeNodeModifiedperson,jdbcType=VARCHAR},
+      tree_node_id = #{record.treeNodeId,jdbcType=VARCHAR},
+      tree_node_version = #{record.treeNodeVersion,jdbcType=INTEGER},
+      tree_id = #{record.treeId,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.RequestmentTreePo" >
+    update requestment_tree
+    <set >
+      <if test="treeNodeName != null" >
+        tree_node_name = #{treeNodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeType != null" >
+        tree_node_type = #{treeNodeType,jdbcType=CHAR},
+      </if>
+      <if test="treeNodeDesc != null" >
+        tree_node_desc = #{treeNodeDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeState != null" >
+        tree_node_state = #{treeNodeState,jdbcType=CHAR},
+      </if>
+      <if test="treeNodeParent != null" >
+        tree_node_parent = #{treeNodeParent,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeIfLeaf != null" >
+        tree_node_if_leaf = #{treeNodeIfLeaf,jdbcType=CHAR},
+      </if>
+      <if test="treeNodeCreatetime != null" >
+        tree_node_createtime = #{treeNodeCreatetime,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeCreateperson != null" >
+        tree_node_createperson = #{treeNodeCreateperson,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeModifiedtime != null" >
+        tree_node_modifiedtime = #{treeNodeModifiedtime,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeLevels != null" >
+        tree_node_levels = #{treeNodeLevels,jdbcType=INTEGER},
+      </if>
+      <if test="treeNodeModifiedperson != null" >
+        tree_node_modifiedperson = #{treeNodeModifiedperson,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeId != null" >
+        tree_node_id = #{treeNodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="treeNodeVersion != null" >
+        tree_node_version = #{treeNodeVersion,jdbcType=INTEGER},
+      </if>
+      <if test="treeId != null" >
+        tree_id = #{treeId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.RequestmentTreePo" >
+    update requestment_tree
+    set tree_node_name = #{treeNodeName,jdbcType=VARCHAR},
+      tree_node_type = #{treeNodeType,jdbcType=CHAR},
+      tree_node_desc = #{treeNodeDesc,jdbcType=VARCHAR},
+      tree_node_state = #{treeNodeState,jdbcType=CHAR},
+      tree_node_parent = #{treeNodeParent,jdbcType=VARCHAR},
+      tree_node_if_leaf = #{treeNodeIfLeaf,jdbcType=CHAR},
+      tree_node_createtime = #{treeNodeCreatetime,jdbcType=VARCHAR},
+      tree_node_createperson = #{treeNodeCreateperson,jdbcType=VARCHAR},
+      tree_node_modifiedtime = #{treeNodeModifiedtime,jdbcType=VARCHAR},
+      tree_node_levels = #{treeNodeLevels,jdbcType=INTEGER},
+      tree_node_modifiedperson = #{treeNodeModifiedperson,jdbcType=VARCHAR},
+      tree_node_id = #{treeNodeId,jdbcType=VARCHAR},
+      tree_node_version = #{treeNodeVersion,jdbcType=INTEGER},
+      tree_id = #{treeId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="findNodeByLevel" resultType="java.lang.String">
+    select id from requestment_tree where tree_node_id=#{tree_node_id} and #{tree_node_levels}>tree_node_levels and (tree_node_state=#{tree_node_state} or tree_node_state='66')
+    ORDER BY tree_node_createtime ASC ,id ASC
+  </select>
+  
+  <update id="updateTreeNodeState">
+        update requestment_tree 
+        set tree_node_state = '66'
+        where tree_node_state = #{state} and tree_node_id = #{product_id}
+  </update>
+  
+  <select id="findRequestById" resultType="java.lang.String">
+     select id from requestment_tree where tree_node_parent=(select id from  requestment_tree where tree_node_parent= #{id})
+  </select>
+  
+  <select id="findConfirmById" resultType="Integer">
+     select count(*) from requestment_tree where tree_node_parent=#{id} and tree_node_state=#{state}
+  </select>
+  
+  <select id="findFindConfirmById" resultType="Integer">
+     select count(*) from requestment_tree where tree_node_parent in (select id from requestment_tree where tree_node_parent=#{id}) and tree_node_state=#{state}
+  </select>
+  
+  <select id="findfuncByState" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.RequestmentTreePoCriteria">
+      select * from requestment_tree where id in (select func_id from function_info where func_state="11") and tree_node_id=#{id}
+  </select>
+  
+  <select id="findTreeById" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.RequestmentTreePo">
+       SELECT * FROM (
+       SELECT
+            *
+        FROM
+            requestment_tree t
+        WHERE       
+        t.tree_id in (${treeId})
+        AND tree_node_state != #{tree_node_state}
+        order by t.tree_node_createtime DESC) a
+        GROUP BY a.tree_id having a.tree_node_state != '33';
+  </select>
+  
+  <select id="findTreeIdByPid" resultType="java.lang.String">
+       select tree_id from requestment_tree 
+       where tree_node_parent = #{treeNodeParent}
+        GROUP BY tree_id
+  </select>
+  
+  <insert id="addMasterTmp">
+      insert into tree_master_tmp (product_id,tree,type) values (#{product_id},#{tree},#{type});
+  </insert>
+  
+ 
+  <select id="findJsonTreeById" resultType="java.lang.String">
+       select tree from tree_master_tmp where product_id=#{product_id} and type=#{type}
+  </select>
+  
+   <update id="editTreeByProductId">
+        update tree_master_tmp
+        set tree = #{tree}
+        where product_id = #{product_id} and type=#{type}
+  </update>
+  
+  <select id="findCountNotEnterByTreeId" resultType="java.lang.Integer">
+       select count(*) from requestment_tree where tree_node_id=#{product_id} and tree_id is null and tree_node_state=#{state}
+  </select>
+  
+  <insert id="insertMaster">
+      insert into tree_master (product_id,tree,version) values (#{product_id},#{tree},#{version});
+  </insert>
+  
+    <select id="findEnterTreeById" resultType="java.lang.String">
+       select tree from tree_master where product_id=#{product_id} and version=#{version}
+  </select>
+  
+  <select id="findCountTypeByState" resultType="java.lang.Integer">
+       select count(*) from requestment_tree where product_id=#{product_id}
+  </select>
+</mapper>

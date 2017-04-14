@@ -1,0 +1,110 @@
+package com.edp.serviceI.dto;
+
+import java.util.List;
+
+import com.edp.serviceI.common.BaseDto;
+
+public class ColumnInfoDto extends BaseDto{
+
+	private String id;
+
+	private String columnModifiedPerson;
+
+	private String columnModifiedTime;
+
+	private String columnCreater;
+
+	private String columnCreateTime;
+
+	private String columnRequired;
+
+	private String columnEnName;
+
+	private String columnType;
+
+	private String columnCnName;
+	
+	private List<ColumnRuleRefDto> crrd;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id == null ? null : id.trim();
+	}
+
+	public String getColumnModifiedPerson() {
+		return columnModifiedPerson;
+	}
+
+	public void setColumnModifiedPerson(String columnModifiedPerson) {
+		this.columnModifiedPerson = columnModifiedPerson == null ? null : columnModifiedPerson.trim();
+	}
+
+	public String getColumnModifiedTime() {
+		return columnModifiedTime;
+	}
+
+	public void setColumnModifiedTime(String columnModifiedTime) {
+		this.columnModifiedTime = columnModifiedTime == null ? null : columnModifiedTime.trim();
+	}
+
+	public String getColumnCreater() {
+		return columnCreater;
+	}
+
+	public void setColumnCreater(String columnCreater) {
+		this.columnCreater = columnCreater == null ? null : columnCreater.trim();
+	}
+
+	public String getColumnCreateTime() {
+		return columnCreateTime;
+	}
+
+	public void setColumnCreateTime(String columnCreateTime) {
+		this.columnCreateTime = columnCreateTime == null ? null : columnCreateTime.trim();
+	}
+
+	public String getColumnRequired() {
+		return columnRequired;
+	}
+
+	public void setColumnRequired(String columnRequired) {
+		this.columnRequired = columnRequired == null ? null : columnRequired.trim();
+	}
+
+	public String getColumnEnName() {
+		return columnEnName;
+	}
+
+	public void setColumnEnName(String columnEnName) {
+		this.columnEnName = columnEnName == null ? null : columnEnName.trim();
+	}
+
+	public String getColumnType() {
+		return columnType;
+	}
+
+	public void setColumnType(String columnType) {
+		this.columnType = columnType == null ? null : columnType.trim();
+	}
+
+	public String getColumnCnName() {
+		return columnCnName;
+	}
+
+	public void setColumnCnName(String columnCnName) {
+		this.columnCnName = columnCnName == null ? null : columnCnName.trim();
+	}
+
+	public List<ColumnRuleRefDto> getCrrd() {
+		return crrd;
+	}
+
+	public void setCrrd(List<ColumnRuleRefDto> crrd) {
+		this.crrd = crrd;
+	}
+
+	
+}

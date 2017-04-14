@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>团队选择+团队创建</title>
+	<link rel="stylesheet" href="./src/resource-module/css/index.css" />
+	<link rel="stylesheet" href="./src/myself-module/css/myself.css" />
+	<link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css">
+</head>
+<body>
+	<div class="container">
+	   <div class="row content-box-zhu" style="position:relative">
+		 <div class="row myrow"></div>
+		 <!--添加管成员-->
+		 <!-- <a href="javascript:void(0);" id="addpeople" class="addowner" data-toggle="modal" data-target="#mymodal">
+			<b>+</b>
+			<span>添加成员</span>
+		 </a> -->
+		<!-- 模态框（Modal） 添加成员-->
+		<div class="modal fade" id="mymodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">添加成员</h4>
+					</div>
+					<div class="modal-body">
+						<div class="input-group">
+							<input type="text" class="form-control" id="valueurl" value="www.123.com">
+							<span class="btn input-group-addon btn-primary" id="copy">复制</span>
+						</div><br/>
+						<div class="input-group">说明 : 请复制地址</div>
+						<div class="input-group" id="copyok" style="width:auto;height:20px;"></div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+		<!-- 是否删除该成员  -->
+		<div class="modal fade" id="deleteowner" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">删除成员</h4>
+					</div>
+					<div class="modal-body" style="text-align:center;">
+						是否删除该成员?
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						<button type="button" id="confirmdelete" class="btn btn-primary" data-dismiss="modal">确定删除</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+		 
+		 
+		 <!-- 查看成员任务信息 -->
+		 <!-- 我的任务 -->
+		   <div id="ownersdetails" class="row content-box-zhu">
+		   		<!-- 返回按钮 -->
+		   		<a href="javascript:void(0);" id="backlist"></a>
+		   		<!-- 个人信息-->
+		   		<div class="task-dateil">
+		   			<div class="task-dateil-left">
+		   				<div class="task-dateil-img"><img src="./src/myself-module/img/bg.jpg" height="100px"/></div>
+		   				<div class="task-dateil-info">
+		   					<ul>
+		   						<li class="info-username" id="info_UserName">--</li>
+		   						<li class="info-usermail" id="info_UserMail">--</li>
+		   						<li>
+		   							<input id="info_UserId" type="hidden"/>
+		   							<!-- <a href="javascript:void(0);">修改密码</a>  9.9改 -->
+		   							<a href="javascript:void(0);">项目日历</a>
+		   						</li>
+		   					</ul>
+		   				</div>
+		   			</div>
+		   			<div class="task-dateil-right">
+		   				<ul class="task-dateil-ul">
+		   					<li class="task-dateil-li1">
+		   						<span style="font-size: 20px;" id="no_task">0</span>
+		   						<span>未完成的任务</span>
+		   					</li>
+		   					<li class="task-dateil-li2"><div class="task-dateil-xian">&nbsp;</div></li>
+		   					<li class="task-dateil-li1">
+		   						<span style="font-size: 20px;" id="yes_task">0</span>
+		   						<span>已完成的任务</span>
+		   					</li>
+		   					<li class="task-dateil-li2"><div class="task-dateil-xian">&nbsp;</div></li>
+		   					<li class="task-dateil-li1">
+		   						<span style="font-size: 20px;" id="approve_task">0</span>
+		   						<span>审核中的任务</span>
+		   					</li>
+		   				</ul>
+		   			</div>
+		   		</div>
+		   		<div class="task-dateil-heng">&nbsp;</div>
+		   		<div class="task-dateil-task">
+		   			<div class="task-deteil-list">
+		   				<div class="task-deteil-no">
+		   					<div class="task-list-top">
+		   						<img src="./src/myself-module/img/no_task.png" width="34px" height="34px"/><span class="top-span">未完成的任务</span>
+		   						<hr class="top-heng"/>
+		   					</div>
+		   					<div class="task-list-center" id="noList">
+		   						
+		   					</div>
+		   				</div>
+		   				<div class="task-deteil-yes">
+		   					<div class="task-list-top">
+		   						<img src="./src/myself-module/img/yes-task.png" width="34px" height="34px"/><span class="top-span">已完成的任务</span>
+		   						<hr class="top-heng"/>
+		   					</div>
+		   					<div class="task-list-center" id="yesList">
+		   					
+		   					</div>
+		   					
+		   				</div>
+		   				<div class="task-deteil-approve">
+		   					<div class="task-list-top">
+		   						<img src="./src/myself-module/img/approve_task.png" width="34px" height="34px"/><span class="top-span">审核中的任务</span>
+		   						<hr class="top-heng"/>
+		   					</div>
+		   					<div class="task-list-center" id="approveList">
+		<!--    						<div class="task-list-info"> -->
+		<!--    							<div class="task-list-info-name"> -->
+		<!--    								<input type="radio" name="task" style="float:left;"/> -->
+		<!--    								<span id="" class="info-taskname">流程图任务XXXXXXXXXXXXXXXXXXXXXXXXXX</span> -->
+		<!--    								<span id="" class="info-tasktime">交付时间：</span> -->
+		<!--    								<span class="info-tasktime">2016-8-20</span> -->
+		<!--    							</div> -->
+		<!--    							<div class="task-list-info-desc"> -->
+		<!--    								这是一个XXX流程，需要有XXX功能，XXX功能，XXX功能，要求。。。。。。。。。 -->
+		<!--    							</div> -->
+		<!--    						</div> -->
+		   					</div>
+		   				</div>
+		   			</div>
+		   		</div>
+		   </div><!-- 查看成员任务信息 -->
+		   
+	   </div>
+	</div>
+	<script src="./src/jquery/jquery.min.js"></script>
+	<script src="./src/kissy/jquery.form.js"></script>
+	<script src="./src/kissy/seed-min.js"></script>
+	<script src="./src/kissy/import-style-min.js"></script>
+	<script src="./src/kissy/kissy/bui/adapter-min.js"></script>
+	<script src="./src/tasklist-module/src/bootstrap.min.js"></script>
+	
+</body>
+</html>
+

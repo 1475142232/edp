@@ -1,0 +1,428 @@
+package com.edp.admin.tree;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.edp.admin.login.UserInfoBean;
+import com.edp.common.constant.Constants;
+import com.edp.common.jedis.JedisUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.serviceI.dto.MasterDto;
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.product.ProductServiceI;
+import com.edp.serviceI.tree.TreeServiceI;
+import com.google.gson.Gson;
+
+import redis.clients.jedis.Jedis;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+/**
+ * 
+ * tree请求模块
+ * @time  2016/4/20
+ * @author zhang_cancan
+ *
+ */
+@Controller
+@RequestMapping("TreeController")
+public class TreeController {
+	
+	@Autowired
+	private TreeServiceI treeServiceI;
+	@Autowired
+	private ProductServiceI productService;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(TreeController.class);
+	private Gson gson = new Gson();
+	
+	/**
+	 * 获取tree信息
+	 * @time 2016/4/20
+	 * @author zhang_cancan
+	 */
+	@RequestMapping(value = "/findTreeById.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String findTreeById(String id,String type,String version){
+		String tree="";
+		if(type.equals("1")){
+			tree=treeServiceI.findJsonTreeById(id,"01");   
+		}else if(type.equals("2")){
+			tree=treeServiceI.findJsonTreeById(id,"11");
+		}
+		return tree;		
+	}
+	@RequestMapping(value = "/editTreeNode.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String editTreeNode(String id){
+		RequestmentDto reqDto=new RequestmentDto();
+		reqDto.setId(id);
+		reqDto.setTreeNodeState("13");
+		Integer i=treeServiceI.editTreeNode(reqDto);
+		return gson.toJson(i);
+	}
+	/**
+	 * 删除treeNode信息
+	 * @time 2016/4/25
+	 * @author zhang_cancan
+	 */
+	@RequestMapping(value = "/delTreeNode.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String delTreeNode(String id,String treeNodeType,Integer type, HttpSession session){
+		String state;
+		if("2".equals(type)){
+			state=Constants.TreeStates.CHANGE_ADD;
+		}else{
+			state=Constants.TreeStates.NORMAL_ADD;
+		}
+		String tree=treeServiceI.findJsonTreeById((String)session.getAttribute("productId"),state);
+		JSONObject a = JSON.parseObject(tree); 
+		JSONArray jsonArr = (JSONArray) a.get("children");
+		if(treeNodeType.equals("6")){//分组
+		    JSONObject b= (JSONObject)jsonArr.get(1);
+		    JSONArray jsonArrs= (JSONArray)b.get("children");
+		    for(int i=0;i<jsonArrs.size();i++){
+		    	JSONObject c=(JSONObject)jsonArrs.get(i);
+		    	if(c.get("id").equals(id)){
+		    		jsonArrs.remove(i);
+		    	}
+		    }
+		}
+		if(treeNodeType.equals("7")){//功能
+			JSONObject b= (JSONObject)jsonArr.get(1);
+			JSONArray jsonArrs= (JSONArray)b.get("children");
+			for(int i=0;i<jsonArrs.size();i++){
+			   JSONObject c=(JSONObject)jsonArrs.get(i);
+			   JSONArray jsonArrc= (JSONArray)c.get("children");
+			   for(int j=0;j<jsonArrc.size();j++){
+				   JSONObject d=(JSONObject)jsonArrc.get(j);
+				   if(d.get("id").equals(id)){
+					   jsonArrc.remove(j);
+					   break;
+				   }
+			   }
+			}
+		}
+		if(treeNodeType.equals("8")){//场景
+			JSONObject b= (JSONObject)jsonArr.get(0);
+		    JSONArray jsonArrs= (JSONArray)b.get("children");
+		    for(int i=0;i<jsonArrs.size();i++){
+		    	JSONObject c=(JSONObject)jsonArrs.get(i);
+		    	if(c.get("id").equals(id)){
+		    		jsonArrs.remove(i);
+		    	}
+		    }
+		}
+		if(treeNodeType.equals("9")){//表
+			JSONObject b= (JSONObject)jsonArr.get(3);
+		    JSONArray jsonArrs= (JSONArray)b.get("children");
+		    for(int i=0;i<jsonArrs.size();i++){
+		    	JSONObject c=(JSONObject)jsonArrs.get(i);
+		    	if(c.get("id").equals(id)){
+		    		jsonArrs.remove(i);
+		    	}
+		    }
+		}
+		if(treeNodeType.equals("10")){//字段
+			JSONObject b= (JSONObject)jsonArr.get(3);
+			JSONArray jsonArrs= (JSONArray)b.get("children");
+			for(int i=0;i<jsonArrs.size();i++){
+			   JSONObject c=(JSONObject)jsonArrs.get(i);
+			   JSONArray jsonArrc= (JSONArray)c.get("children");
+			   for(int j=0;j<jsonArrc.size();j++){
+				   JSONObject d=(JSONObject)jsonArrc.get(j);
+				   if(d.get("id").equals(id)){
+					   jsonArrc.remove(j);
+					   break;
+				   }
+			   }
+			}
+		}
+		if(treeNodeType.equals("12")){//原型图
+			JSONObject b= (JSONObject)jsonArr.get(2);
+		    JSONArray jsonArrs= (JSONArray)b.get("children");
+		    for(int i=0;i<jsonArrs.size();i++){
+		    	JSONObject c=(JSONObject)jsonArrs.get(i);
+		    	if(c.get("id").equals(id)){
+		    		jsonArrs.remove(i);
+		    	}
+		    }
+		}
+		treeServiceI.editTreeByProductId((String)session.getAttribute("productId"),a.toString(),state);
+		return gson.toJson("1");
+	}
+	/**
+	 * 
+	 * @author zhang_cancan 2016/5/10
+	 * 
+	 */
+	@RequestMapping(value = "/findCountTreeById.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String findCountTreeById(String id, HttpSession session){
+		session.setAttribute("productId", id);
+		ProductDto product=productService.getProductById(id);
+		session.setAttribute("version",product.getProductVersion());
+//		Integer count=treeServiceI.findCountTreeById(id);
+//		if(count==0){
+//		    createTree(product.getProductName(),session);
+//		    return gson.toJson(0);
+//		}
+		return gson.toJson(1);
+	}
+	/**
+	 * @author zhang_cancan  2016/5/9
+	 */
+	@RequestMapping(value = "/findNodeByLevel.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String findNodeByLevel(String treeNodeId,String type){
+		List<String> id=new ArrayList<String>();
+		if(type.equals("1")){
+			id=treeServiceI.findNodeByLevel(treeNodeId,4,"01");
+		}else if(type.equals("2")){
+			id=treeServiceI.findNodeByLevel(treeNodeId,4,"11");
+		}else if(type.equals("3")){
+			id=treeServiceI.findNodeByLevel(treeNodeId,4,"22");
+		};
+		return gson.toJson(id);
+	}
+	/**
+	 * @author zhang_cancan  2016/6/12
+	 * 查询树
+	 */
+	@RequestMapping(value = "/findTreeByProductId.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String findTreeByProductId(String func_id,String type,HttpSession session){
+		String productId=(String)session.getAttribute("productId");
+		String tree="";
+		if(type.equals("1")){
+			tree=treeServiceI.findJsonTreeById(productId,"01");
+		}else{
+			tree=treeServiceI.findJsonTreeById(productId,"11");
+		}
+		JSONObject a = JSON.parseObject(tree); 
+		JSONArray jsonArr = (JSONArray) a.get("children");
+		JSONObject b= (JSONObject)jsonArr.get(1);
+		if(b.containsKey("children") == false){
+			b.put("children", new JSONArray());
+		}
+		JSONArray jsonArrs= (JSONArray)b.get("children");
+		for(int i=0;i<jsonArrs.size();i++){
+		   JSONObject c=(JSONObject)jsonArrs.get(i);
+		   if(c.containsKey("children") == false){
+				c.put("children", new JSONArray());
+			}
+		   JSONArray jsonArrc= (JSONArray)c.get("children");
+		   for(int j=0;j<jsonArrc.size();j++){
+			   JSONObject d=(JSONObject)jsonArrc.get(j);
+			   if(d.get("id").equals(func_id)){
+				   d.put("checked", true);
+			   }
+			   d.remove("children");
+		   }
+		}
+		return "["+gson.toJson(b)+"]";
+	}
+	
+	
+	private String createDto(String treeNodeName,String treeNodeParent,String treeNodeCreateperson,String setTreeNodeCreatetime,String treeNodeState
+			,String treeNodeId,Integer treeNodeLevels,String treeNodeType,String treeNodeIfLeaf){
+		RequestmentDto dto = new RequestmentDto();
+		String id=SequenceManage.getSequence("");
+		dto.setId(id);
+		dto.setTreeNodeParent(treeNodeParent);
+		dto.setTreeNodeName(treeNodeName);
+		dto.setTreeNodeLevels(treeNodeLevels);
+		dto.setTreeNodeType(treeNodeType);
+		dto.setTreeNodeCreateperson(treeNodeCreateperson);
+		dto.setTreeNodeCreatetime(setTreeNodeCreatetime);
+		dto.setTreeNodeIfLeaf(treeNodeIfLeaf);
+		dto.setTreeNodeState(treeNodeState);
+		dto.setTreeId(id);
+		treeServiceI.addTreeNode(dto, treeNodeId);
+		RequestmentDto pdto = new RequestmentDto();
+		pdto.setId(treeNodeParent);
+		pdto.setTreeNodeIfLeaf("0");
+		treeServiceI.editTreeNode(pdto);
+		return id;
+	}
+	
+	/**
+	 * 2016/6/14
+	 * @author zhang_cancan
+	 */
+	@RequestMapping(value = "/addTreeNode.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	private String addTreeNode(RequestmentDto dto,String opType,HttpSession session){
+		String state="11";
+		if("1".equals(opType)){
+			state="01";
+		}
+
+		String productId=(String)session.getAttribute("productId");
+		UserInfoBean userInfoBean = (UserInfoBean) session.getAttribute("userInfoBean");
+	    //获取系统时间
+        Date today = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String id=createDto(dto.getTreeNodeName(),dto.getTreeNodeParent(),userInfoBean.getUsername(),sdf.format(today),state,productId,3,"6","1");
+        return gson.toJson(id);
+	}
+	/**
+	 * 2016/6/15
+	 * @author zhang_cancan
+	 */
+	@RequestMapping(value = "/findTreeByFunFic.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	private String findTreeByFuncFic(String type,HttpSession session){
+		String productId=(String)session.getAttribute("productId");
+		String state;
+		if(type.equals("2")){
+			state="11";
+		}else{
+			state="01";
+		}
+		String tree=treeServiceI.findJsonTreeById(productId,state);
+		JSONObject a = JSON.parseObject(tree); 
+		JSONArray jsonArr = (JSONArray) a.get("children");
+		JSONObject b= (JSONObject)jsonArr.get(2);
+		return "["+gson.toJson(b)+"]";
+	}
+	/**
+	 * 2016/6/15
+	 * @author zhang_cancan
+	 */
+	@RequestMapping(value = "/findTableByProductId.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	private String findTableByProductId(String type,HttpSession session){
+		String productId=(String)session.getAttribute("productId");
+		String state;
+		if(type.equals("2")){
+			state="11";
+		}else{
+			state="01";
+		}
+		String tree=treeServiceI.findJsonTreeById(productId,state);
+		JSONObject a = JSON.parseObject(tree); 
+		JSONArray jsonArr = (JSONArray) a.get("children");
+		JSONObject b= (JSONObject)jsonArr.get(3);
+		if(b.containsKey("children") == false){
+			b.put("children", new JSONArray());
+		}
+		JSONArray jsonArrs= (JSONArray)b.get("children");	
+		return gson.toJson(jsonArrs);
+	}
+	/**
+	 * 2016/6/15
+	 * @author zhang_cancan
+	 */
+	@RequestMapping(value = "/findColumnByTableId.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	private String findColumnByTableId(String tableId){
+		List<RequestmentDto> dto = treeServiceI.findTreeNodesById(tableId);
+		return gson.toJson(dto);
+	}
+	/**
+	 * 2016/6/22
+	 * @author zhang_cancan
+	 */
+	@RequestMapping(value = "/editTreeNodeById.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	private String editTreeNodeById(String PicId,String Name){
+		RequestmentDto dto=new RequestmentDto();
+		dto.setId(PicId);
+		dto.setTreeNodeName(Name);
+		treeServiceI.editTreeNode(dto);
+		return gson.toJson(dto);
+	}
+	/**
+	 * 获取tree信息
+	 * @time 2016/6/24
+	 * @author zhang_cancan
+	 */
+	@RequestMapping(value = "/findRequestById.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String findRequestById(String id,HttpSession session){
+		ProductDto productDto=productService.getProductById(id);
+		String tree01=treeServiceI.findJsonTreeById(id,"01");   
+		String tree11=treeServiceI.findJsonTreeById(id,"11");   
+		String tree66=treeServiceI.findEnterTreeById(id, productDto.getProductVersion()-1);
+		List<Object> request=treeServiceI.findRequestById(tree01,tree11,tree66);
+		return gson.toJson(request);
+	}
+	/**
+	 * 添加分组
+	 * @time 2016/6/24
+	 * @author zhang_cancan
+	 */
+	@RequestMapping(value = "/addGroup.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String addGroup(MasterDto dto,String refType,HttpSession session){
+		String productId=(String)session.getAttribute("productId");
+        String id=SequenceManage.getSequence("");
+        dto.setId(id);
+        String state="";
+        if("2".equals(refType)){
+        	dto.setTreeNodeState(Constants.TreeStates.CHANGE_ADD);
+			state=Constants.TreeStates.CHANGE_ADD;
+		}else{
+			dto.setTreeNodeState(Constants.TreeStates.NORMAL_ADD);
+			state=Constants.TreeStates.NORMAL_ADD;
+		}
+        dto.setText(dto.getTreeNodeName());
+        dto.setTreeNodeId(productId);
+        dto.setTreeId(dto.getId());
+        treeServiceI.addTreeNode(dto);
+        String tree=treeServiceI.findJsonTreeById(productId,state);
+        JSONObject a = JSON.parseObject(tree); 
+		JSONArray jsonArr = (JSONArray) a.get("children");
+		JSONObject b= (JSONObject)jsonArr.get(1);
+		if(b.containsKey("children") == false){
+			b.put("children", new JSONArray());
+		}
+		JSONArray jsonArrs= (JSONArray)b.get("children");
+		jsonArrs.add(JSON.parseObject(gson.toJson(dto)));
+		Jedis client = JedisUtils.getJedis();
+		if("2".equals(refType)){
+			String change=client.get("CHANGE_NODE");
+			Constants.CHANGE_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			Constants.CHANGE_NODE.get(productId).add(dto);
+    		Map<String,List<Object>> JsonChange=Constants.CHANGE_NODE;
+			client.set("CHANGE_NODE", gson.toJson(JsonChange));
+		}else{
+			String change=client.get("NORMAL_NODE");
+			Constants.NORMAL_NODE=(Map<String,List<Object>>)JSON.parse(change);
+			Constants.NORMAL_NODE.get(productId).add(dto);
+			Map<String,List<Object>> JsonNormal=Constants.NORMAL_NODE;
+			client.set("NORMAL_NODE", gson.toJson(JsonNormal));
+		}	
+		JedisUtils.returnResource(client);
+		treeServiceI.editTreeByProductId(productId,a.toString(),state);
+		List<MasterDto> masterDto=new ArrayList<MasterDto>();
+		masterDto.add(dto);
+		return gson.toJson(masterDto);
+	}
+	
+	/**
+	 * 
+	 * 修改临时树
+	 */
+	@RequestMapping(value = "/editTreeByProductId.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String editTreeByProductId(String productId,String resulet,String type){
+//		Integer res=treeServiceI.editTreeByProductId(productId,resulet);
+		return gson.toJson(resulet);
+	}
+}

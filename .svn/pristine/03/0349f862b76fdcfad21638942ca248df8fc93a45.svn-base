@@ -1,0 +1,91 @@
+package com.edp.admin.columnRuleRef;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.edp.admin.common.BaseController;
+import com.edp.serviceI.columnInfo.ColumnInfoServiceI;
+import com.edp.serviceI.columnRuleRef.ColumnRuleRefServiceI;
+import com.edp.serviceI.dto.ColumnInfoDto;
+import com.edp.serviceI.dto.ColumnRuleRefDto;
+import com.edp.serviceI.ruleinfo.RuleInfoServiceI;
+import com.google.gson.Gson;
+
+@Controller
+@RequestMapping("columnRuleRefController")
+public class ColumnRuleRefController extends BaseController{
+	@Autowired
+	private ColumnRuleRefServiceI columnRuleRefServiceI;
+	@Autowired
+	private ColumnInfoServiceI columnInfoServiceI;
+	@Autowired
+	private RuleInfoServiceI ruleInfoService;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ColumnRuleRefController.class);
+	private Gson gson = new Gson();
+
+	//查询所有
+	@RequestMapping(value = "/getAllColumnRuleRef.action" , method = {RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String getAllColumnRuleRef(ColumnRuleRefDto dto){
+		ColumnRuleRefDto getAllColumnRuleRef = columnRuleRefServiceI.getAllColumnRuleRef(dto);
+		List<ColumnRuleRefDto> crd=getAllColumnRuleRef.getRows();
+		for(int i=0;i<crd.size();i++){
+			ColumnInfoDto cid=columnInfoServiceI.getColumnInfoDtoById(crd.get(i).getColumnId());
+			crd.get(i).setRuleName(cid.getColumnCnName());
+		}
+		return gson.toJson(crd);
+
+	}
+
+	//根据id查询
+	@RequestMapping(value = "/getColumnRuleRefDtoById.action" , method = {RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String getColumnRuleRefDtoById(Integer id){
+		ColumnRuleRefDto getColumnRuleRefDtoById = columnRuleRefServiceI.getColumnRuleRefDtoById(id);
+
+		return gson.toJson(getColumnRuleRefDtoById);
+
+	}
+
+	//修改
+	@RequestMapping(value = "/updateColumnRuleRef.action" , method = {RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String updateColumnRuleRef(ColumnRuleRefDto dto){
+		columnRuleRefServiceI.updateColumnRuleRef(dto);
+		return null;
+		
+	}
+
+	//删除
+	@RequestMapping(value = "/delColumnRuleRef.action" , method = {RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String delColumnRuleRef(Integer id){
+		columnRuleRefServiceI.delColumnRuleRef(id);
+		return null;
+	}
+
+	//添加
+	@RequestMapping(value = "/addColumnRuleRef.action" , method = {RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String addColumnRuleRef(String id,String value){
+		String[] values=value.split(",");
+		for(int i=0;i<values.length-1;){
+			ColumnRuleRefDto dto=new ColumnRuleRefDto();
+			dto.setRuleId(values[i]);
+			dto.setRuleValue(values[i+1]);
+			dto.setColumnId(id);
+			dto.setRuleName(ruleInfoService.getRuleById(values[i]).getRuleName());
+			columnRuleRefServiceI.addColumnRuleRef(dto);
+			i=i+2;
+		}
+		return null;
+		
+	}
+}

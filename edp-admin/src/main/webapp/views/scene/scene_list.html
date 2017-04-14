@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>EDP</title>
+	<link rel="stylesheet" href="./src/scene-module/css/index.css" />
+	<link rel="stylesheet" href="./src/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css"/>
+	<link rel="stylesheet" href="./src/bootstrapvalidator/dist/css/bootstrapValidator.css"/>
+</head>
+<body>
+	<!-- 项目列表内容部分 -->
+    <div class="content-box-zhu">
+       <div class="product">
+       		<div class="productName" id="productName">发送到发送到</div>
+       		<div class="back"></div>
+       </div>
+       <div class="sceneList" id="sceneList">
+       	
+       </div>
+    </div>
+    
+    	<!-- 模态框（Modal） --> 
+    <div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+	    <div class="modal-dialog"> 
+	        <div class="modal-content"> 
+	          	<form id="save_Form"> 
+		            <div class="modal-header"> 
+		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+		                <h4 class="modal-title" id="myModalLabel">编辑场景</h4> 
+		            </div> 
+		            <div class="modal-body container-fluid " style="height:250px;">
+		                <div class="row">
+							<div class="form-group col-md-12 col-md-offset-1" style="margin-bottom: 25px;">
+							   <div class="form-label">
+									<label for="sceneName">场景名称： </label>
+							   </div>
+					        	<input type="hidden" id="sava_id" name="id">
+								<input type="text" name="sceneName" id="sceneName" class="form-control tab-login-input data-index"  required="required" 
+													placeholder="场景名称" style="width:60%"/>
+		            		</div>
+							<input type="hidden" id="productId" name="productId" />
+		            		<div class="form-group col-md-12 col-md-offset-1" style="margin-bottom: 25px;">
+		            			<div class="form-label abs">
+									<label for="sceneDesc">场景描述： </label>
+								</div>
+								<textarea id="sceneDesc" name="sceneDesc" rows="" cols="2" class="form-control data-index" style="width:60%;margin-left: 118px;"></textarea>
+		            		</div>
+		                </div>
+		            </div> 
+		            <div class="modal-footer"> 
+		            	<span id="error" style="color: red;margin-right: 10px;"></span>
+		                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+		                <button type="button" class="btn btn-primary" id="save_Data">保存</button>
+		            </div> 
+           		</form>
+	        </div><!-- /.modal-content --> 
+	    </div><!-- /.modal --> 
+	</div>
+	
+	<!-- 模态框（Modal） --> 
+    <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+	    <div class="modal-dialog"> 
+	        <div class="modal-content"> 
+	            <div class="modal-header"> 
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+	                <h4 class="modal-title" id="myModalLabel">提示信息</h4> 
+	            </div> 
+	            <div class="modal-body">
+	                	您确定删除此场景？
+	            </div> 
+	            <div class="modal-footer"> 
+	                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	                <button type="button" class="btn btn-primary" data-dismiss="modal" id="del_Data">确定</button>
+	            </div> 
+	        </div><!-- /.modal-content --> 
+   		</div><!-- /.modal -->   
+   	</div>
+   	
+	<!-- 模态框（Modal） --> 
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+	    <div class="modal-dialog"> 
+	        <div class="modal-content"> 
+	            <div class="modal-header"> 
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> 
+	                <h4 class="modal-title" id="myModalLabel">提示信息</h4> 
+	            </div> 
+	            <div class="modal-body" id="modelInfo"></div> 
+	            <div class="modal-footer"> 
+	                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+	            </div> 
+	        </div><!-- /.modal-content --> 
+	    </div><!-- /.modal --> 
+	</div>
+	
+	<script src="./src/bootstrapvalidator/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./src/bootstrapvalidator/dist/js/bootstrapValidator.js"></script>
+	<script src="./src/module-config.js"></script>
+	<script src="./src/scene-module/scene-entry.js"></script>
+</body>
+</html>

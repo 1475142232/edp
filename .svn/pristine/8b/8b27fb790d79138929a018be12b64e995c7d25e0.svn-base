@@ -1,0 +1,196 @@
+  KISSY.add("activititree-module/src/activititree",function (S,Event,Tree,IO,Data,Form,Node){
+	 function ActivitiTree() {
+        var _this = this;
+        var tree;
+        var addType = 0;
+        var addForm = new Form.HForm({
+	        srcNode : '#addFrom'
+	      }).render();
+        
+        //功能分组和子功能添加
+        Node.one("#Save_Module").on("click",function(){
+        	if(getParamString("version") === "01" || getParamString("type") === "2"){
+        		var parentId = Node.one("#parentId").val();
+        		var func_name = Node.one("#name").val();
+        		if(parentId === ""){//判断是否选择根节点
+        			Node.one("#parentName").html("请先点击选择一个根节点！");
+        			return false;
+        		}else if(addType === 0){//节点必须是一级和二级节点
+        			return false;
+        		}else if(addForm.isValid()){//校验名称输入的正确性
+        			//addType=1时为功能分组，其他为功能
+        			var type = addType === 1 ? "6" : getParamString("type");
+        			var url = "";
+        			var data = {};
+        			if(addType === 1){
+        				url = "TreeController/addGroup.action?refType=" + getParamString("type");
+        				data = {treeNodeName: func_name, treeNodeType: type};
+        			}else{
+        				url = "functionInfoController/addFunctionInfo.action";
+        				data = {ParentId: parentId, funcName: func_name, opType: type,GroupId:parentId};
+        			}
+        			IO({
+        				url: url,
+        				data: data,
+        				type: "POST",
+        				dataType: 'json',
+        				cache: false,
+        				async: false,
+        				success: function (data) {
+        					//添加成功，如果添加的是功能，则给保存需要的隐藏域赋值，并默认勾中新添加的功能
+        					if (data !== null && data !== undefined && addType === 2) {
+        						window.parent.document.getElementById("treeCheckId").value = data[0].funcId;
+        						window.parent.document.getElementById("treeCheckName").value = data[0].funcName;
+        						window.parent.document.getElementById("treeCheckType").value = getParamString("type");
+        						renderTree(data[0].funcId);
+        					}else{
+        						window.parent.document.getElementById("treeCheckId").value = "";
+        						window.parent.document.getElementById("treeCheckName").value = "";
+        						window.parent.document.getElementById("treeCheckType").value = "";
+        						renderTree();
+        					}
+        					//添加完成清空上次的选择
+        					Node.one("#parentId").val("");
+        					Node.one("#name").val("");
+        					Node.one("#parentName").html("点击根节点添加分组或功能");
+        					addType = 0;
+        				},
+        				error: function (XMLHttpRequest, textStatus, errorThrown) {
+        				}
+        			}); 
+        		}
+        	}else{
+        		Node.one("#parentName").html("需求已确认不能添加！");
+        	}
+        });
+        
+        renderTree();
+       
+        /**
+         * 渲染树列表
+         * funcId 节点ID,新增功能刷新后使用
+         */
+        function renderTree(funcId){
+        	 Node.one("#atree").html("");//清空树
+             Event.detach("#atree");//重置树关联
+        	 var type = getParamString("type");
+             //判断回显节点的来源，如果没有方法传入则使用上次选择的节点id
+        	 var func_id = funcId !== undefined ? funcId : window.parent.document.getElementById("treeCheckId").value;
+        	 var url = 'TreeController/findTreeByProductId.action?type='+type;
+        	 //判断是否是第一次打开树
+        	 if(func_id !== null && func_id !== undefined && func_id !== ""){
+        		 url += '&func_id=' + func_id;
+        	 }
+        	 IO({
+               url: url,
+               type: "GET",
+               dataType: 'json',
+               cache: false,
+               async: false,
+               success: function (data) {
+                   if (data !== null && data !== undefined) {
+                	   /**
+                        * 树内容方法
+                        */
+                       tree = new Tree.TreeList({
+                          render : '#atree',
+                          showLine : true, 
+                          height: '100%',
+                          nodes : data,
+                          isSpecialIcon: true,
+                          checkType: 'all',
+                          multipleCheck : false, //是否多选，非多选时使用radio
+                          showRoot : false
+                        });
+                       tree.render();
+                       
+                       //树节点单选框勾选事件
+                       tree.on('checkedchange',function(ev){
+                      	 var checkedNodes = tree.getCheckedNodes();
+                           BUI.each(checkedNodes,function(node){
+                        	   if(node.treeNodeType === "7"){
+                        		   window.parent.document.getElementById("treeCheckId").value = node.id;
+                        		   window.parent.document.getElementById("treeCheckName").value = node.text;
+                        		   window.parent.document.getElementById("treeCheckType").value = type;
+                        	   }
+                           });
+                       });
+                       //树节点点击选中事件
+                       tree.on('itemclick',function(ev){
+                    	   if(ev.item.treeNodeType === "5"){
+                    		   addType = 1;
+                    		   Node.one("#nameType").html("分组名称：");
+                    	   }else if(ev.item.treeNodeType === "6"){
+                    		   addType = 2;
+                    		   Node.one("#nameType").html("功能名称：");
+                    	   }else{
+                    		   addType = 0;
+                    		   Node.one("#parentName").html("功能节点下不能添加！");
+                    	   }
+                    	   if(ev.item.treeNodeType !== "7"){
+                    		   Node.one("#parentId").val(ev.item.id);
+                    		   Node.one("#parentName").html(ev.item.text);
+                    	   }
+                       });
+                   }
+               },
+               error: function (XMLHttpRequest, textStatus, errorThrown) {
+               }
+           }); 
+        }     
+        
+        /**
+         * 获取地址栏url的参数
+         * name 参数名称
+         */
+        function getParamString(name){
+             var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+             var r = window.parent.location.search.substr(1).match(reg);
+             if(r!=null)return  unescape(r[2]); return null;
+        }
+        
+//      /**
+//      * 查询产品信息
+//      */
+//     function getProductInfo(){
+//     	var id = getParamString("modelId");
+//     	IO({
+//             url: 'activitiController/getModelKey.do?id=' + id,
+//             type: "GET",
+//             dataType: 'json',
+//             cache: false,
+//             async: false,
+//             success: function (data) {
+//                 if (data !== null && data !== undefined && data.proId !== "") {
+//                 	IO({
+//                         url: 'productController/getproductById.action',
+//                         type: "post",
+//                         data: {proId: "0513153980940001"},
+//                         dataType: 'json',
+//                         cache: false,
+//                         async: false,
+//                         success: function (datasend) {
+//                             if (datasend) {
+//                                renderTree(datasend.id, datasend.productName);
+//                             }
+//                         },
+//                         error: function (XMLHttpRequest, textStatus, errorThrown) {
+//                         }
+//                     });
+//                 }
+//             },
+//             error: function (XMLHttpRequest, textStatus, errorThrown) {
+//             }
+//         });
+//     };
+	 }
+      
+	 return ActivitiTree;
+      
+},  {requires: ['event',
+                'bui/tree',
+                'io',
+                'bui/data',
+                'bui/form',
+                'node'
+               ]});

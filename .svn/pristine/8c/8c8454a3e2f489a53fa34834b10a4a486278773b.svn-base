@@ -1,0 +1,35 @@
+@charset "utf-8";
+/*=========================Reset_start==========================*/
+body,h1,h2,h3,h4,h5,h6,div,p,dl,dt,dd,ol,ul,li,form,table,th,td,a,
+img,span,strong,var,em,input,textarea,select,option{margin: 0; padding: 0;}
+html,body{font-family:"宋体","微软雅黑",Arail,Tabhoma; font-size: 12px;
+	text-align: left;}
+ul,ol{list-style: none;}
+img{border: 0;}
+input,select,textarea{outline:0;}
+table{border-collapse: collapse; border-spacing: 0;}
+th,strong,var,em{font-weight: normal; font-style: normal;}
+a{text-decoration: none;}
+a:link,a:visited,a:hover,a:active{text-decoration:none;}
+/*==========================Reset_End===========================*/
+body{background:url(images/bg.jpg) repeat;}
+.addNav {background: #fff;padding:10px;border-radius: 3px;width:300px;}
+.addNav .navList a {display:inline-block;width:280px;border:1px solid deepskyblue;height: 50px;line-height: 50px;font-size:20px;font-weight: bold; text-align: center;margin-bottom:10px;cursor: pointer;color:deepskyblue;border-radius: 3px;}
+.addNavBtn {display: inline-block;width:280px;height:50px;line-height: 50px;text-align: center;border:1px solid #ccc;color:deepskyblue;border-radius: 3px;font-weight: bold;}
+.addNavAlert {background: #fff;width:350px;padding:30px 30px;margin:20px auto; auto;display: none;border-radius:4px;
+				-webkit-box-shadow:3px 3px 3px #CCCCCC;  
+				-moz-box-shadow:3px 3px 3px #CCCCCC;  
+				box-shadow:3px 3px 3px #CCCCCC;}
+.addNavAlert h1 {font-size:22px;font-weight:bold;color:#444;text-align: center;}
+.addNavAlert input {width:226px;height:30px;border:1px solid #ccc;border-radius: 3px;text-indent: 8px;}
+.addNavAlert span {display: inline-block;width:50px;}
+.addNavName {margin-top:20px;margin-bottom:20px;}
+.addNavUrl {margin-bottom:30px;}
+.addNavAlert .btnA {border:1px solid #ccc;display: inline-block;height:34px;width:100px;border-radius: 3px;text-align: center;line-height: 34px;color:#333;margin-left: 20px;}
+.addNavAlert .btnA:hover {opacity: 0.8;}
+.addNavAlert .blue {background:#00BFFF;color:#fff;border:1px solid #00BFFF;margin-left:50px;}
+.addNavAlert .blue:active {opacity: 0.7;}
+.row-box-zhu{width:300px;height:auto;border-radius:8px;background:#fff;margin:200px auto 0 auto;
+				-webkit-box-shadow:3px 3px 3px #CCCCCC;  
+				-moz-box-shadow:3px 3px 3px #CCCCCC;  
+				box-shadow:3px 3px 3px #CCCCCC; }

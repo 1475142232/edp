@@ -1,0 +1,76 @@
+KISSY.add("teamcreat-module/src/myproject",function(S,IO,Projectlist, Cookie){
+	function myProject(){
+		var cookie = new Cookie();
+		
+		$(".back").click(function(){
+ 			//项目列表跳转
+ 			IO.get("views/team/projectlist.html",null,function(){
+     			$(".container").html(arguments[0], true);
+     			var teamId = cookie.getCookie("teamId");
+     			var projectlist = new Projectlist();
+     			projectlist.getproductList(teamId);
+         	});
+		});
+		//创建项目-提交
+		$('#creatpro').click(function(){
+			var teamId = cookie.getCookie("teamId");
+			if($("#id").val() != "" && $("#id").val() != null){
+				var formvalue =  $("#formsend").serialize();
+				formvalue.id = $("#id").val();
+				$.ajax({
+		             type: "POST",
+		             url: "productController/editProductById.action",
+		             async: false,
+		             dataType: "json",
+		             data:formvalue,
+		             success: function(data){
+		            	if(data !== null && data === "0000"){
+		            		//跳转到项目列表    调用刷新列表方法
+		            		IO.get("views/team/projectlist.html",null,function(){
+		            			$(".container").html(arguments[0], true);
+		            			var projectlist = new Projectlist();
+		            			projectlist.getproductList(teamId);
+		            		});
+		            	}else{
+		            		alert('修改失败！');
+		            	}
+	                 }
+	       	 	});
+			}else{
+			var formvalue =  $("#formsend").serialize();
+			$.ajax({
+	             type: "POST",
+	             url: "productController/addProduct.action?teamId="+teamId,
+	             async: false,
+	             dataType: "json",
+	             data:formvalue,
+	             success: function(data){
+	            	if(data !== null && data === "0000"){
+	            		//跳转到项目列表    调用刷新列表方法
+	            		IO.get("views/team/projectlist.html",null,function(){
+	            			$(".container").html(arguments[0], true);
+	            			var projectlist = new Projectlist();
+	            			projectlist.getproductList(teamId);
+	            		});
+	            	}else{
+	            		alert('创建失败！');
+	            	}
+                 }
+       	 	});
+			}
+		});
+		this.updateproduct = function(){
+			
+			
+		}
+		
+		
+		
+		
+	}
+	return myProject;
+},{
+	requires : ['io',
+	            'teamcreat-module/src/projectlist',
+	            'common-module/src/cookie']
+});

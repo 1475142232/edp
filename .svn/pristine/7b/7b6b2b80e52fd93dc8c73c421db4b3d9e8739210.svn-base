@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.ReqChangeInfoPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.ReqChangeInfoPo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="function_id" property="functionId" jdbcType="VARCHAR" />
+    <result column="function_name" property="functionName" jdbcType="VARCHAR" />
+    <result column="function_spec" property="functionSpec" jdbcType="VARCHAR" />
+    <result column="function_en_name" property="functionEnName" jdbcType="VARCHAR" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="impact" property="impact" jdbcType="VARCHAR" />
+    <result column="applyor" property="applyor" jdbcType="VARCHAR" />
+    <result column="apply_time" property="applyTime" jdbcType="VARCHAR" />
+    <result column="verifyor" property="verifyor" jdbcType="VARCHAR" />
+    <result column="verify_time" property="verifyTime" jdbcType="VARCHAR" />
+    <result column="varify_result" property="varifyResult" jdbcType="CHAR" />
+    <result column="verify_spec" property="verifySpec" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, function_id, function_name, function_spec, function_en_name, reason, content, 
+    impact, applyor, apply_time, verifyor, verify_time, varify_result, verify_spec
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.ReqChangeInfoPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from req_change_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from req_change_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from req_change_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.ReqChangeInfoPoCriteria" >
+    delete from req_change_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.ReqChangeInfoPo" >
+    insert into req_change_info (id, function_id, function_name, 
+      function_spec, function_en_name, reason, 
+      content, impact, applyor, 
+      apply_time, verifyor, verify_time, 
+      varify_result, verify_spec)
+    values (#{id,jdbcType=INTEGER}, #{functionId,jdbcType=VARCHAR}, #{functionName,jdbcType=VARCHAR}, 
+      #{functionSpec,jdbcType=VARCHAR}, #{functionEnName,jdbcType=VARCHAR}, #{reason,jdbcType=VARCHAR}, 
+      #{content,jdbcType=VARCHAR}, #{impact,jdbcType=VARCHAR}, #{applyor,jdbcType=VARCHAR}, 
+      #{applyTime,jdbcType=VARCHAR}, #{verifyor,jdbcType=VARCHAR}, #{verifyTime,jdbcType=VARCHAR}, 
+      #{varifyResult,jdbcType=CHAR}, #{verifySpec,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.ReqChangeInfoPo" >
+    insert into req_change_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="functionId != null" >
+        function_id,
+      </if>
+      <if test="functionName != null" >
+        function_name,
+      </if>
+      <if test="functionSpec != null" >
+        function_spec,
+      </if>
+      <if test="functionEnName != null" >
+        function_en_name,
+      </if>
+      <if test="reason != null" >
+        reason,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="impact != null" >
+        impact,
+      </if>
+      <if test="applyor != null" >
+        applyor,
+      </if>
+      <if test="applyTime != null" >
+        apply_time,
+      </if>
+      <if test="verifyor != null" >
+        verifyor,
+      </if>
+      <if test="verifyTime != null" >
+        verify_time,
+      </if>
+      <if test="varifyResult != null" >
+        varify_result,
+      </if>
+      <if test="verifySpec != null" >
+        verify_spec,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="functionId != null" >
+        #{functionId,jdbcType=VARCHAR},
+      </if>
+      <if test="functionName != null" >
+        #{functionName,jdbcType=VARCHAR},
+      </if>
+      <if test="functionSpec != null" >
+        #{functionSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="functionEnName != null" >
+        #{functionEnName,jdbcType=VARCHAR},
+      </if>
+      <if test="reason != null" >
+        #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="impact != null" >
+        #{impact,jdbcType=VARCHAR},
+      </if>
+      <if test="applyor != null" >
+        #{applyor,jdbcType=VARCHAR},
+      </if>
+      <if test="applyTime != null" >
+        #{applyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyor != null" >
+        #{verifyor,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyTime != null" >
+        #{verifyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="varifyResult != null" >
+        #{varifyResult,jdbcType=CHAR},
+      </if>
+      <if test="verifySpec != null" >
+        #{verifySpec,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.ReqChangeInfoPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from req_change_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update req_change_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.functionId != null" >
+        function_id = #{record.functionId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.functionName != null" >
+        function_name = #{record.functionName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.functionSpec != null" >
+        function_spec = #{record.functionSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="record.functionEnName != null" >
+        function_en_name = #{record.functionEnName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.reason != null" >
+        reason = #{record.reason,jdbcType=VARCHAR},
+      </if>
+      <if test="record.content != null" >
+        content = #{record.content,jdbcType=VARCHAR},
+      </if>
+      <if test="record.impact != null" >
+        impact = #{record.impact,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyor != null" >
+        applyor = #{record.applyor,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyTime != null" >
+        apply_time = #{record.applyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.verifyor != null" >
+        verifyor = #{record.verifyor,jdbcType=VARCHAR},
+      </if>
+      <if test="record.verifyTime != null" >
+        verify_time = #{record.verifyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.varifyResult != null" >
+        varify_result = #{record.varifyResult,jdbcType=CHAR},
+      </if>
+      <if test="record.verifySpec != null" >
+        verify_spec = #{record.verifySpec,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update req_change_info
+    set id = #{record.id,jdbcType=INTEGER},
+      function_id = #{record.functionId,jdbcType=VARCHAR},
+      function_name = #{record.functionName,jdbcType=VARCHAR},
+      function_spec = #{record.functionSpec,jdbcType=VARCHAR},
+      function_en_name = #{record.functionEnName,jdbcType=VARCHAR},
+      reason = #{record.reason,jdbcType=VARCHAR},
+      content = #{record.content,jdbcType=VARCHAR},
+      impact = #{record.impact,jdbcType=VARCHAR},
+      applyor = #{record.applyor,jdbcType=VARCHAR},
+      apply_time = #{record.applyTime,jdbcType=VARCHAR},
+      verifyor = #{record.verifyor,jdbcType=VARCHAR},
+      verify_time = #{record.verifyTime,jdbcType=VARCHAR},
+      varify_result = #{record.varifyResult,jdbcType=CHAR},
+      verify_spec = #{record.verifySpec,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.ReqChangeInfoPo" >
+    update req_change_info
+    <set >
+      <if test="functionId != null" >
+        function_id = #{functionId,jdbcType=VARCHAR},
+      </if>
+      <if test="functionName != null" >
+        function_name = #{functionName,jdbcType=VARCHAR},
+      </if>
+      <if test="functionSpec != null" >
+        function_spec = #{functionSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="functionEnName != null" >
+        function_en_name = #{functionEnName,jdbcType=VARCHAR},
+      </if>
+      <if test="reason != null" >
+        reason = #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="impact != null" >
+        impact = #{impact,jdbcType=VARCHAR},
+      </if>
+      <if test="applyor != null" >
+        applyor = #{applyor,jdbcType=VARCHAR},
+      </if>
+      <if test="applyTime != null" >
+        apply_time = #{applyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyor != null" >
+        verifyor = #{verifyor,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyTime != null" >
+        verify_time = #{verifyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="varifyResult != null" >
+        varify_result = #{varifyResult,jdbcType=CHAR},
+      </if>
+      <if test="verifySpec != null" >
+        verify_spec = #{verifySpec,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.ReqChangeInfoPo" >
+    update req_change_info
+    set function_id = #{functionId,jdbcType=VARCHAR},
+      function_name = #{functionName,jdbcType=VARCHAR},
+      function_spec = #{functionSpec,jdbcType=VARCHAR},
+      function_en_name = #{functionEnName,jdbcType=VARCHAR},
+      reason = #{reason,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      impact = #{impact,jdbcType=VARCHAR},
+      applyor = #{applyor,jdbcType=VARCHAR},
+      apply_time = #{applyTime,jdbcType=VARCHAR},
+      verifyor = #{verifyor,jdbcType=VARCHAR},
+      verify_time = #{verifyTime,jdbcType=VARCHAR},
+      varify_result = #{varifyResult,jdbcType=CHAR},
+      verify_spec = #{verifySpec,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

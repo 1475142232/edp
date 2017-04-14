@@ -1,0 +1,87 @@
+package com.edp.admin.taskTrace;
+
+import com.edp.admin.common.BaseController;
+import com.edp.serviceI.dto.TaskTraceDto;
+import com.edp.serviceI.taskTrace.TaskTraceServiceI;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+
+/**
+ * Created by changer on 2016/7/22.
+ */
+@Controller
+@RequestMapping("/taskTrace")
+public class TaskTraceController extends BaseController {
+
+
+    @Resource
+    private TaskTraceServiceI taskTraceServiceI;
+
+
+    @RequestMapping(value = "/queryAllTaskTracesByCondition",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public TaskTraceDto queryAllTaskTracesByCondition(TaskTraceDto condition){
+
+        return taskTraceServiceI.queryAllTaskTracesByCondition(condition);
+
+    }
+
+    @RequestMapping(value = "/saveTaskTrace",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public TaskTraceDto saveTaskTrace(TaskTraceDto taskTrace){
+
+        return taskTraceServiceI.saveTaskTrace(taskTrace);
+
+    }
+
+    @RequestMapping(value = "/updateTaskTrace",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public TaskTraceDto updateTaskTrace(TaskTraceDto taskTrace){
+        taskTrace.setId(1);
+        taskTrace.setDelayTime(55);
+        taskTrace.setFromUser("b");
+        taskTrace.setOperateSpec("操作说明1111");
+        taskTrace.setOperateTime("2016-7-22");
+        taskTrace.setOperateType("00");
+        taskTrace.setTaskId("1111");
+        taskTrace.setTaskState("00");
+        taskTrace.setToUser("c");
+        return taskTraceServiceI.updateTaskTrace(taskTrace);
+
+    }
+
+    @RequestMapping(value = "/findTaskTraceByPrimaryKey",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public TaskTraceDto findTaskTraceByPrimaryKey(int id){
+
+        return taskTraceServiceI.findTaskTraceByPrimaryKey(id);
+
+    }
+
+    @RequestMapping(value = "/queryTaskTracesByTaskId",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public TaskTraceDto queryTaskTracesByTaskId(String taskId){
+
+        return taskTraceServiceI.queryTaskTracesByTaskId(taskId);
+
+    }
+
+    @RequestMapping(value = "/deleteTaskTracesById",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public TaskTraceDto deleteTaskTracesById(int id){
+
+        return taskTraceServiceI.deleteTaskTraceByPrimaryKey(id);
+    }
+
+    @RequestMapping(value = "/deleteTaskTracesByTaskId",method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public TaskTraceDto deleteTaskTracesByTaskId(String taskId){
+
+        return taskTraceServiceI.deleteTaskTraceByTaskId(taskId);
+    }
+
+}

@@ -1,0 +1,4 @@
+
+<span ng-if="!property.noValue">{{property.value.belongFunction}}</span>
+<span ng-if="!property.noValue" style="display: none">{{property.value.id}}</span>
+<span ng-if="property.noValue" translate>PROPERTY.BELONGFUNCTION.EMPTY</span>

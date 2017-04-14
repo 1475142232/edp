@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edp.dao.mapper.ColumnPicPoMapper" >
+  <resultMap id="BaseResultMap" type="com.edp.dao.domain.ColumnPicPo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="column_id" property="columnId" jdbcType="CHAR" />
+    <result column="column_name" property="columnName" jdbcType="CHAR" />
+    <result column="pic_id" property="picId" jdbcType="CHAR" />
+    <result column="colunm_spec" property="colunmSpec" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, column_id, column_name, pic_id, colunm_spec
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.edp.dao.domain.ColumnPicPoCriteria" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from column_pic
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from column_pic
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from column_pic
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.edp.dao.domain.ColumnPicPoCriteria" >
+    delete from column_pic
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.edp.dao.domain.ColumnPicPo" >
+    insert into column_pic (id, column_id, column_name, 
+      pic_id, colunm_spec)
+    values (#{id,jdbcType=INTEGER}, #{columnId,jdbcType=CHAR}, #{columnName,jdbcType=CHAR}, 
+      #{picId,jdbcType=CHAR}, #{colunmSpec,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edp.dao.domain.ColumnPicPo" >
+    insert into column_pic
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="columnId != null" >
+        column_id,
+      </if>
+      <if test="columnName != null" >
+        column_name,
+      </if>
+      <if test="picId != null" >
+        pic_id,
+      </if>
+      <if test="colunmSpec != null" >
+        colunm_spec,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="columnId != null" >
+        #{columnId,jdbcType=CHAR},
+      </if>
+      <if test="columnName != null" >
+        #{columnName,jdbcType=CHAR},
+      </if>
+      <if test="picId != null" >
+        #{picId,jdbcType=CHAR},
+      </if>
+      <if test="colunmSpec != null" >
+        #{colunmSpec,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.edp.dao.domain.ColumnPicPoCriteria" resultType="java.lang.Integer" >
+    select count(*) from column_pic
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update column_pic
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.columnId != null" >
+        column_id = #{record.columnId,jdbcType=CHAR},
+      </if>
+      <if test="record.columnName != null" >
+        column_name = #{record.columnName,jdbcType=CHAR},
+      </if>
+      <if test="record.picId != null" >
+        pic_id = #{record.picId,jdbcType=CHAR},
+      </if>
+      <if test="record.colunmSpec != null" >
+        colunm_spec = #{record.colunmSpec,jdbcType=CHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update column_pic
+    set id = #{record.id,jdbcType=INTEGER},
+      column_id = #{record.columnId,jdbcType=CHAR},
+      column_name = #{record.columnName,jdbcType=CHAR},
+      pic_id = #{record.picId,jdbcType=CHAR},
+      colunm_spec = #{record.colunmSpec,jdbcType=CHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edp.dao.domain.ColumnPicPo" >
+    update column_pic
+    <set >
+      <if test="columnId != null" >
+        column_id = #{columnId,jdbcType=CHAR},
+      </if>
+      <if test="columnName != null" >
+        column_name = #{columnName,jdbcType=CHAR},
+      </if>
+      <if test="picId != null" >
+        pic_id = #{picId,jdbcType=CHAR},
+      </if>
+      <if test="colunmSpec != null" >
+        colunm_spec = #{colunmSpec,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edp.dao.domain.ColumnPicPo" >
+    update column_pic
+    set column_id = #{columnId,jdbcType=CHAR},
+      column_name = #{columnName,jdbcType=CHAR},
+      pic_id = #{picId,jdbcType=CHAR},
+      colunm_spec = #{colunmSpec,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,79 @@
+package com.edp.admin.scene;
+
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.http.HttpSession;
+
+import com.edp.admin.common.BaseController;
+import com.edp.admin.login.UserInfoBean;
+import com.edp.common.constant.Constants;
+import com.edp.common.jedis.JedisUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import org.activiti.editor.constants.ModelDataJsonConstants;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.edp.common.utils.BeanCopyUtils;
+import com.edp.common.utils.SequenceManage;
+import com.edp.serviceI.dto.ControlDto;
+import com.edp.serviceI.dto.FunConTrolDto;
+import com.edp.serviceI.dto.MasterDto;
+import com.edp.serviceI.dto.ProductDto;
+import com.edp.serviceI.dto.RequestmentDto;
+import com.edp.serviceI.dto.SceneInfoDto;
+import com.edp.serviceI.functionInfo.FunctionInfoServiceI;
+import com.edp.serviceI.product.ProductServiceI;
+import com.edp.serviceI.sceneinfo.SceneInfoServiceI;
+import com.edp.serviceI.tree.TreeServiceI;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
+
+import redis.clients.jedis.Jedis;
+@Controller
+@RequestMapping("sceneController")
+public class SceneController extends BaseController{
+	@Autowired
+	private SceneInfoServiceI sceneInfoService;
+	
+	
+	
+private static final Logger LOGGER = LoggerFactory.getLogger(SceneController.class);
+
+	private Gson gson = new Gson();
+	
+	@RequestMapping(value = "/scenelist.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String getAllScenes(SceneInfoDto dto){
+		SceneInfoDto allScenes = sceneInfoService.getAllScenes(dto);
+		return gson.toJson(allScenes);
+	}
+	//根据id查询商品
+	@RequestMapping(value = "/getsceneById.action" , method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String selectSceneById(String Id){
+		SceneInfoDto sceneById = sceneInfoService.getSceneById(Id);
+		return gson.toJson(sceneById);
+	}
+	
+}
